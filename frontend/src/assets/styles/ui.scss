@@ -1,0 +1,50 @@
+@font-face {
+    font-family: "Museo Sans";
+    font-style: normal;
+    font-weight: normal;
+    src: url("../fonts/MuseoSans-300.ttf") format("truetype");
+}
+
+html,
+body, #app  {
+    background-color: $background-color;
+    font-family: "Museo Sans";
+    scroll-behavior: smooth;
+}
+
+/**
+* Buttons
+**/
+.btn.btn-primary{
+    background-color: $primary-color;
+    padding: 0.5rem 1em;
+    border-radius: 50px;
+    color: $white;
+}
+
+.btn.btn-secondary{
+    background-color: $secondary-color;
+    padding: 0.5rem 1em;
+    border-radius: 50px;
+    color: $white;
+}
+
+/**
+* UI
+**/
+header {
+    height: 89.45px;
+    background-color: #E0E5F1;
+}
+
+main {
+    min-height: calc(100vh - 89.45px - 124px);
+}
+
+footer {
+    height: 91.5px;
+}
+
+a {
+    text-decoration: none;
+}
