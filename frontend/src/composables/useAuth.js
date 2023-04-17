@@ -83,7 +83,6 @@ const useAuth = () => {
 
     user.value = data;
     isLoggedIn.value = true;
-    router.push("/");
   };
 
   const refreshAccessToken = async (verifier, refreshToken) => {

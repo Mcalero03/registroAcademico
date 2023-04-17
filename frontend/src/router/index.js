@@ -21,6 +21,18 @@ const router = createRouter({
       meta: { requiresAuth: true }, // add meta field to specify the route requires authentication
     },
     {
+      path: "/test",
+      name: "test",
+      component: () => import("../views/TestView.vue"),
+      meta: { requiresAuth: true }, // add meta field to specify the route requires authentication
+    },
+    {
+      path: "/department",
+      name: "department",
+      component: () => import("../views/DepartmentView.vue"),
+      meta: { requiresAuth: true }, // add meta field to specify the route requires authentication
+    },
+    {
       path: "/:pathMatch(.*)*",
       name: "NotFound",
       component: NotFoundView,

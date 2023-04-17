@@ -1,3 +1,132 @@
 .v-card{
     border-radius: $kbd-border-radius;
 }
+
+.v-input__details{
+    display: none;
+}
+
+// Inputs
+.v-field.v-field--appended.v-field--variant-outlined.v-theme--light{
+    // color: red;
+    border-radius: 50px;
+}
+
+// .v-field__outline{
+    
+//     : 0px
+//     // border: 1px solid #4880ff;
+//     border-radius: 5px;
+// }
+
+// .v-field {
+//     caret-color: red;
+//     border: 5px solid green;
+//     border-radius: 15px;
+// }
+
+.v-text-field--outlined fieldset {
+    color: blue !important;
+}
+
+$material-light: (
+  'text-fields': (
+    'outlined': yellow,
+    'outlined-hover': green,
+  ),
+);
+
+.v-field.v-field--variant-outlined.v-theme--light {
+    color: #3558AB;
+    opacity: 1;
+}
+.v-field.v-field--active.v-field--variant-outlined.v-theme--light.v-field--focused {
+    color: #3558AB !important;
+}
+
+// .v-field__field{
+//     height: 40px;
+// }
+
+.v-field__input {
+    min-height: 40px;
+    padding-top: 0px;
+}
+
+.v-field__append-inner{
+    padding-top: 8px;
+}
+
+.v-text-field input {
+    min-height: 30px !important;
+    border-radius: 15px;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+}
+
+.v-input .v-input__slot {
+    border-radius: 100px;
+}
+
+
+.v-label.v-field-label{
+    top: 8px;
+}
+
+
+/**
+* Textare
+**/
+textarea {
+    padding-top: 0.8rem !important;
+}
+
+/**
+* Borders to inputs
+**/
+
+.v-field__outline{
+    --v-field-border-opacity: 1 !important;
+}
+
+.v-field--variant-outlined .v-field__outline__start{
+    // border-left: 2px solid $dark-blue;
+    border-top-left-radius: $text-field-border-radius;
+    border-bottom-left-radius: $text-field-border-radius;
+}
+
+.v-field--variant-outlined .v-field__outline__notch{
+    // border-top: 2px solid $dark-blue;
+    // border-bottom: 2px solid $dark-blue;
+    // border-top-radius: $text-field-border-radius;
+    // border-bottom-radius: $text-field-border-radius;
+}
+
+.v-field--variant-outlined .v-field__outline__end{
+    // border-top: 2px solid $dark-blue;
+    // border-bottom: 2px solid $dark-blue;
+    border-top-right-radius: $text-field-border-radius;
+    border-bottom-right-radius: $text-field-border-radius;
+}
+
+/**
+* V-AutoComplete
+**/
+
+.v-autocomplete .v-field__input{
+    padding-bottom: 8px;
+    // color: black;
+}
+
+.v-autocomplete__selection{
+    padding-top: 8px;
+    color: black;
+}
+
+
+/**
+* Selects
+**/
+.v-select__selection-text{
+    padding-top: 8px;
+}
