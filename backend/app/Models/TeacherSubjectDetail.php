@@ -6,19 +6,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Pensum_Type extends Model
+class TeacherSubjectDetail extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'pensum_type';
+    protected $table = 'teacher_subject_detail';
 
-    public $incrementing = true;
+    public  $incrementing = true;
 
     protected $data = ['deleted_at'];
 
     protected $fillable = [
         'id',
-        'pensum_type_name'
+        'subject_id',
+        'teacher_id	',
     ];
 
     public $hidden = [
