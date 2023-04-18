@@ -5,16 +5,17 @@
         <h2>{{ title }}</h2>
         <div class="options-table">
           <base-button type="primary" title="Agregar" @click="addRecord()" />
+          <v-col cols="12" sm="12" md="4" lg="4" xl="4" class="pl-0 pb-0 pr-0">
+            <v-text-field
+              class="mt-3"
+              variant="outlined"
+              label="Buscar"
+              type="text"
+              v-model="search"
+            >
+            </v-text-field>
+          </v-col>
         </div>
-        <v-col cols="12" sm="12" md="4" lg="4" xl="4" class="pl-0 pb-0 pr-0">
-          <v-text-field
-            class="mt-3"
-            variant="outlined"
-            label="Buscar"
-            type="text"
-            v-model="search"
-          ></v-text-field>
-        </v-col>
       </v-container>
       <v-data-table-server
         :headers="headers"
@@ -52,50 +53,19 @@
             {{ formTitle }}
           </h2>
         </v-card-title>
-
         <v-card-text>
           <v-container>
             <!-- Form -->
             <v-row class="pt-3">
-              <!-- department_name -->
+              <!-- direction_name  -->
               <v-col cols="12" sm="12" md="4">
                 <base-input
-                  label="Department Name"
-                  v-model="v$.editedItem.department_name.$model"
-                  :rules="v$.editedItem.department_name"
+                  label="Dirección"
+                  v-model="v$.editedItem.direction_name.$model"
+                  :rules="v$.editedItem.direction_name"
                 />
               </v-col>
-              <!-- department_name -->
-
-              <!-- min_dpto -->
-              <v-col cols="12" sm="12" md="4">
-                <base-input
-                  label="Min Dpto"
-                  v-model="v$.editedItem.min_dpto.$model"
-                  :rules="v$.editedItem.min_dpto"
-                />
-              </v-col>
-              <!-- min_dpto -->
-
-              <!-- may_dpto -->
-              <v-col cols="12" sm="12" md="4">
-                <base-input
-                  label="May Dpto"
-                  v-model="v$.editedItem.may_dpto.$model"
-                  :rules="v$.editedItem.may_dpto"
-                />
-              </v-col>
-              <!-- may_dpto -->
-
-              <!-- cod_dpto -->
-              <v-col cols="12" sm="12" md="4">
-                <base-input
-                  label="Cod Dpto"
-                  v-model="v$.editedItem.cod_dpto.$model"
-                  :rules="v$.editedItem.cod_dpto"
-                />
-              </v-col>
-              <!-- cod_dpto -->
+              <!-- direction_name  -->
             </v-row>
             <!-- Form -->
             <v-row>
@@ -139,25 +109,24 @@
       </v-card>
     </v-dialog>
   </div>
-</template>
-    
-    <script>
+</template> 
+
+<script>
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, minLength, required, email } from "@vuelidate/validators";
 
-import departmentApi from "@/services/departmentApi";
-
+import directionApi from "@/services/directionApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
-import BaseSelect from "../components/base-components/BaseSelect.vue";
+
 import useAlert from "../composables/useAlert";
 
 const { alert } = useAlert();
 const langMessages = messages["es"].validations;
 
 export default {
-  components: { BaseButton, BaseInput, BaseSelect },
+  components: { BaseButton, BaseInput },
   setup() {
     return { v$: useVuelidate() };
   },
@@ -167,70 +136,28 @@ export default {
       dialog: false,
       dialogDelete: false,
       headers: [
-        { title: "Department Name", key: "department_name" },
-        { title: "Min Dpto", key: "min_dpto" },
-        { title: "May Dpto", key: "may_dpto" },
-        { title: "Cod Dpto", key: "cod_dpto" },
+        { title: "DIRECCIÓN", key: "direction_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
-      records: [],
-      editedIndex: -1,
-      title: "Department",
+      title: "DIRECCIONES",
       total: 0,
-      options: {},
-      editedItem: {
-        department_name: "",
-        min_dpto: "",
-        may_dpto: "",
-        cod_dpto: "",
-      },
-      defaultItem: {
-        department_name: "",
-        min_dpto: "",
-        may_dpto: "",
-        cod_dpto: "",
-      },
+      records: [],
       loading: false,
       debounce: 0,
-    };
-  },
-
-  watch: {
-    dialogDelete(val) {
-      val || this.closeDelete();
-    },
-  },
-
-  // Validations
-  validations() {
-    return {
+      options: {},
       editedItem: {
-        department_name: {
-          required,
-          minLength: minLength(1),
-        },
-        min_dpto: {
-          required,
-          minLength: minLength(1),
-        },
-        may_dpto: {
-          required,
-          minLength: minLength(1),
-        },
-        cod_dpto: {
-          required,
-          minLength: minLength(1),
-        },
+        direction_name: "",
+      },
+      defaultItem: {
+        direction_name: "",
       },
     };
   },
-
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "Nuevo registro" : "Editar registro";
     },
   },
-
   watch: {
     search(val) {
       this.getDataFromApi();
@@ -241,6 +168,23 @@ export default {
     dialogBlock(val) {
       val || this.closeBlock();
     },
+    dialogDelete(val) {
+      val || this.closeDelete();
+    },
+  },
+
+  validations() {
+    return {
+      editedItem: {
+        direction_name: {
+          required: helpers.withMessage(langMessages.required, required),
+          minLength: helpers.withMessage(
+            ({ $params }) => langMessages.minLength($params),
+            minLength(4)
+          ),
+        },
+      },
+    };
   },
 
   created() {
@@ -250,14 +194,12 @@ export default {
   beforeMount() {
     this.getDataFromApi({ page: 1, itemsPerPage: 10, sortBy: [], search: "" });
   },
-
   methods: {
     async initialize() {
       this.loading = true;
       this.records = [];
 
       let requests = [this.getDataFromApi()];
-
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
       });
@@ -268,18 +210,25 @@ export default {
       this.loading = false;
     },
 
+    addRecord() {
+      this.dialog = true;
+      this.editedIndex = -1;
+      this.editedItem = Object.assign({}, this.defaultItem);
+      this.v$.$reset();
+    },
+
     editItem(item) {
       this.editedIndex = this.records.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
-    close() {
-      this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
+    deleteItem(item) {
+      console.log(item);
+      this.editedIndex = this.records.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+
+      this.dialogDelete = true;
     },
 
     async save() {
@@ -297,8 +246,7 @@ export default {
         );
 
         try {
-          const { data } = await departmentApi.put(`/${edited.id}`, edited);
-
+          const { data } = await directionApi.put(`/${edited.id}`, edited);
           alert.success(data.message);
         } catch (error) {
           alert.error("No fue posible actualizar el registro.");
@@ -309,10 +257,10 @@ export default {
         return;
       }
 
-      //Creating record
+      // Creating record
       try {
-        const { data } = await departmentApi.post(null, this.editedItem);
-
+        const { data } = await directionApi.post(null, this.editedItem);
+        console.log(data);
         alert.success(data.message);
       } catch (error) {
         alert.error("No fue posible crear el registro.");
@@ -323,11 +271,26 @@ export default {
       return;
     },
 
-    deleteItem(item) {
-      this.editedIndex = this.records.indexOf(item);
-      this.editedItem = Object.assign({}, item);
+    async deleteItemConfirm() {
+      try {
+        const { data } = await directionApi.delete(`/${this.editedItem.id}`, {
+          params: { id: this.editedItem.id },
+        });
 
-      this.dialogDelete = true;
+        alert.success(data.message);
+      } catch (error) {
+        this.close();
+      }
+      this.initialize();
+      this.closeDelete();
+    },
+
+    close() {
+      this.dialog = false;
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      });
     },
 
     closeDelete() {
@@ -338,32 +301,14 @@ export default {
       });
     },
 
-    async deleteItemConfirm() {
-      try {
-        const { data } = await departmentApi.delete(`/${this.editedItem.id}`, {
-          params: {
-            id: this.editedItem.id,
-          },
-        });
-
-        alert.success(data.message);
-      } catch (error) {
-        this.close();
-      }
-
-      this.initialize();
-      this.closeDelete();
-    },
-
     getDataFromApi(options) {
-      this.loading = true;
+      this.loading = false;
       this.records = [];
 
-      //debounce
       clearTimeout(this.debounce);
       this.debounce = setTimeout(async () => {
         try {
-          const { data } = await departmentApi.get(null, {
+          const { data } = await directionApi.get(null, {
             params: { ...options, search: this.search },
           });
 
@@ -373,14 +318,7 @@ export default {
         } catch (error) {
           alert.error("No fue posible obtener los registros.");
         }
-      }, 500);
-    },
-
-    addRecord() {
-      this.dialog = true;
-      this.editedIndex = -1;
-      this.editedItem = Object.assign({}, this.defaultItem);
-      this.v$.$reset();
+      });
     },
   },
 };

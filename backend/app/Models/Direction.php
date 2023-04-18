@@ -26,4 +26,24 @@ class Direction extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
+    {
+        return Direction::select('direction.*', 'direction.id as id')
+
+            ->where('direction.direction_name', 'like', $search)
+
+            ->skip($skip)
+            ->take($itemsPerpage)
+            ->orderBy("direction.$sortBy", $sort)
+            ->get();
+    }
+
+    public static function counterPagination($search)
+    {
+        return Direction::select('direction.*', 'direction.id as id')
+
+            ->where('direction.direction_name', 'like', $search)
+            ->count();
+    }
 }

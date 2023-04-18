@@ -15,6 +15,20 @@
           <span>Bases de datos</span>
         </RouterLink>
         <RouterLink
+          to="/direction"
+          class="d-flex flex-column align-center mb-4"
+        >
+          <v-icon icon="mdi-home" size="25"></v-icon>
+          <span>Dirección</span>
+        </RouterLink>
+        <RouterLink
+          to="/pensumType"
+          class="d-flex flex-column align-center mb-4"
+        >
+          <v-icon icon="mdi-home" size="25"></v-icon>
+          <span>Tipo Pensum</span>
+        </RouterLink>
+        <RouterLink
           to="/"
           class="d-flex flex-column align-center mb-4"
           @click="logout()"
