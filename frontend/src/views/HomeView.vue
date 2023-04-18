@@ -1,9 +1,9 @@
 <script setup>
-import Database from "../components/Database.vue";
+// import Database from "../components/Database.vue";
 </script>
 
 <template>
   <main>
-    <Database />
+    <!-- <Database /> -->
   </main>
 </template>

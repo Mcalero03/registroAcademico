@@ -17,7 +17,7 @@ const router = createRouter({
     {
       path: "/",
       name: "home",
-      component: () => import("../components/Database.vue"),
+      component: () => import("../views/HomeView.vue"),
       meta: { requiresAuth: true }, // add meta field to specify the route requires authentication
     },
     {
@@ -31,6 +31,12 @@ const router = createRouter({
       name: "department",
       component: () => import("../views/DepartmentView.vue"),
       meta: { requiresAuth: true }, // add meta field to specify the route requires authentication
+    },
+    {
+      path: "/direction", 
+      name: "direction",
+      component: () => import("../views/DirectionView.vue"),
+      meta: { requiresAuth: true }, // add meta field to specify the route
     },
     {
       path: "/:pathMatch(.*)*",
