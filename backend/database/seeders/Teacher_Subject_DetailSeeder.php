@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Teacher_Subject_Detail;
+use App\Models\TeacherSubjectDetail;
 
 class Teacher_Subject_DetailSeeder extends Seeder
 {
@@ -15,7 +15,7 @@ class Teacher_Subject_DetailSeeder extends Seeder
      */
     public function run()
     {
-        Teacher_Subject_Detail::insert([
+        TeacherSubjectDetail::insert([
             [
                 "id" => 1,
                 "subject_id" => 1,

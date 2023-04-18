@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Pensum_Subject_Detail extends Model
+class PensumSubjectDetail extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = 'pensum_subject_detail';

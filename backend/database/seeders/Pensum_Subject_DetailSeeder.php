@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Pensum_Subject_Detail;
+use App\Models\PensumSubjectDetail;
 
 class Pensum_Subject_DetailSeeder extends Seeder
 {
@@ -15,7 +15,7 @@ class Pensum_Subject_DetailSeeder extends Seeder
      */
     public function run()
     {
-        Pensum_Subject_Detail::insert([
+        PensumSubjectDetail::insert([
             [
                 "id" => 1,
                 "pensum_id" => 1,
