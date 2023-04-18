@@ -36,7 +36,7 @@ class DepartmentController extends Controller
         $total = Department::counterPagination($search);
 
         return response()->json([
-            "message"=>"Registros obtenidos correctamente.",
+            "message" => "Registros obtenidos correctamente.",
             "data" => $department,
             "total" => $total,
         ]);
@@ -52,16 +52,16 @@ class DepartmentController extends Controller
     {
         $department = new Department;
 
-		$department->department_name = $request->department_name;
-		$department->min_dpto = $request->min_dpto;
-		$department->may_dpto = $request->may_dpto;
-		$department->cod_dpto = $request->cod_dpto;
-		$department->deleted_at = $request->deleted_at;
+        $department->department_name = $request->department_name;
+        $department->min_dpto = $request->min_dpto;
+        $department->may_dpto = $request->may_dpto;
+        $department->cod_dpto = $request->cod_dpto;
+        $department->deleted_at = $request->deleted_at;
 
         $department->save();
 
         return response()->json([
-            "message"=>"Registro creado correctamente.",
+            "message" => "Registro creado correctamente.",
         ]);
     }
 
@@ -88,16 +88,16 @@ class DepartmentController extends Controller
         $data = Encrypt::decryptArray($request->all(), 'id');
 
         $department = Department::where('id', $data['id'])->first();
-		$department->department_name = $request->department_name;
-		$department->min_dpto = $request->min_dpto;
-		$department->may_dpto = $request->may_dpto;
-		$department->cod_dpto = $request->cod_dpto;
-		$department->deleted_at = $request->deleted_at;
+        $department->department_name = $request->department_name;
+        $department->min_dpto = $request->min_dpto;
+        $department->may_dpto = $request->may_dpto;
+        $department->cod_dpto = $request->cod_dpto;
+        $department->deleted_at = $request->deleted_at;
 
         $department->save();
 
         return response()->json([
-            "message"=>"Registro modificado correctamente.",
+            "message" => "Registro modificado correctamente.",
         ]);
     }
 
@@ -114,7 +114,7 @@ class DepartmentController extends Controller
         Department::where('id', $id)->delete();
 
         return response()->json([
-            "message"=>"Registro eliminado correctamente.",
+            "message" => "Registro eliminado correctamente.",
         ]);
     }
 }

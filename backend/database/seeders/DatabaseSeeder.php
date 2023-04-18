@@ -21,6 +21,25 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             DepartmentSeeder::class,
+            MunicipalitiesSeeder::class,
+            DirectionSeeder::class,
+            CollegeSeeder::class,
+            Pensum_TypeSeeder::class,
+            PensumSeeder::class,
+            SubjectSeeder::class,
+            Pensum_Subject_DetailSeeder::class,
+            PrerequisiteSeeder::class,
+            TeacherSeeder::class,
+            Teacher_Subject_DetailSeeder::class,
+            EvaluationSeeder::class,
+            CycleSeeder::class,
+            GroupSeeder::class,
+            ScheduleSeeder::class,
+            RelativeSeeder::class,
+            StudentSeeder::class,
+            InscriptionSeeder::class,
+            AttendanceSeeder::class,
+            GradeSeeder::class,
         ]);
     }
 }
