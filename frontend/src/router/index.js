@@ -47,7 +47,7 @@ const router = createRouter({
     {
       path: "/group", 
       name: "group",
-      component: () => import("../views/Group.vue"),
+      component: () => import("../views/GroupView.vue"),
       meta: { requiresAuth: true }, // add meta field to specify the route
     },
     {

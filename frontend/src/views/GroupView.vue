@@ -2,10 +2,16 @@
   <div data-app>
     <v-card class="p-3 mt-3">
       <v-container>
-        <h2>{{ title }}</h2>
+        <h2>
+          {{ title }}
+        </h2>
         <div class="options-table">
-          <base-button type="primary" title="Agregar" @click="addRecord()" />
-          <v-col cols="12" sm="12" md="4" lg="4" xl="4" class="pl-0 pb-0 pr-0">
+          <base-button
+            type="primary"
+            title="Agregar"
+            @click="addRecord()"
+          ></base-button>
+          <v-col cols="12" sm="4" lg="4" xl="4" class="pl-0 pb-0 pr-0">
             <v-text-field
               class="mt-3"
               variant="outlined"
@@ -22,7 +28,7 @@
         :items-length="total"
         :items="records"
         :loading="loading"
-        item-title="id"
+        items-title="id"
         item-value="id"
         @update:options="getDataFromApi"
       >
@@ -57,15 +63,25 @@
           <v-container>
             <!-- Form -->
             <v-row class="pt-0">
-              <!-- direction_name  -->
-              <v-col cols="12" sm="12" md="12">
+              <!-- group_name  -->
+              <v-col cols="12" sm="12" md="6">
                 <base-input
-                  label="Dirección"
-                  v-model="v$.editedItem.direction_name.$model"
-                  :rules="v$.editedItem.direction_name"
+                  label="Nombre de grupo"
+                  v-model="v$.editedItem.group_name.$model"
+                  :rules="v$.editedItem.group_name"
                 />
               </v-col>
-              <!-- direction_name  -->
+              <!-- group_name  -->
+              <!-- student_quantity  -->
+              <v-col cols="12" sm="12" md="6">
+                <base-input
+                  label="Cantidad de estudiantes"
+                  v-model="v$.editedItem.students_quantity.$model"
+                  :rules="v$.editedItem.students_quantity"
+                  type="number"
+                />
+              </v-col>
+              <!-- student_quantity  -->
             </v-row>
             <!-- Form -->
             <v-row>
@@ -111,12 +127,14 @@
   </div>
 </template> 
 
+
+
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
-import { helpers, minLength, required, email } from "@vuelidate/validators";
+import { helpers, minLength, required } from "@vuelidate/validators";
 
-import directionApi from "@/services/directionApi";
+import groupApi from "@/services/groupApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 
@@ -137,21 +155,24 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      title: "GRUPO",
       headers: [
-        { title: "DIRECCIÓN", key: "direction_name" },
+        { title: "GRUPO", key: "group_name" },
+        { title: "CANTIDAD", key: "students_quantity" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
-      title: "DIRECCIONES",
       total: 0,
       records: [],
       loading: false,
       debounce: 0,
       options: {},
       editedItem: {
-        direction_name: "",
+        group_name: "",
+        students_quantity: "",
       },
       defaultItem: {
-        direction_name: "",
+        group_name: "",
+        students_quantity: "",
       },
     };
   },
@@ -169,9 +190,6 @@ export default {
     dialog(val) {
       val || this.close();
     },
-    dialogBlock(val) {
-      val || this.closeBlock();
-    },
     dialogDelete(val) {
       val || this.closeDelete();
     },
@@ -180,24 +198,20 @@ export default {
   validations() {
     return {
       editedItem: {
-        direction_name: {
+        group_name: {
           required: helpers.withMessage(langMessages.required, required),
           minLength: helpers.withMessage(
             ({ $params }) => langMessages.minLength($params),
             minLength(4)
           ),
         },
+        students_quantity: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
       },
     };
   },
 
-  created() {
-    this.initialize();
-  },
-
-  beforeMount() {
-    this.getDataFromApi({ page: 1, itemsPerPage: 10, sortBy: [], search: "" });
-  },
   methods: {
     async initialize() {
       this.loading = true;
@@ -214,6 +228,47 @@ export default {
       this.loading = false;
     },
 
+    getDataFromApi(options) {
+      this.loading = false;
+      this.records = [];
+
+      clearTimeout(this.debounce);
+      this.debounce = setTimeout(async () => {
+        try {
+          const { data } = await groupApi.get(null, {
+            params: { ...options, search: this.search },
+          });
+
+          this.records = data.data;
+          this.total = data.total;
+          this.loading = false;
+        } catch (error) {
+          alert.error("No fue posible obtener los registros.");
+        }
+      });
+    },
+
+    created() {
+      this.initialize();
+    },
+
+    beforeMount() {
+      this.getDataFromApi({
+        page: 1,
+        itemsPerPage: 10,
+        sortBy: [],
+        search: "",
+      });
+    },
+
+    close() {
+      this.dialog = false;
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      });
+    },
+
     addRecord() {
       this.dialog = true;
       this.editedIndex = -1;
@@ -225,13 +280,6 @@ export default {
       this.editedIndex = this.records.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
-    },
-
-    deleteItem(item) {
-      this.editedIndex = this.records.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-
-      this.dialogDelete = true;
     },
 
     async save() {
@@ -249,7 +297,7 @@ export default {
         );
 
         try {
-          const { data } = await directionApi.put(`/${edited.id}`, edited);
+          const { data } = await groupApi.put(`/${edited.id}`, edited);
           alert.success(data.message);
         } catch (error) {
           alert.error("No fue posible actualizar el registro.");
@@ -262,7 +310,7 @@ export default {
 
       // Creating record
       try {
-        const { data } = await directionApi.post(null, this.editedItem);
+        const { data } = await groupApi.post(null, this.editedItem);
         console.log(data);
         alert.success(data.message);
       } catch (error) {
@@ -274,9 +322,16 @@ export default {
       return;
     },
 
+    deleteItem(item) {
+      this.editedIndex = this.records.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+
+      this.dialogDelete = true;
+    },
+
     async deleteItemConfirm() {
       try {
-        const { data } = await directionApi.delete(`/${this.editedItem.id}`, {
+        const { data } = await groupApi.delete(`/${this.editedItem.id}`, {
           params: { id: this.editedItem.id },
         });
 
@@ -288,40 +343,11 @@ export default {
       this.closeDelete();
     },
 
-    close() {
-      this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
     closeDelete() {
       this.dialogDelete = false;
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
-      });
-    },
-
-    getDataFromApi(options) {
-      this.loading = false;
-      this.records = [];
-
-      clearTimeout(this.debounce);
-      this.debounce = setTimeout(async () => {
-        try {
-          const { data } = await directionApi.get(null, {
-            params: { ...options, search: this.search },
-          });
-
-          this.records = data.data;
-          this.total = data.total;
-          this.loading = false;
-        } catch (error) {
-          alert.error("No fue posible obtener los registros.");
-          console.log(error);
-        }
       });
     },
   },

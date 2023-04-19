@@ -28,6 +28,10 @@
           <v-icon icon="mdi-school" size="25"></v-icon>
           <span>Tipo Pensum</span>
         </RouterLink>
+        <RouterLink to="/group" class="d-flex flex-column align-center mb-4">
+          <v-icon icon="mdi-account-group" size="25"></v-icon>
+          <span>Grupo</span>
+        </RouterLink>
         <RouterLink
           to="/"
           class="d-flex flex-column align-center mb-4"
