@@ -53,12 +53,12 @@
             {{ formTitle }}
           </h2>
         </v-card-title>
-        <v-card-text>
+        <v-card-text class="pt-0">
           <v-container>
             <!-- Form -->
-            <v-row class="pt-3">
+            <v-row class="pt-0">
               <!-- pensum_type_name  -->
-              <v-col cols="12" sm="12" md="4">
+              <v-col cols="12" sm="12" md="12">
                 <base-input
                   label="Tipo de Pensum"
                   v-model="v$.editedItem.pensum_type_name.$model"

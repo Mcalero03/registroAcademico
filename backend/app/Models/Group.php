@@ -27,4 +27,26 @@ class Group extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
+    {
+        return Group::select('group.*', 'group.id as id')
+
+            ->where('group.group_name', 'like', $search)
+            ->orWhere('group.students_quantity', 'like', $search)
+
+            ->skip($skip)
+            ->take($itemsPerpage)
+            ->orderBy("group.$sortBy", $sort)
+            ->get();
+    }
+
+    public static function counterPagination($search)
+    {
+        return Group::select('group.*', 'group.id as id')
+
+            ->where('group.group_name', 'like', $search)
+            ->orWhere('group.students_quantity', 'like', $search)
+            ->count();
+    }
 }
