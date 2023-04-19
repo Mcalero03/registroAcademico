@@ -127,9 +127,11 @@ const langMessages = messages["es"].validations;
 
 export default {
   components: { BaseButton, BaseInput },
+
   setup() {
     return { v$: useVuelidate() };
   },
+
   data() {
     return {
       search: "",
@@ -153,11 +155,13 @@ export default {
       },
     };
   },
+
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "Nuevo registro" : "Editar registro";
     },
   },
+
   watch: {
     search(val) {
       this.getDataFromApi();
@@ -224,7 +228,6 @@ export default {
     },
 
     deleteItem(item) {
-      console.log(item);
       this.editedIndex = this.records.indexOf(item);
       this.editedItem = Object.assign({}, item);
 
@@ -234,7 +237,7 @@ export default {
     async save() {
       this.v$.$validate();
       if (this.v$.$invalid) {
-        alert.error("Campos obligatorios");
+        alert.error("Campo obligatorio");
         return;
       }
 
@@ -317,6 +320,7 @@ export default {
           this.loading = false;
         } catch (error) {
           alert.error("No fue posible obtener los registros.");
+          console.log(error);
         }
       });
     },

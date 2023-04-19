@@ -39,6 +39,18 @@ const router = createRouter({
       meta: { requiresAuth: true }, // add meta field to specify the route
     },
     {
+      path: "/pensumType", 
+      name: "pensumType",
+      component: () => import("../views/PensumTypeView.vue"),
+      meta: { requiresAuth: true }, // add meta field to specify the route
+    },
+    {
+      path: "/group", 
+      name: "group",
+      component: () => import("../views/Group.vue"),
+      meta: { requiresAuth: true }, // add meta field to specify the route
+    },
+    {
       path: "/:pathMatch(.*)*",
       name: "NotFound",
       component: NotFoundView,

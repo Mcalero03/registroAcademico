@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DirectionController;
+use App\Http\Controllers\PensumTypeController;
+use App\Http\Controllers\GroupController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,3 +26,4 @@ Route::get('/status', fn () => response()->json(["message" => "Active"]));
 Route::resource('/department', DepartmentController::class);
 Route::resource('/direction', DirectionController::class);
 Route::resource('/pensumType', PensumTypeController::class);
+Route::resource('/group', GroupController::class);
