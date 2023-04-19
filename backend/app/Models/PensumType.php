@@ -26,4 +26,24 @@ class PensumType extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
+    {
+        return PensumType::select('pensum_type.*', 'pensum_type.id as id')
+
+            ->where('pensum_type.pensum_type_name', 'like', $search)
+
+            ->skip($skip)
+            ->take($itemsPerpage)
+            ->orderBy("pensum_type.$sortBy", $sort)
+            ->get();
+    }
+
+    public static function counterPagination($search)
+    {
+        return PensumType::select('pensum_type.*', 'pensum_type.id as id')
+
+            ->where('pensum_type.pensum_type_name', 'like', $search)
+            ->count();
+    }
 }

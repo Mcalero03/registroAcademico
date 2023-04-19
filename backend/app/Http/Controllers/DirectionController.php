@@ -13,7 +13,6 @@ class DirectionController extends Controller
      */
     public function index(Request $request)
     {
-        // dd($request);
         $itemsPerPage = $request->itemsPerPage ?? 10;
         $skip = ($request->page - 1) * $request->itemsPerPage;
 
