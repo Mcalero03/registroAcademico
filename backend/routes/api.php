@@ -7,6 +7,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\RelativeController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\CollegeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,3 +34,4 @@ Route::resource('/group', GroupController::class);
 Route::resource('/relative', RelativeController::class);
 Route::resource('/subject', SubjectController::class);
 Route::resource('/teacher', TeacherController::class);
+Route::resource('/college', CollegeController::class);

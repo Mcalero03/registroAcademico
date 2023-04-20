@@ -219,17 +219,9 @@ export default {
         },
         average_approval: {
           required: helpers.withMessage(langMessages.required, required),
-          //   minLength: helpers.withMessage(
-          //     ({ $params }) => langMessages.minLength($params),
-          //     minLength(4)
-          //   ),
         },
         units_value: {
           required: helpers.withMessage(langMessages.required, required),
-          //   minLength: helpers.withMessage(
-          //     ({ $params }) => langMessages.minLength($params),
-          //     minLength(4)
-          //   ),
         },
       },
     };

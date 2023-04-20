@@ -67,6 +67,12 @@ const router = createRouter({
       name: "teacher",
       component: () => import("../views/TeacherView.vue"),
       meta: {requiresAuth: true}, // add meta field to specify the route
+    }, 
+    {
+      path: "/college", 
+      name: "college", 
+      component: () => import("../views/CollegeView.vue"), 
+      meta: {requiresAuth: true}, // add meta field to specify the route  
     },
     {
       path: "/:pathMatch(.*)*",
