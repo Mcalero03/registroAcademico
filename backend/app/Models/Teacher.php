@@ -32,4 +32,35 @@ class Teacher extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
+    {
+        return Teacher::select('teacher.*', 'teacher.id as id')
+
+            ->where('teacher.name', 'like', $search)
+            ->orWhere('teacher.last_name', 'like', $search)
+            ->orWhere('teacher.card', 'like', $search)
+            ->orWhere('teacher.dui', 'like', $search)
+            ->orWhere('teacher.phone_number', 'like', $search)
+            ->orWhere('teacher.mail', 'like', $search)
+
+            ->skip($skip)
+            ->take($itemsPerpage)
+            ->orderBy("teacher.$sortBy", $sort)
+            ->get();
+    }
+
+    public static function counterPagination($search)
+    {
+        return Teacher::select('teacher.*', 'teacher.id as id')
+
+            ->where('teacher.name', 'like', $search)
+            ->orWhere('teacher.last_name', 'like', $search)
+            ->orWhere('teacher.card', 'like', $search)
+            ->orWhere('teacher.dui', 'like', $search)
+            ->orWhere('teacher.phone_number', 'like', $search)
+            ->orWhere('teacher.mail', 'like', $search)
+
+            ->count();
+    }
 }
