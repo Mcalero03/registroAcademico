@@ -40,6 +40,10 @@
           <v-icon icon="mdi-bookshelf" size="25"></v-icon>
           <span>Materia</span>
         </RouterLink>
+        <RouterLink to="/teacher" class="d-flex flex-column align-center mb-4">
+          <v-icon icon="mdi-human-male-board" size="25"></v-icon>
+          <span>Profesor</span>
+        </RouterLink>
         <RouterLink
           to="/"
           class="d-flex flex-column align-center mb-4"
