@@ -42,7 +42,7 @@ export default {
             ""
           );
           break;
-        case "only-letters":
+        case "onlyletters":
           this.rules.$model = this.rules.$model.replace(
             /[^A-ZàèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚñ\' ']/gi,
             ""

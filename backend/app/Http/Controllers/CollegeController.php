@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\College;
 use App\Models\Direction;
 use Illuminate\Http\Request;
 use Encrypt;
 
-class DirectionController extends Controller
+class CollegeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,7 +19,7 @@ class DirectionController extends Controller
 
         // Getting all the records
         if (($request->itemsPerPage == -1)) {
-            $itemsPerPage =  Direction::count();
+            $itemsPerPage =  College::count();
             $skip = 0;
         }
 
@@ -27,16 +28,13 @@ class DirectionController extends Controller
 
         $search = (isset($request->search)) ? "%$request->search%" : '%%';
 
-        $direction = Direction::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
-        $direction = Encrypt::encryptObject($direction, "id");
+        $college = College::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
 
-        $total = Direction::counterPagination($search);
-
-        // dd($direction);
+        $total = college::counterPagination($search);
 
         return response()->json([
             "message" => "Registros obtenidos correctamente.",
-            "data" => $direction,
+            "data" => $college,
             "total" => $total,
         ]);
     }
@@ -46,13 +44,14 @@ class DirectionController extends Controller
      */
     public function store(Request $request)
     {
-        $direction = new Direction;
-        $direction->direction_name = $request->direction_name;
+        $college = new College;
+        $college->college_name = $request->college_name;
+        $college->direction_id = Direction::where('direction_name', $request->direction_name)->first()?->id;
 
-        $direction->save();
+        $college->save();
 
         return response()->json([
-            "message" => "Registro creado correctamente.",
+            "message" => "Registro creado correctamente",
         ]);
     }
 
@@ -71,13 +70,14 @@ class DirectionController extends Controller
     {
         $data = Encrypt::decryptArray($request->all(), 'id');
 
-        $direction = Direction::where('id', $data['id'])->first();
-        $direction->direction_name = $request->direction_name;
+        $college = College::where('id', $data['id'])->first();
+        $college->college_name = $request->college_name;
+        $college->direction_id = Direction::where('direction_name', $request->direction_name)->first()?->id;
 
-        $direction->save();
+        $college->save();
 
         return response()->json([
-            "message" => "Registro modificado correctamente.",
+            "message" => "Registro modificado correctamente",
         ]);
     }
 
@@ -88,10 +88,10 @@ class DirectionController extends Controller
     {
         $id = Encrypt::decryptValue($request->id);
 
-        Direction::where('id', $id)->delete();
+        College::where('id', $id)->delete();
 
         return response()->json([
-            "message" => "Registro eliminado correctamente.",
+            "message" => "Registro eliminado correctamente",
         ]);
     }
 }

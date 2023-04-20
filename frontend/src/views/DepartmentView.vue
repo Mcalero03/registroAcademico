@@ -175,7 +175,7 @@ export default {
       ],
       records: [],
       editedIndex: -1,
-      title: "Department",
+      title: "Departamento",
       total: 0,
       options: {},
       editedItem: {

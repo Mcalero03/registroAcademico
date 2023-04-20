@@ -45,6 +45,17 @@
           <span>Profesor</span>
         </RouterLink>
         <RouterLink
+          to="/department"
+          class="d-flex flex-column align-center mb-4"
+        >
+          <v-icon icon="mdi-earth" size="25"></v-icon>
+          <span>Departamento</span>
+        </RouterLink>
+        <RouterLink to="/college" class="d-flex flex-column align-center mb-4">
+          <v-icon icon="mdi-earth" size="25"></v-icon>
+          <span>Escuela</span>
+        </RouterLink>
+        <RouterLink
           to="/"
           class="d-flex flex-column align-center mb-4"
           @click="logout()"

@@ -169,7 +169,13 @@
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
-import { helpers, minLength, required } from "@vuelidate/validators";
+import {
+  helpers,
+  minLength,
+  required,
+  email,
+  maxLength,
+} from "@vuelidate/validators";
 
 import relativeApi from "@/services/relativeApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
@@ -274,6 +280,7 @@ export default {
             ({ $params }) => langMessages.minLength($params),
             minLength(9)
           ),
+          maxLength: (({ $params }) => maxLength($params), maxLength(9)),
         },
         phone_number: {
           required: helpers.withMessage(langMessages.required, required),
@@ -281,10 +288,11 @@ export default {
             ({ $params }) => langMessages.minLength($params),
             minLength(8)
           ),
+          maxLength: (({ $params }) => maxLength($params), maxLength(8)),
         },
         mail: {
           required: helpers.withMessage(langMessages.required, required),
-          // mail: helpers.withMessage(langMessages.mail, mail),
+          email: helpers.withMessage(langMessages.email, email),
         },
       },
     };

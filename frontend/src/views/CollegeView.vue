@@ -63,73 +63,27 @@
           <v-container>
             <!-- Form -->
             <v-row class="pt-0">
-              <!-- name  -->
+              <!-- college_name  -->
               <v-col cols="12" sm="12" md="6">
                 <base-input
-                  label="Nombres del profesor"
-                  v-model="v$.editedItem.name.$model"
-                  :rules="v$.editedItem.name"
+                  label="Nombre de la escuela"
+                  v-model="v$.editedItem.college_name.$model"
+                  :rules="v$.editedItem.college_name"
                 />
               </v-col>
-              <!-- name  -->
-              <!-- last_name  -->
+              <!-- college_name  -->
+              <!-- direction_name  -->
               <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Apellidos del profesor"
-                  v-model="v$.editedItem.last_name.$model"
-                  :rules="v$.editedItem.last_name"
+                <base-select
+                  label="Dirección"
+                  :items="directions"
+                  item-title="direction_name"
+                  item-value="direction_name"
+                  v-model="v$.editedItem.direction_name.$model"
+                  :rules="v$.editedItem.direction_name"
                 />
               </v-col>
-              <!-- last_name  -->
-              <!-- card  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Carnet"
-                  v-model="v$.editedItem.card.$model"
-                  :rules="v$.editedItem.card"
-                  type="number"
-                />
-              </v-col>
-              <!-- card  -->
-              <!-- dui  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Número único de identificación"
-                  v-model="v$.editedItem.dui.$model"
-                  :rules="v$.editedItem.dui"
-                  type="number"
-                />
-              </v-col>
-              <!-- dui  -->
-              <!-- nit  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Número de Identificación Tributaria"
-                  v-model="v$.editedItem.nit.$model"
-                  :rules="v$.editedItem.nit"
-                  type="number"
-                />
-              </v-col>
-              <!-- nit  -->
-              <!-- phone_number  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Número de teléfono"
-                  v-model="v$.editedItem.phone_number.$model"
-                  :rules="v$.editedItem.phone_number"
-                  type="number"
-                />
-              </v-col>
-              <!-- phone_number  -->
-              <!-- mails  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Correo electrónico"
-                  v-model="v$.editedItem.mail.$model"
-                  :rules="v$.editedItem.mail"
-                />
-              </v-col>
-              <!-- mail  -->
+              <!-- direction_name  -->
             </v-row>
             <!-- Form -->
             <v-row>
@@ -180,17 +134,13 @@
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
-import {
-  helpers,
-  minLength,
-  required,
-  email,
-  maxLength,
-} from "@vuelidate/validators";
+import { helpers, minLength, required } from "@vuelidate/validators";
 
-import teacherApi from "@/services/teacherApi";
+import collegeApi from "@/services/collegeApi";
+import directionApi from "@/services/directionApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
+import BaseSelect from "../components/base-components/BaseSelect.vue";
 
 import useAlert from "../composables/useAlert";
 
@@ -198,7 +148,7 @@ const { alert } = useAlert();
 const langMessages = messages["es"].validations;
 
 export default {
-  components: { BaseButton, BaseInput },
+  components: { BaseButton, BaseInput, BaseSelect },
 
   setup() {
     return { v$: useVuelidate() };
@@ -209,41 +159,31 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
-      title: "PROFESOR",
+      title: "ESCUELA",
       headers: [
-        { title: "NOMBRE", key: "name" },
-        { title: "APELLIDO", key: "last_name" },
-        { title: "CARNET", key: "card" },
-        { title: "DUI", key: "dui" },
-        { title: "NIT", key: "nit" },
-        { title: "TELÉFONO", key: "phone_number" },
-        { title: "CORREO", key: "mail" },
+        { title: "ESCUELA", key: "college_name" },
+        { title: "DIRECCIÓN", key: "direction_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       total: 0,
       records: [],
+      directions: [],
       loading: false,
       debounce: 0,
       options: {},
       editedItem: {
-        name: "",
-        last_name: "",
-        card: "",
-        dui: "",
-        nit: "",
-        phone_number: "",
-        mail: "",
+        college_name: "",
+        direction_name: "",
       },
       defaultItem: {
-        name: "",
-        last_name: "",
-        card: "",
-        dui: "",
-        nit: "",
-        phone_number: "",
-        mail: "",
+        college_name: "",
+        direction_name: "",
       },
     };
+  },
+
+  mounted() {
+    this.initialize();
   },
 
   computed: {
@@ -267,55 +207,15 @@ export default {
   validations() {
     return {
       editedItem: {
-        name: {
+        college_name: {
           required: helpers.withMessage(langMessages.required, required),
           minLength: helpers.withMessage(
             ({ $params }) => langMessages.minLength($params),
             minLength(4)
           ),
         },
-        last_name: {
+        direction_name: {
           required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(4)
-          ),
-        },
-        card: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(6)
-          ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(6)),
-        },
-        dui: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(9)
-          ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(9)),
-        },
-        nit: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(14)
-          ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(14)),
-        },
-        phone_number: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(8)
-          ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(8)),
-        },
-        mail: {
-          required: helpers.withMessage(langMessages.required, required),
-          email: helpers.withMessage(langMessages.email, email),
         },
       },
     };
@@ -326,12 +226,20 @@ export default {
       this.loading = true;
       this.records = [];
 
-      let requests = [this.getDataFromApi()];
+      let requests = [
+        this.getDataFromApi(),
+        directionApi.get(null, {
+          params: {
+            itemsPerPage: -1,
+          },
+        }),
+      ];
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
       });
 
       if (responses) {
+        this.directions = responses[1].data.data;
       }
 
       this.loading = false;
@@ -344,7 +252,7 @@ export default {
       clearTimeout(this.debounce);
       this.debounce = setTimeout(async () => {
         try {
-          const { data } = await teacherApi.get(null, {
+          const { data } = await collegeApi.get(null, {
             params: { ...options, search: this.search },
           });
 
@@ -406,7 +314,7 @@ export default {
         );
 
         try {
-          const { data } = await teacherApi.put(`/${edited.id}`, edited);
+          const { data } = await collegeApi.put(`/${edited.id}`, edited);
           alert.success(data.message);
         } catch (error) {
           alert.error("No fue posible actualizar el registro.");
@@ -419,7 +327,7 @@ export default {
 
       // Creating record
       try {
-        const { data } = await teacherApi.post(null, this.editedItem);
+        const { data } = await collegeApi.post(null, this.editedItem);
         alert.success(data.message);
       } catch (error) {
         alert.error("No fue posible crear el registro.");
@@ -439,7 +347,7 @@ export default {
 
     async deleteItemConfirm() {
       try {
-        const { data } = await teacherApi.delete(`/${this.editedItem.id}`, {
+        const { data } = await collegeApi.delete(`/${this.editedItem.id}`, {
           params: { id: this.editedItem.id },
         });
 
