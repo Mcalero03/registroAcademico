@@ -28,4 +28,28 @@ class Subject extends Model
         'updated_at',
         'deleted_at',
     ];
+    public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
+    {
+        return Subject::select('subject.*', 'subject.id as id')
+
+            ->where('subject.subject_name', 'like', $search)
+            ->orWhere('subject.average_approval', 'like', $search)
+            ->orWhere('subject.units_value', 'like', $search)
+
+            ->skip($skip)
+            ->take($itemsPerpage)
+            ->orderBy("subject.$sortBy", $sort)
+            ->get();
+    }
+
+    public static function counterPagination($search)
+    {
+        return Subject::select('subject.*', 'subject.id as id')
+
+            ->where('subject.subject_name', 'like', $search)
+            ->orWhere('subject.average_approval', 'like', $search)
+            ->orWhere('subject.units_value', 'like', $search)
+
+            ->count();
+    }
 }
