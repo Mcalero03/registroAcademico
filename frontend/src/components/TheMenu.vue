@@ -10,10 +10,10 @@
     </div>
     <div class="menu-options mt-3 text-center">
       <template v-if="isLoggedIn">
-        <RouterLink to="/" class="d-flex flex-column align-center mb-4">
+        <!-- <RouterLink to="/" class="d-flex flex-column align-center mb-4">
           <v-icon icon="mdi-home" size="25"></v-icon>
           <span>Bases de datos</span>
-        </RouterLink>
+        </RouterLink> -->
         <RouterLink
           to="/direction"
           class="d-flex flex-column align-center mb-4"
@@ -31,6 +31,10 @@
         <RouterLink to="/group" class="d-flex flex-column align-center mb-4">
           <v-icon icon="mdi-account-group" size="25"></v-icon>
           <span>Grupo</span>
+        </RouterLink>
+        <RouterLink to="/relative" class="d-flex flex-column align-center mb-4">
+          <v-icon icon="mdi-human-male-female-child" size="25"></v-icon>
+          <span>Pariente</span>
         </RouterLink>
         <RouterLink
           to="/"
