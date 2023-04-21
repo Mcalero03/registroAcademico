@@ -15,51 +15,25 @@
           <v-icon icon="mdi-home" size="15"></v-icon>
           <span>Bases de datos</span>
         </RouterLink> -->
-        <RouterLink
-          to="/direction"
-          class="d-flex flex-column align-center mb-4"
-        >
-          <v-icon icon="mdi-town-hall" size="15"></v-icon>
-          <span>Dirección</span>
-        </RouterLink>
-        <RouterLink
-          to="/pensumType"
-          class="d-flex flex-column align-center mb-4"
-        >
-          <v-icon icon="mdi-school" size="15"></v-icon>
-          <span>Tipo Pensum</span>
-        </RouterLink>
-        <RouterLink to="/group" class="d-flex flex-column align-center mb-4">
-          <v-icon icon="mdi-account-group" size="15"></v-icon>
-          <span>Grupo</span>
-        </RouterLink>
-        <RouterLink to="/relative" class="d-flex flex-column align-center mb-4">
-          <v-icon icon="mdi-human-male-female-child" size="15"></v-icon>
-          <span>Pariente</span>
-        </RouterLink>
-        <RouterLink to="/subject" class="d-flex flex-column align-center mb-4">
-          <v-icon icon="mdi-bookshelf" size="15"></v-icon>
-          <span>Materia</span>
-        </RouterLink>
-        <RouterLink to="/teacher" class="d-flex flex-column align-center mb-4">
-          <v-icon icon="mdi-human-male-board" size="15"></v-icon>
-          <span>Profesor</span>
-        </RouterLink>
-        <RouterLink
-          to="/department"
-          class="d-flex flex-column align-center mb-4"
-        >
-          <v-icon icon="mdi-earth" size="15"></v-icon>
-          <span>Departamento</span>
-        </RouterLink>
-        <RouterLink to="/college" class="d-flex flex-column align-center mb-4">
-          <v-icon icon="mdi-earth" size="15"></v-icon>
-          <span>Escuela</span>
-        </RouterLink>
-        <RouterLink to="/Cycle" class="d-flex flex-column align-center mb-4">
-          <v-icon icon="mdi-earth" size="15"></v-icon>
-          <span>Ciclo</span>
-        </RouterLink>
+        <v-menu>
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" class="d-flex flex-column align-center mb-4"
+              ><v-icon icon="mdi-cogs" size="15"></v-icon>
+              CRUD
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item
+              v-for="(item, index) in items"
+              :key="index"
+              :value="index"
+              :prepend-icon="item.icon"
+              :to="item.url"
+            >
+              <v-list-item-title size="15">{{ item.title }} </v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
         <RouterLink
           to="/"
           class="d-flex flex-column align-center mb-4"
@@ -68,6 +42,32 @@
           <v-icon icon="mdi-logout" size="15"></v-icon>
           <span>Cerrar sesión</span>
         </RouterLink>
+        <!-- <v-card
+          class="d-flex flex-column align-center mx-auto"
+          width="100%"
+          position="absolute"
+          append-icon="mdi-cogs"
+        >
+          <v-list
+            v-model="open"
+            class="d-flex flex-column align-center pl-4 mb-4"
+          >
+            <v-list-group value="CRUD">
+              <template v-slot:activator="{ props }">
+                <v-list-item v-bind="props" title="CRUD"></v-list-item>
+              </template>
+
+              <v-list-item
+                v-for="([title, icon, url], i) in settings"
+                :key="i"
+                :title="title"
+                :prepend-icon="icon"
+                :value="title"
+                :to="url"
+              ></v-list-item>
+            </v-list-group>
+          </v-list>
+        </v-card> -->
       </template>
       <template v-else>
         <RouterLink to="/" class="d-flex flex-column align-center mb-4">
@@ -90,7 +90,54 @@ import useAuth from "../composables/useAuth";
 
 const { stateSideBar } = useMenu();
 const { isLoggedIn, logout } = useAuth();
-</script>
+</script> 
+<script>
+export default {
+  data: () => ({
+    items: [
+      { title: "Direccion", url: "/direction", icon: "mdi-town-hall" },
+      { title: "Tipo Pensum", url: "/pensumType", icon: "mdi-school" },
+      { title: "Pensum", url: "/pensum", icon: "mdi-view-list" },
+      { title: "Grupo", url: "/group", icon: "mdi-account-group" },
+      {
+        title: "Pariente",
+        url: "/relative",
+        icon: "mdi-human-male-female-child",
+      },
+      {
+        title: "Materia",
+        url: "/subject",
+        icon: "mdi-bookshelf",
+      },
+      {
+        title: "Profesor",
+        url: "/teacher",
+        icon: "mdi-human-male-board",
+      },
+      {
+        title: "Departamento",
+        url: "/department",
+        icon: "mdi-earth",
+      },
+      {
+        title: "Escuela",
+        url: "/college",
+        icon: "mdi-account-school",
+      },
+      {
+        title: "Cycle",
+        url: "/cycle",
+        icon: "mdi-list-status",
+      },
+    ],
+    // settings: [
+    //   ["Escuela", "mdi-account-school", "/college"],
+    //   ["Cycle", "mdi-list-status"],
+    // ],
+  }),
+};
+</script> 
+
 
 <style lang="scss">
 @import "@/assets/styles/variables.scss";
