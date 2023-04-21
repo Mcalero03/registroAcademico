@@ -9,6 +9,7 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\CollegeController;
 use App\Http\Controllers\CycleController;
+use App\Http\Controllers\PensumController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -37,3 +38,4 @@ Route::resource('/subject', SubjectController::class);
 Route::resource('/teacher', TeacherController::class);
 Route::resource('/college', CollegeController::class);
 Route::resource('/cycle', CycleController::class);
+Route::resource('/pensum', PensumController::class);
