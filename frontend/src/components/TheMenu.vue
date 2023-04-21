@@ -1,4 +1,5 @@
 <template>
+  <!-- v-icon size= "25" -->
   <div
     class="menu-sidebar d-flex flex-column align-center"
     :class="stateSideBar"
@@ -11,66 +12,70 @@
     <div class="menu-options mt-3 text-center">
       <template v-if="isLoggedIn">
         <!-- <RouterLink to="/" class="d-flex flex-column align-center mb-4">
-          <v-icon icon="mdi-home" size="25"></v-icon>
+          <v-icon icon="mdi-home" size="15"></v-icon>
           <span>Bases de datos</span>
         </RouterLink> -->
         <RouterLink
           to="/direction"
           class="d-flex flex-column align-center mb-4"
         >
-          <v-icon icon="mdi-town-hall" size="25"></v-icon>
+          <v-icon icon="mdi-town-hall" size="15"></v-icon>
           <span>Dirección</span>
         </RouterLink>
         <RouterLink
           to="/pensumType"
           class="d-flex flex-column align-center mb-4"
         >
-          <v-icon icon="mdi-school" size="25"></v-icon>
+          <v-icon icon="mdi-school" size="15"></v-icon>
           <span>Tipo Pensum</span>
         </RouterLink>
         <RouterLink to="/group" class="d-flex flex-column align-center mb-4">
-          <v-icon icon="mdi-account-group" size="25"></v-icon>
+          <v-icon icon="mdi-account-group" size="15"></v-icon>
           <span>Grupo</span>
         </RouterLink>
         <RouterLink to="/relative" class="d-flex flex-column align-center mb-4">
-          <v-icon icon="mdi-human-male-female-child" size="25"></v-icon>
+          <v-icon icon="mdi-human-male-female-child" size="15"></v-icon>
           <span>Pariente</span>
         </RouterLink>
         <RouterLink to="/subject" class="d-flex flex-column align-center mb-4">
-          <v-icon icon="mdi-bookshelf" size="25"></v-icon>
+          <v-icon icon="mdi-bookshelf" size="15"></v-icon>
           <span>Materia</span>
         </RouterLink>
         <RouterLink to="/teacher" class="d-flex flex-column align-center mb-4">
-          <v-icon icon="mdi-human-male-board" size="25"></v-icon>
+          <v-icon icon="mdi-human-male-board" size="15"></v-icon>
           <span>Profesor</span>
         </RouterLink>
         <RouterLink
           to="/department"
           class="d-flex flex-column align-center mb-4"
         >
-          <v-icon icon="mdi-earth" size="25"></v-icon>
+          <v-icon icon="mdi-earth" size="15"></v-icon>
           <span>Departamento</span>
         </RouterLink>
         <RouterLink to="/college" class="d-flex flex-column align-center mb-4">
-          <v-icon icon="mdi-earth" size="25"></v-icon>
+          <v-icon icon="mdi-earth" size="15"></v-icon>
           <span>Escuela</span>
+        </RouterLink>
+        <RouterLink to="/Cycle" class="d-flex flex-column align-center mb-4">
+          <v-icon icon="mdi-earth" size="15"></v-icon>
+          <span>Ciclo</span>
         </RouterLink>
         <RouterLink
           to="/"
           class="d-flex flex-column align-center mb-4"
           @click="logout()"
         >
-          <v-icon icon="mdi-logout" size="25"></v-icon>
+          <v-icon icon="mdi-logout" size="15"></v-icon>
           <span>Cerrar sesión</span>
         </RouterLink>
       </template>
       <template v-else>
         <RouterLink to="/" class="d-flex flex-column align-center mb-4">
-          <v-icon icon="mdi-login" size="25"></v-icon>
+          <v-icon icon="mdi-login" size="15"></v-icon>
           <span>Iniciar sesión</span>
         </RouterLink>
         <!-- <RouterLink to="/register" class="d-flex flex-column align-center mb-4">
-          <v-icon icon="mdi-account-plus" size="25"></v-icon>
+          <v-icon icon="mdi-account-plus" size="15"></v-icon>
           <span>Registrarse</span>
         </RouterLink> -->
       </template>

@@ -30,4 +30,33 @@ class Cycle extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
+    {
+        return Cycle::select('cycle.*', 'cycle.id as id')
+
+            ->where('cycle.cycle_number', 'like', $search)
+            ->orWhere('cycle.year', 'like', $search)
+            ->orWhere('cycle.start_date', 'like', $search)
+            ->orWhere('cycle.end_date', 'like', $search)
+            ->orWhere('cycle.status', 'like', $search)
+
+            ->skip($skip)
+            ->take($itemsPerpage)
+            ->orderBy("cycle.$sortBy", $sort)
+            ->get();
+    }
+
+    public static function counterPagination($search)
+    {
+        return Cycle::select('cycle.*', 'cycle.id as id')
+
+            ->where('cycle.cycle_number', 'like', $search)
+            ->orWhere('cycle.year', 'like', $search)
+            ->orWhere('cycle.start_date', 'like', $search)
+            ->orWhere('cycle.end_date', 'like', $search)
+            ->orWhere('cycle.status', 'like', $search)
+
+            ->count();
+    }
 }
