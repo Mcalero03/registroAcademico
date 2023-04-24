@@ -11,6 +11,7 @@ use App\Http\Controllers\CollegeController;
 use App\Http\Controllers\CycleController;
 use App\Http\Controllers\PensumController;
 use App\Http\Controllers\PensumSubjectDetailController;
+use App\Http\Controllers\EvaluationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,3 +42,4 @@ Route::resource('/college', CollegeController::class);
 Route::resource('/cycle', CycleController::class);
 Route::resource('/pensum', PensumController::class);
 Route::resource('/pensumSubjectDetail', PensumSubjectDetailController::class);
+Route::resource('/evaluation', EvaluationController::class);
