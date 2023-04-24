@@ -10,6 +10,7 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\CollegeController;
 use App\Http\Controllers\CycleController;
 use App\Http\Controllers\PensumController;
+use App\Http\Controllers\PensumSubjectDetailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -39,3 +40,4 @@ Route::resource('/teacher', TeacherController::class);
 Route::resource('/college', CollegeController::class);
 Route::resource('/cycle', CycleController::class);
 Route::resource('/pensum', PensumController::class);
+Route::resource('/pensumSubjectDetail', PensumSubjectDetailController::class);
