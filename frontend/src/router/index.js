@@ -87,6 +87,12 @@ const router = createRouter({
       meta: {requiresAuth: true}, // add meta field to specify the route
     },
     {
+      path: '/pensumSubjectDetail',
+      name: 'pensumSubjectDetail', 
+      component: () => import("../views/PensumSubjectDetailView.vue"), 
+      meta: {requiresAuth: true}, // add meta field to specify the route
+    },
+    {
       path: "/:pathMatch(.*)*",
       name: "NotFound",
       component: NotFoundView,

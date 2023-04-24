@@ -98,16 +98,21 @@ export default {
       { title: "Direccion", url: "/direction", icon: "mdi-town-hall" },
       { title: "Tipo Pensum", url: "/pensumType", icon: "mdi-school" },
       { title: "Pensum", url: "/pensum", icon: "mdi-view-list" },
-      { title: "Grupo", url: "/group", icon: "mdi-account-group" },
       {
-        title: "Pariente",
-        url: "/relative",
-        icon: "mdi-human-male-female-child",
+        title: "Detalle Pensum Materia",
+        url: "/pensumSubjectDetail",
+        icon: "mdi-details",
       },
       {
         title: "Materia",
         url: "/subject",
         icon: "mdi-bookshelf",
+      },
+      { title: "Grupo", url: "/group", icon: "mdi-account-group" },
+      {
+        title: "Pariente",
+        url: "/relative",
+        icon: "mdi-human-male-female-child",
       },
       {
         title: "Profesor",

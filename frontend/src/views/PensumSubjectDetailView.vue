@@ -65,86 +65,28 @@
             <v-row class="pt-0">
               <!-- program_name  -->
               <v-col cols="12" sm="12" md="6">
-                <base-input
+                <base-select
                   label="Nombre del programa"
+                  :items="pensums"
+                  item-title="program_name"
+                  item-value="program_name"
                   v-model="v$.editedItem.program_name.$model"
                   :rules="v$.editedItem.program_name"
                 />
               </v-col>
               <!-- program_name  -->
-              <!-- uv_total  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Total de unidades valorativas"
-                  v-model="v$.editedItem.uv_total.$model"
-                  :rules="v$.editedItem.uv_total"
-                  type="number"
-                />
-              </v-col>
-              <!-- uv_total  -->
-              <!-- required_subject  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Materias requeridas"
-                  v-model="v$.editedItem.required_subject.$model"
-                  :rules="v$.editedItem.required_subject"
-                  type="number"
-                />
-              </v-col>
-              <!-- required_subject  -->
-              <!-- optional_subject  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Materias opcionales"
-                  v-model="v$.editedItem.optional_subject.$model"
-                  :rules="v$.editedItem.optional_subject"
-                  type="number"
-                />
-              </v-col>
-              <!-- optional_subject  -->
-              <!-- cycle_quantity  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Cantidad de ciclos"
-                  v-model="v$.editedItem.cycle_quantity.$model"
-                  :rules="v$.editedItem.cycle_quantity"
-                  type="number"
-                />
-              </v-col>
-              <!-- cycle_quantity  -->
-              <!-- study_plan_year  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Año de plan de estudio"
-                  v-model="v$.editedItem.study_plan_year.$model"
-                  :rules="v$.editedItem.study_plan_year"
-                />
-              </v-col>
-              <!-- study_plan_year  -->
-              <!-- college_name  -->
+              <!-- subject_name  -->
               <v-col cols="12" sm="12" md="6">
                 <base-select
-                  label="Escuela"
-                  :items="colleges"
-                  item-title="college_name"
-                  item-value="college_name"
-                  v-model="v$.editedItem.college_name.$model"
-                  :rules="v$.editedItem.college_name"
+                  label="Nombre de la materia"
+                  :items="subjects"
+                  item-title="subject_name"
+                  item-value="subject_name"
+                  v-model="v$.editedItem.subject_name.$model"
+                  :rules="v$.editedItem.subject_name"
                 />
               </v-col>
-              <!-- college_name  -->
-              <!-- pensum_type_name  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-select
-                  label="Tipo de pensum"
-                  :items="pensumTypes"
-                  item-title="pensum_type_name"
-                  item-value="pensum_type_name"
-                  v-model="v$.editedItem.pensum_type_name.$model"
-                  :rules="v$.editedItem.pensum_type_name"
-                />
-              </v-col>
-              <!-- pensum_type_name  -->
+              <!-- subject_name  -->
             </v-row>
             <!-- Form -->
             <v-row>
@@ -195,13 +137,12 @@
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
-import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
+import { helpers, required } from "@vuelidate/validators";
 
+import pensumSubjectDetailApi from "@/services/pensumSubjectDetailApi";
 import pensumApi from "@/services/pensumApi";
-import collegeApi from "@/services/collegeApi";
-import pensumTypeApi from "@/services/pensumTypeApi";
+import subjectApi from "@/services/subjectApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
-import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
 
 import useAlert from "../composables/useAlert";
@@ -210,7 +151,7 @@ const { alert } = useAlert();
 const langMessages = messages["es"].validations;
 
 export default {
-  components: { BaseButton, BaseInput, BaseSelect },
+  components: { BaseButton, BaseSelect },
 
   setup() {
     return { v$: useVuelidate() };
@@ -221,44 +162,26 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
-      title: "PENSUM",
+      title: "DETALLE PENSUM MATERIA",
       headers: [
-        { title: "PROGRAMA", key: "program_name" },
-        { title: "TOTAL U.V", key: "uv_total" },
-        { title: "MATERIAS OBLIGATORIAS", key: "required_subject" },
-        { title: "MATERIAS OPCIONALES", key: "optional_subject" },
-        { title: "CICLOS", key: "cycle_quantity" },
-        { title: "PLAN DE ESTUDIO", key: "study_plan_year" },
-        { title: "ESCUELA", key: "college_name" },
-        { title: "TIPO DE PENSUM", key: "pensum_type_name" },
+        { title: "PENSUM", key: "program_name" },
+        { title: "MATERIA", key: "subject_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       total: 0,
       records: [],
-      colleges: [],
-      pensumTypes: [],
+      pensums: [],
+      subjects: [],
       loading: false,
       debounce: 0,
       options: {},
       editedItem: {
         program_name: "",
-        uv_total: "",
-        required_subject: "",
-        optional_subject: "",
-        cycle_quantity: "",
-        study_plan_year: "",
-        college_name: "",
-        pensum_type_name: "",
+        subject_name: "",
       },
       defaultItem: {
         program_name: "",
-        uv_total: "",
-        required_subject: "",
-        optional_subject: "",
-        cycle_quantity: "",
-        study_plan_year: "",
-        college_name: "",
-        pensum_type_name: "",
+        subject_name: "",
       },
     };
   },
@@ -290,55 +213,8 @@ export default {
       editedItem: {
         program_name: {
           required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(4)
-          ),
         },
-        uv_total: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(1)
-          ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(2)),
-        },
-        required_subject: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(1)
-          ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(2)),
-        },
-        optional_subject: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(1)
-          ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(2)),
-        },
-        cycle_quantity: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(1)
-          ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(2)),
-        },
-        study_plan_year: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(4)
-          ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(4)),
-        },
-        college_name: {
-          required: helpers.withMessage(langMessages.required, required),
-        },
-        pensum_type_name: {
+        subject_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
       },
@@ -352,24 +228,25 @@ export default {
 
       let requests = [
         this.getDataFromApi(),
-        collegeApi.get(null, {
+        pensumApi.get(null, {
           params: {
             itemsPerPage: -1,
           },
         }),
-        pensumTypeApi.get(null, {
+        subjectApi.get(null, {
           params: {
             itemsPerPage: -1,
           },
         }),
       ];
+
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
       });
 
       if (responses) {
-        this.colleges = responses[1].data.data;
-        this.pensumTypes = responses[2].data.data;
+        this.pensums = responses[1].data.data;
+        this.subjects = responses[2].data.data;
       }
 
       this.loading = false;
@@ -382,7 +259,7 @@ export default {
       clearTimeout(this.debounce);
       this.debounce = setTimeout(async () => {
         try {
-          const { data } = await pensumApi.get(null, {
+          const { data } = await pensumSubjectDetailApi.get(null, {
             params: { ...options, search: this.search },
           });
 
@@ -444,7 +321,10 @@ export default {
         );
 
         try {
-          const { data } = await pensumApi.put(`/${edited.id}`, edited);
+          const { data } = await pensumSubjectDetailApi.put(
+            `/${edited.id}`,
+            edited
+          );
           alert.success(data.message);
         } catch (error) {
           alert.error("No fue posible actualizar el registro.");
@@ -457,7 +337,10 @@ export default {
 
       // Creating record
       try {
-        const { data } = await pensumApi.post(null, this.editedItem);
+        const { data } = await pensumSubjectDetailApi.post(
+          null,
+          this.editedItem
+        );
         alert.success(data.message);
       } catch (error) {
         alert.error("No fue posible crear el registro.");
@@ -477,9 +360,12 @@ export default {
 
     async deleteItemConfirm() {
       try {
-        const { data } = await pensumApi.delete(`/${this.editedItem.id}`, {
-          params: { id: this.editedItem.id },
-        });
+        const { data } = await pensumSubjectDetailApi.delete(
+          `/${this.editedItem.id}`,
+          {
+            params: { id: this.editedItem.id },
+          }
+        );
 
         alert.success(data.message);
       } catch (error) {
