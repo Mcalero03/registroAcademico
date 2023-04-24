@@ -130,6 +130,11 @@ export default {
         icon: "mdi-earth",
       },
       {
+        title: "Municipio",
+        url: "/municipality",
+        icon: "mdi-home-city-outline",
+      },
+      {
         title: "Escuela",
         url: "/college",
         icon: "mdi-account-school",
