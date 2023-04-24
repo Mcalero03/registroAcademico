@@ -106,6 +106,12 @@ const router = createRouter({
       meta: {requiresAuth: true}, // add meta field to specify the route
     },
     {
+      path: '/municipality',
+      name:'municipality',
+      component: () => import("../views/MunicipalityView.vue"),
+      meta: {requiresAuth: true}  // add meta field to specify the route
+    },
+    {
       path: "/:pathMatch(.*)*",
       name: "NotFound",
       component: NotFoundView,

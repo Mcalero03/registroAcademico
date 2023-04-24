@@ -12,6 +12,7 @@ use App\Http\Controllers\CycleController;
 use App\Http\Controllers\PensumController;
 use App\Http\Controllers\PensumSubjectDetailController;
 use App\Http\Controllers\EvaluationController;
+use App\Http\Controllers\MunicipalityController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -43,3 +44,4 @@ Route::resource('/cycle', CycleController::class);
 Route::resource('/pensum', PensumController::class);
 Route::resource('/pensumSubjectDetail', PensumSubjectDetailController::class);
 Route::resource('/evaluation', EvaluationController::class);
+Route::resource('/municipality', MunicipalityController::class);
