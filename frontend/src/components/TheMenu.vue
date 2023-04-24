@@ -115,6 +115,11 @@ export default {
       },
       { title: "Grupo", url: "/group", icon: "mdi-account-group" },
       {
+        title: "Horario",
+        url: "/schedule",
+        icon: "mdi-calendar-clock",
+      },
+      {
         title: "Pariente",
         url: "/relative",
         icon: "mdi-human-male-female-child",
