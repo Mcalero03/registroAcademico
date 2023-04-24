@@ -91,6 +91,19 @@ const router = createRouter({
       name: 'pensumSubjectDetail', 
       component: () => import("../views/PensumSubjectDetailView.vue"), 
       meta: {requiresAuth: true}, // add meta field to specify the route
+    }, 
+    {
+      path:'/prerequisite',
+      name:'prerequisite',
+      component: () => import("../views/PrerequisiteView.vue"),
+      meta: {requiresAuth: true}, // add meta field to specify the route
+
+    },
+    {
+      path:'/evaluation',
+      name:'evaluation',
+      component: () => import("../views/EvaluationView.vue"),
+      meta: {requiresAuth: true}, // add meta field to specify the route
     },
     {
       path: "/:pathMatch(.*)*",

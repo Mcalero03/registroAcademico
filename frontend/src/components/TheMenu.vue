@@ -108,6 +108,11 @@ export default {
         url: "/subject",
         icon: "mdi-bookshelf",
       },
+      {
+        title: "Evaluación",
+        url: "/evaluation",
+        icon: "mdi-playlist-edit",
+      },
       { title: "Grupo", url: "/group", icon: "mdi-account-group" },
       {
         title: "Pariente",
@@ -130,7 +135,7 @@ export default {
         icon: "mdi-account-school",
       },
       {
-        title: "Cycle",
+        title: "Ciclo",
         url: "/cycle",
         icon: "mdi-list-status",
       },
