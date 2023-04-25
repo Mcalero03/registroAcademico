@@ -115,6 +115,11 @@ export default {
       },
       { title: "Grupo", url: "/group", icon: "mdi-account-group" },
       {
+        title: "Inscripción",
+        url: "/inscription",
+        icon: "mdi-file",
+      },
+      {
         title: "Horario",
         url: "/schedule",
         icon: "mdi-calendar-clock",
