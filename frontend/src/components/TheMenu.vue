@@ -119,11 +119,7 @@ export default {
         url: "/schedule",
         icon: "mdi-calendar-clock",
       },
-      {
-        title: "Pariente",
-        url: "/relative",
-        icon: "mdi-human-male-female-child",
-      },
+
       {
         title: "Profesor",
         url: "/teacher",
@@ -138,6 +134,16 @@ export default {
         title: "Municipio",
         url: "/municipality",
         icon: "mdi-home-city-outline",
+      },
+      {
+        title: "Estudiante",
+        url: "/student",
+        icon: "mdi-account",
+      },
+      {
+        title: "Pariente",
+        url: "/relative",
+        icon: "mdi-human-male-female-child",
       },
       {
         title: "Escuela",
