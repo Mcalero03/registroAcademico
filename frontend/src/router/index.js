@@ -133,6 +133,12 @@ const router = createRouter({
       name:'attendance',
       component: () => import("../views/AttendanceView.vue"),
       meta: {requiresAuth: true} // add meta field to specify the route
+    }, 
+    {
+      path: '/teacherSubjectDetail',
+      name:'teacherSubjectDetail',
+      component: () => import("../views/TeacherSubjectDetailView.vue"),
+      meta: {requiresAuth: true} // add meta field to specify the route
     },
     {
       path: "/:pathMatch(.*)*",

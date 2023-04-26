@@ -20,31 +20,37 @@ class Teacher_Subject_DetailSeeder extends Seeder
                 "id" => 1,
                 "subject_id" => 1,
                 "teacher_id" => 1,
+                "group_id" => 1,
             ],
             [
                 "id" => 2,
                 "subject_id" => 2,
                 "teacher_id" => 2,
+                "group_id" => 2,
             ],
             [
                 "id" => 3,
                 "subject_id" => 3,
                 "teacher_id" => 3,
+                "group_id" => 3,
             ],
             [
                 "id" => 4,
                 "subject_id" => 4,
                 "teacher_id" => 1,
+                "group_id" => 4,
             ],
             [
                 "id" => 5,
                 "subject_id" => 5,
                 "teacher_id" => 2,
+                "group_id" => 5,
             ],
             [
                 "id" => 6,
                 "subject_id" => 6,
                 "teacher_id" => 3,
+                "group_id" => 6,
             ],
         ]);
     }
