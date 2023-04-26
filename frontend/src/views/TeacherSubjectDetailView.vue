@@ -63,47 +63,42 @@
           <v-container>
             <!-- Form -->
             <v-row class="pt-0">
-              <!-- attendance_date  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Fecha de asistencia"
-                  v-model="v$.editedItem.attendance_date.$model"
-                  :rules="v$.editedItem.attendance_date"
-                  type="date"
-                />
-              </v-col>
-              <!-- attendance_date  -->
-              <!-- attendance_time  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Hora de asistencia"
-                  v-model="v$.editedItem.attendance_time.$model"
-                  :rules="v$.editedItem.attendance_time"
-                  type="time"
-                />
-              </v-col>
-              <!-- attendance_time  -->
-              <!-- status  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Estado"
-                  v-model="v$.editedItem.status.$model"
-                  :rules="v$.editedItem.status"
-                />
-              </v-col>
-              <!-- status  -->
-              <!-- inscription_id  -->
+              <!-- subject_name  -->
               <v-col cols="12" sm="12" md="6">
                 <base-select
-                  label="Inscripción"
-                  :items="inscriptions"
-                  item-title="id"
-                  item-value="id"
-                  v-model="v$.editedItem.inscription_id.$model"
-                  :rules="v$.editedItem.inscription_id"
+                  label="Materia"
+                  :items="subjects"
+                  item-title="subject_name"
+                  item-value="subject_name"
+                  v-model="v$.editedItem.subject_name.$model"
+                  :rules="v$.editedItem.subject_name"
                 />
               </v-col>
-              <!-- inscription_id  -->
+              <!-- subject_name  -->
+              <!-- teacher_name  -->
+              <v-col cols="12" sm="12" md="6">
+                <base-select
+                  label="Profesor"
+                  :items="teachers"
+                  item-title="name"
+                  item-value="name"
+                  v-model="v$.editedItem.teacher_name.$model"
+                  :rules="v$.editedItem.teacher_name"
+                />
+              </v-col>
+              <!-- teacher_name  -->
+              <!-- group_name  -->
+              <v-col cols="12" sm="12" md="6">
+                <base-select
+                  label="Grupo"
+                  :items="groups"
+                  item-title="group_name"
+                  item-value="group_name"
+                  v-model="v$.editedItem.group_name.$model"
+                  :rules="v$.editedItem.group_name"
+                />
+              </v-col>
+              <!-- group_name  -->
             </v-row>
             <!-- Form -->
             <v-row>
@@ -156,10 +151,11 @@ import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, required } from "@vuelidate/validators";
 
-import attendanceApi from "@/services/attendanceApi";
-import inscriptionApi from "@/services/inscriptionApi";
+import teacherSubjectDetailApi from "@/services/teacherSubjectDetailApi";
+import subjectApi from "@/services/subjectApi";
+import teacherApi from "@/services/teacherApi";
+import groupApi from "@/services/groupApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
-import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
 
 import useAlert from "../composables/useAlert";
@@ -168,7 +164,7 @@ const { alert } = useAlert();
 const langMessages = messages["es"].validations;
 
 export default {
-  components: { BaseButton, BaseInput, BaseSelect },
+  components: { BaseButton, BaseSelect },
 
   setup() {
     return { v$: useVuelidate() };
@@ -179,44 +175,36 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
-      title: "ASISTENCIA",
+      title: "DETALLE PROFESOR MATERIA",
       headers: [
-        { title: "FECHA", key: "attendance_date" },
-        { title: "HORA", key: "attendance_time" },
-        { title: "ESTADO", key: "status" },
-        // { title: "INSCRIPCIÓN", key: "inscription_id" },
-        { title: "CARNET", key: "card" },
         { title: "MATERIA", key: "subject_name" },
-        { title: "GROUP", key: "group_name" },
+        { title: "PROFESOR", key: "teacher_name" },
+        { title: "GRUPO", key: "group_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       total: 0,
       records: [],
-      inscriptions: [],
+      subjects: [],
+      teachers: [],
+      groups: [],
       loading: false,
       debounce: 0,
       options: {},
       editedItem: {
-        attendance_date: "",
-        attendance_time: "",
-        status: "",
-        inscription_id: "",
-        card: "",
+        subject_name: "",
+        teacher_name: "",
+        group_name: "",
       },
       defaultItem: {
-        attendance_date: "",
-        attendance_time: "",
-        status: "",
-        inscription_id: "",
-        card: "",
+        subject_name: "",
+        teacher_name: "",
+        group_name: "",
       },
     };
   },
-
   mounted() {
     this.initialize();
   },
-
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "Nuevo registro" : "Editar registro";
@@ -238,16 +226,13 @@ export default {
   validations() {
     return {
       editedItem: {
-        attendance_date: {
+        subject_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
-        attendance_time: {
+        teacher_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
-        status: {
-          required: helpers.withMessage(langMessages.required, required),
-        },
-        inscription_id: {
+        group_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
       },
@@ -261,7 +246,17 @@ export default {
 
       let requests = [
         this.getDataFromApi(),
-        inscriptionApi.get(null, {
+        subjectApi.get(null, {
+          params: {
+            itemsPerPage: -1,
+          },
+        }),
+        teacherApi.get(null, {
+          params: {
+            itemsPerPage: -1,
+          },
+        }),
+        groupApi.get(null, {
           params: {
             itemsPerPage: -1,
           },
@@ -272,7 +267,9 @@ export default {
       });
 
       if (responses) {
-        this.inscriptions = responses[1].data.data;
+        this.subjects = responses[1].data.data;
+        this.teachers = responses[2].data.data;
+        this.groups = responses[3].data.data;
       }
 
       this.loading = false;
@@ -285,7 +282,7 @@ export default {
       clearTimeout(this.debounce);
       this.debounce = setTimeout(async () => {
         try {
-          const { data } = await attendanceApi.get(null, {
+          const { data } = await teacherSubjectDetailApi.get(null, {
             params: { ...options, search: this.search },
           });
 
@@ -347,7 +344,10 @@ export default {
         );
 
         try {
-          const { data } = await attendanceApi.put(`/${edited.id}`, edited);
+          const { data } = await teacherSubjectDetailApi.put(
+            `/${edited.id}`,
+            edited
+          );
           alert.success(data.message);
         } catch (error) {
           alert.error("No fue posible actualizar el registro.");
@@ -360,7 +360,10 @@ export default {
 
       // Creating record
       try {
-        const { data } = await attendanceApi.post(null, this.editedItem);
+        const { data } = await teacherSubjectDetailApi.post(
+          null,
+          this.editedItem
+        );
         alert.success(data.message);
       } catch (error) {
         alert.error("No fue posible crear el registro.");
@@ -380,9 +383,12 @@ export default {
 
     async deleteItemConfirm() {
       try {
-        const { data } = await attendanceApi.delete(`/${this.editedItem.id}`, {
-          params: { id: this.editedItem.id },
-        });
+        const { data } = await teacherSubjectDetailApi.delete(
+          `/${this.editedItem.id}`,
+          {
+            params: { id: this.editedItem.id },
+          }
+        );
 
         alert.success(data.message);
       } catch (error) {

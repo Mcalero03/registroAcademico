@@ -28,6 +28,7 @@ class AttendanceController extends Controller
         $search = (isset($request->search)) ? "%$request->search%" : '%%';
 
         $attendance = Attendance::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
+        $attendance = Encrypt::encryptObject($attendance, "id");
 
         $total = Attendance::counterPagination($search);
 
