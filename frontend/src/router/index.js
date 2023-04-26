@@ -128,6 +128,11 @@ const router = createRouter({
       name:'inscription',
       component: () => import("../views/InscriptionView.vue"),
       meta: {requiresAuth: true} // add meta field to specify the route
+    },{
+      path: '/attendance', 
+      name:'attendance',
+      component: () => import("../views/AttendanceView.vue"),
+      meta: {requiresAuth: true} // add meta field to specify the route
     },
     {
       path: "/:pathMatch(.*)*",

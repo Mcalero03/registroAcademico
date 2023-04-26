@@ -120,6 +120,11 @@ export default {
         icon: "mdi-file",
       },
       {
+        title: "Asistencia",
+        url: "/attendance",
+        icon: "mdi-checkbox-multiple-outline",
+      },
+      {
         title: "Horario",
         url: "/schedule",
         icon: "mdi-calendar-clock",
