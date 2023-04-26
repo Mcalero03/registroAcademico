@@ -59,7 +59,8 @@ class Inscription extends Model
     {
 
         return [
-            'id' => Encrypt::encryptValue($this->id),
+            // 'id' => Encrypt::encryptValue($this->id),
+            'id' => $this->id,
             'inscription_date' => $this->inscription_date,
             'subject_average' => $this->subject_average,
             'attendance_quantity' => $this->attendance_quantity,
