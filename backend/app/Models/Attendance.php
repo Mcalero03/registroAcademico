@@ -31,10 +31,28 @@ class Attendance extends Model
         'deleted_at',
     ];
 
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
+
+    public function format()
+    {
+        // $datos = $this->datos();
+        return [
+            'id' => Encrypt::encryptValue($this->id),
+            'attendance_date' => $this->attendance_date,
+            'attendance_time' => $this->attendance_time,
+            'status' => $this->status,
+            'inscription_id' => $this->inscription_id,
+            // 'group_name' => $this->group->group_name,
+        ];
+    }
+
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Attendance::select('attendance.*', 's.card', 'sub.subject_name', 'g.group_name')
+        return Attendance::select('attendance.*', 's.card as student_card', 'sub.subject_name', 'g.group_name')
             ->join('inscription as i', 'attendance.inscription_id', '=', 'i.id')
             ->join('student as s', 'i.student_id', '=', 's.id')
             ->join('subject as sub', 'i.subject_id', '=', 'sub.id')

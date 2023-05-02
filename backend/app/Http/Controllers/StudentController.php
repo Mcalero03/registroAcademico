@@ -29,8 +29,8 @@ class StudentController extends Controller
 
         $search = (isset($request->search)) ? "%$request->search%" : '%%';
 
-        $student = Student::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
 
+        $student = Student::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
         $total = Student::counterPagination($search);
 
         return response()->json([
@@ -45,6 +45,15 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
+        $municipality = $request->municipality_name;
+        $data = explode(', ', $municipality);
+        $id = Student::municipalityId($data[0], $data[1])->pluck('id');
+
+        $relative = $request->full_name;
+        $rData = explode(', ', $relative);
+        $rId = Student::relativeId($rData[0], $rData[1])->pluck('id');
+
+
         $student = new Student;
         $student->name = $request->name;
         $student->last_name = $request->last_name;
@@ -54,8 +63,8 @@ class StudentController extends Controller
         $student->phone_number = $request->phone_number;
         $student->mail = $request->mail;
         $student->admission_date = $request->admission_date;
-        $student->municipalities_id = Municipality::where('municipality_name', $request->municipality_name)->first()?->id;
-        $student->relative_id = Relative::where('name', $request->relative_name)->first()?->id;
+        $student->municipalities_id = Municipality::where('id', $id)->first()?->id;
+        $student->relative_id = Relative::where('id', $rId)->first()?->id;
 
         $student->save();
 
@@ -79,6 +88,14 @@ class StudentController extends Controller
     {
         $data = Encrypt::decryptArray($request->all(), 'id');
 
+        $municipality = $request->municipality_name;
+        $info = explode(', ', $municipality);
+        $id = Student::municipalityId($info[0], $info[1])->pluck('id');
+
+        $relative = $request->full_name;
+        $rData = explode(', ', $relative);
+        $rId = Student::relativeId($rData[0], $rData[1])->pluck('id');
+
         $student = Student::where('id', $data['id'])->first();
         $student->name = $request->name;
         $student->last_name = $request->last_name;
@@ -88,8 +105,8 @@ class StudentController extends Controller
         $student->phone_number = $request->phone_number;
         $student->mail = $request->mail;
         $student->admission_date = $request->admission_date;
-        $student->municipalities_id = Municipality::where('municipality_name', $request->municipality_name)->first()?->id;
-        $student->relative_id = Relative::where('name', $request->relative_name)->first()?->id;
+        $student->municipalities_id = Municipality::where('id', $id)->first()?->id;
+        $student->relative_id = Relative::where('id', $rId)->first()?->id;
 
         $student->save();
 

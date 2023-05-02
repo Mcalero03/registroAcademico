@@ -28,7 +28,6 @@ class RelativeController extends Controller
         $search = (isset($request->search)) ? "%$request->search%" : '%%';
 
         $relative = Relative::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
-        $relative = Encrypt::encryptObject($relative, "id");
 
         $total = Relative::counterPagination($search);
 

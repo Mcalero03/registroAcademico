@@ -45,7 +45,7 @@ class MunicipalityController extends Controller
     public function store(Request $request)
     {
         $municipality = new Municipality;
-        $municipality->municipality_name = $request->municipality_name;
+        $municipality->municipality_name = $request->municipality;
         $municipality->mun_min = $request->mun_min;
         $municipality->mun_may = $request->mun_may;
         $municipality->dm_cod = $request->dm_cod;
@@ -75,7 +75,7 @@ class MunicipalityController extends Controller
         $data = Encrypt::decryptArray($request->all(), 'id');
 
         $municipality = Municipality::where('id', $data['id'])->first();
-        $municipality->municipality_name = $request->municipality_name;
+        $municipality->municipality_name = $request->municipality;
         $municipality->mun_min = $request->mun_min;
         $municipality->mun_may = $request->mun_may;
         $municipality->dm_cod = $request->dm_cod;

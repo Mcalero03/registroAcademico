@@ -39,12 +39,12 @@ class Student extends Model
 
     public function municipality()
     {
-        return $this->belongsTo(Municipality::class, 'municipalities_id');
+        return $this->belongsTo(Municipality::class, 'municipalities_id')->withDefault();
     }
 
     public function relative()
     {
-        return $this->belongsTo(Relative::class, 'relative_id');
+        return $this->belongsTo(Relative::class, 'relative_id')->withDefault();
     }
 
     public function format()
@@ -59,15 +59,14 @@ class Student extends Model
             'phone_number' => $this->phone_number,
             'mail' => $this->mail,
             'admission_date' => $this->admission_date,
-            'municipality_name' => $this->municipality->municipality_name,
-            'relative_name' => $this->relative->name,
+            'municipality_name' => $this->municipality->municipality_name . ', ' . $this->municipality->department->department_name,
+            'full_name' => $this->relative->name . ', ' . $this->relative->last_name,
         ];
     }
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
         return Student::select('student.*', 'student.id as id')
-
             ->where('student.name', 'like', $search)
             ->orWhere('student.last_name', 'like', $search)
             ->orWhere('student.age', 'like', $search)
@@ -89,7 +88,6 @@ class Student extends Model
     public static function counterPagination($search)
     {
         return Student::select('student.*', 'student.id as id')
-
             ->where('student.name', 'like', $search)
             ->orWhere('student.last_name', 'like', $search)
             ->orWhere('student.age', 'like', $search)
@@ -102,5 +100,22 @@ class Student extends Model
             ->orWhere('student.relative_id', 'like', $search)
 
             ->count();
+    }
+
+    public static function municipalityId($municipality, $department)
+    {
+        return Municipality::select('municipalities.id')
+            ->join('department', 'municipalities.department_id', '=', 'department.id')
+            ->where('municipalities.municipality_name', $municipality)
+            ->where('department.department_name', $department)
+            ->get('municipalities.id');
+    }
+
+    public static function relativeId($name, $last_name)
+    {
+        return Relative::select('relative.id')
+            ->where('name', $name)
+            ->where('last_name', $last_name)
+            ->get('relative.id');
     }
 }

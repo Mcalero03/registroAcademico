@@ -15,5 +15,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/status', fn () => response()->json(["message" => "Active"]));
+// Route::get('/api/municipality/byDepartment/{department_name}', [MunicipalityController::class, 'byDepartment']);
 
 // Route::resource('/api/department', DepartmentController::class);

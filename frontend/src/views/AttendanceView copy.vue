@@ -63,111 +63,47 @@
           <v-container>
             <!-- Form -->
             <v-row class="pt-0">
-              <!-- name  -->
-              <v-col cols="12" sm="6" md="6">
+              <!-- attendance_date  -->
+              <v-col cols="12" sm="12" md="6">
                 <base-input
-                  label="Nombres del estudiante"
-                  v-model="v$.editedItem.name.$model"
-                  :rules="v$.editedItem.name"
-                />
-              </v-col>
-              <!-- name  -->
-              <!-- last_name  -->
-              <v-col cols="12" sm="6" md="6">
-                <base-input
-                  label="Apellidos del estudiante"
-                  v-model="v$.editedItem.last_name.$model"
-                  :rules="v$.editedItem.last_name"
-                />
-              </v-col>
-              <!-- last_name  -->
-              <!-- age  -->
-              <v-col cols="6" sm="3" md="3">
-                <base-input
-                  label="Edad"
-                  v-model="v$.editedItem.age.$model"
-                  :rules="v$.editedItem.age"
-                  type="number"
-                  min="1"
-                />
-              </v-col>
-              <!-- age  -->
-              <!-- card  -->
-              <v-col cols="6" sm="3" md="3">
-                <base-input
-                  label="Carnet"
-                  v-model="v$.editedItem.card.$model"
-                  :rules="v$.editedItem.card"
-                  type="number"
-                  min="0"
-                />
-              </v-col>
-              <!-- card  -->
-              <!-- nie  -->
-              <v-col cols="6" sm="3" md="3">
-                <base-input
-                  label="NIE"
-                  v-model="v$.editedItem.nie.$model"
-                  :rules="v$.editedItem.nie"
-                  type="number"
-                  min="0"
-                />
-              </v-col>
-              <!-- nie  -->
-              <!-- phone_number  -->
-              <v-col cols="6" sm="3" md="3">
-                <base-input
-                  label="Teléfono"
-                  v-model="v$.editedItem.phone_number.$model"
-                  :rules="v$.editedItem.phone_number"
-                  type="number"
-                />
-              </v-col>
-              <!-- phone_number  -->
-              <!-- mail  -->
-              <v-col cols="12" sm="6" md="6">
-                <base-input
-                  label="Correo"
-                  v-model="v$.editedItem.mail.$model"
-                  :rules="v$.editedItem.mail"
-                />
-              </v-col>
-              <!-- mail  -->
-              <!-- admission_date  -->
-              <v-col cols="12" sm="6" md="6">
-                <base-input
-                  label="Fecha de ingreso"
-                  v-model="v$.editedItem.admission_date.$model"
-                  :rules="v$.editedItem.admission_date"
+                  label="Fecha de asistencia"
+                  v-model="v$.editedItem.attendance_date.$model"
+                  :rules="v$.editedItem.attendance_date"
                   type="date"
                 />
               </v-col>
-              <!-- admission_date  -->
-              <!-- municipality_name  -->
-              <v-col cols="12" sm="6" md="6">
-                <base-select
-                  label="Municipio de residencia"
-                  :items="municipalities"
-                  item-title="municipality_name"
-                  item-value="municipality_name"
-                  v-model="v$.editedItem.municipality_name.$model"
-                  :rules="v$.editedItem.municipality_name"
-                >
-                </base-select>
-              </v-col>
-              <!-- municipality_name  -->
-              <!-- relative_name  -->
-              <v-col cols="12" sm="6" md="6">
-                <base-select
-                  label="Nombre del pariente"
-                  :items="relatives"
-                  item-title="full_name"
-                  item-value="full_name"
-                  v-model="v$.editedItem.full_name.$model"
-                  :rules="v$.editedItem.full_name"
+              <!-- attendance_date  -->
+              <!-- attendance_time  -->
+              <v-col cols="12" sm="12" md="6">
+                <base-input
+                  label="Hora de asistencia"
+                  v-model="v$.editedItem.attendance_time.$model"
+                  :rules="v$.editedItem.attendance_time"
+                  type="time"
                 />
               </v-col>
-              <!-- relative_name  -->
+              <!-- attendance_time  -->
+              <!-- status  -->
+              <v-col cols="12" sm="12" md="6">
+                <base-input
+                  label="Estado"
+                  v-model="v$.editedItem.status.$model"
+                  :rules="v$.editedItem.status"
+                />
+              </v-col>
+              <!-- status  -->
+              <!-- inscription_id  -->
+              <v-col cols="12" sm="12" md="6">
+                <base-select
+                  label="Inscripción"
+                  :items="inscriptions"
+                  item-title="id"
+                  item-value="id"
+                  v-model="v$.editedItem.inscription_id.$model"
+                  :rules="v$.editedItem.inscription_id"
+                />
+              </v-col>
+              <!-- inscription_id  -->
             </v-row>
             <!-- Form -->
             <v-row>
@@ -218,17 +154,10 @@
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
-import {
-  helpers,
-  minLength,
-  required,
-  email,
-  maxLength,
-} from "@vuelidate/validators";
+import { helpers, required } from "@vuelidate/validators";
 
-import studentApi from "@/services/studentApi";
-import relativeApi from "@/services/relativeApi";
-import municipalityApi from "@/services/municipalityApi";
+import attendanceApi from "@/services/attendanceApi";
+import inscriptionApi from "@/services/inscriptionApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
@@ -250,54 +179,40 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
-      title: "ESTUDIANTE",
+      title: "ASISTENCIA",
       headers: [
-        { title: "NOMBRES", key: "name" },
-        { title: "APELLIDOS", key: "last_name" },
-        { title: "EDAD ", key: "age" },
+        { title: "FECHA", key: "attendance_date" },
+        { title: "HORA", key: "attendance_time" },
+        { title: "ESTADO", key: "status" },
+        // { title: "INSCRIPCIÓN", key: "inscription_id" },
         { title: "CARNET", key: "card" },
-        { title: "NIE", key: "nie" },
-        { title: "TELÉFONO ", key: "phone_number" },
-        { title: "CORREO", key: "mail" },
-        { title: "FECHA INGRESO", key: "admission_date" },
-        { title: "MUNICIPIO ", key: "municipality_name" },
-        { title: "PARIENTE ", key: "full_name" },
+        { title: "MATERIA", key: "subject_name" },
+        { title: "GROUP", key: "group_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       total: 0,
       records: [],
-      municipalities: [],
-      departments: [],
-      relatives: [],
+      inscriptions: [],
       loading: false,
       debounce: 0,
       options: {},
       editedItem: {
-        name: "",
-        last_name: "",
-        age: "",
+        attendance_date: "",
+        attendance_time: "",
+        status: "",
+        inscription_id: "",
         card: "",
-        nie: "",
-        phone_number: "",
-        mail: "",
-        admission_date: "",
-        municipality_name: "",
-        full_name: "",
       },
       defaultItem: {
-        name: "",
-        last_name: "",
-        age: "",
+        attendance_date: "",
+        attendance_time: "",
+        status: "",
+        inscription_id: "",
         card: "",
-        nie: "",
-        phone_number: "",
-        mail: "",
-        admission_date: "",
-        municipality_name: "",
-        full_name: "",
       },
     };
   },
+
   mounted() {
     this.initialize();
   },
@@ -323,63 +238,16 @@ export default {
   validations() {
     return {
       editedItem: {
-        name: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(3)
-          ),
-        },
-        last_name: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(3)
-          ),
-        },
-        age: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(1)
-          ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(2)),
-        },
-        card: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(4)
-          ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(4)),
-        },
-        nie: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(7)
-          ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(7)),
-        },
-        phone_number: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(8)
-          ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(8)),
-        },
-        mail: {
-          required: helpers.withMessage(langMessages.required, required),
-          email: helpers.withMessage(langMessages.email, email),
-        },
-        admission_date: {
+        attendance_date: {
           required: helpers.withMessage(langMessages.required, required),
         },
-        municipality_name: {
+        attendance_time: {
           required: helpers.withMessage(langMessages.required, required),
         },
-        full_name: {
+        status: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
+        inscription_id: {
           required: helpers.withMessage(langMessages.required, required),
         },
       },
@@ -393,12 +261,7 @@ export default {
 
       let requests = [
         this.getDataFromApi(),
-        municipalityApi.get(null, {
-          params: {
-            itemsPerPage: -1,
-          },
-        }),
-        relativeApi.get(null, {
+        inscriptionApi.get(null, {
           params: {
             itemsPerPage: -1,
           },
@@ -409,8 +272,7 @@ export default {
       });
 
       if (responses) {
-        this.municipalities = responses[1].data.data;
-        this.relatives = responses[2].data.data;
+        this.inscriptions = responses[1].data.data;
       }
 
       this.loading = false;
@@ -423,7 +285,7 @@ export default {
       clearTimeout(this.debounce);
       this.debounce = setTimeout(async () => {
         try {
-          const { data } = await studentApi.get(null, {
+          const { data } = await attendanceApi.get(null, {
             params: { ...options, search: this.search },
           });
 
@@ -485,7 +347,7 @@ export default {
         );
 
         try {
-          const { data } = await studentApi.put(`/${edited.id}`, edited);
+          const { data } = await attendanceApi.put(`/${edited.id}`, edited);
           alert.success(data.message);
         } catch (error) {
           alert.error("No fue posible actualizar el registro.");
@@ -498,7 +360,7 @@ export default {
 
       // Creating record
       try {
-        const { data } = await studentApi.post(null, this.editedItem);
+        const { data } = await attendanceApi.post(null, this.editedItem);
         alert.success(data.message);
       } catch (error) {
         alert.error("No fue posible crear el registro.");
@@ -518,7 +380,7 @@ export default {
 
     async deleteItemConfirm() {
       try {
-        const { data } = await studentApi.delete(`/${this.editedItem.id}`, {
+        const { data } = await attendanceApi.delete(`/${this.editedItem.id}`, {
           params: { id: this.editedItem.id },
         });
 
