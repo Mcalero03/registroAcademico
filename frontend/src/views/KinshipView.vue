@@ -63,47 +63,15 @@
           <v-container>
             <!-- Form -->
             <v-row class="pt-0">
-              <!-- attendance_date  -->
-              <v-col cols="12" sm="12" md="6">
+              <!-- subject_name  -->
+              <v-col cols="12" sm="12" md="12">
                 <base-input
-                  label="Fecha de asistencia"
-                  v-model="v$.editedItem.attendance_date.$model"
-                  :rules="v$.editedItem.attendance_date"
-                  type="date"
+                  label="Parentesco"
+                  v-model="v$.editedItem.kinship.$model"
+                  :rules="v$.editedItem.kinship"
                 />
               </v-col>
-              <!-- attendance_date  -->
-              <!-- attendance_time  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Hora de asistencia"
-                  v-model="v$.editedItem.attendance_time.$model"
-                  :rules="v$.editedItem.attendance_time"
-                  type="time"
-                />
-              </v-col>
-              <!-- attendance_time  -->
-              <!-- status  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Estado"
-                  v-model="v$.editedItem.status.$model"
-                  :rules="v$.editedItem.status"
-                />
-              </v-col>
-              <!-- status  -->
-              <!-- inscription_id  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-select
-                  label="Inscripción"
-                  :items="inscriptions"
-                  item-title="id"
-                  item-value="id"
-                  v-model="v$.editedItem.inscription_id.$model"
-                  :rules="v$.editedItem.inscription_id"
-                />
-              </v-col>
-              <!-- inscription_id  -->
+              <!-- subject_name  -->
             </v-row>
             <!-- Form -->
             <v-row>
@@ -154,13 +122,11 @@
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
-import { helpers, required } from "@vuelidate/validators";
+import { helpers, minLength, required } from "@vuelidate/validators";
 
-import attendanceApi from "@/services/attendanceApi";
-import inscriptionApi from "@/services/inscriptionApi";
+import kinshipApi from "@/services/kinshipApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
-import BaseSelect from "../components/base-components/BaseSelect.vue";
 
 import useAlert from "../composables/useAlert";
 
@@ -168,7 +134,7 @@ const { alert } = useAlert();
 const langMessages = messages["es"].validations;
 
 export default {
-  components: { BaseButton, BaseInput, BaseSelect },
+  components: { BaseButton, BaseInput },
 
   setup() {
     return { v$: useVuelidate() };
@@ -179,42 +145,24 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
-      title: "ASISTENCIA",
+      editedIndex: -1,
+      title: "PARENTESCO",
       headers: [
-        { title: "FECHA", key: "attendance_date" },
-        { title: "HORA", key: "attendance_time" },
-        { title: "ESTADO", key: "status" },
-        // { title: "INSCRIPCIÓN", key: "inscription_id" },
-        { title: "CARNET", key: "card" },
-        { title: "MATERIA", key: "subject_name" },
-        { title: "GROUP", key: "group_name" },
+        { title: "PARENTESCO", key: "kinship" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       total: 0,
       records: [],
-      inscriptions: [],
       loading: false,
       debounce: 0,
       options: {},
       editedItem: {
-        attendance_date: "",
-        attendance_time: "",
-        status: "",
-        inscription_id: "",
-        card: "",
+        kinship: "",
       },
       defaultItem: {
-        attendance_date: "",
-        attendance_time: "",
-        status: "",
-        inscription_id: "",
-        card: "",
+        kinship: "",
       },
     };
-  },
-
-  mounted() {
-    this.initialize();
   },
 
   computed: {
@@ -238,17 +186,12 @@ export default {
   validations() {
     return {
       editedItem: {
-        attendance_date: {
+        kinship: {
           required: helpers.withMessage(langMessages.required, required),
-        },
-        attendance_time: {
-          required: helpers.withMessage(langMessages.required, required),
-        },
-        status: {
-          required: helpers.withMessage(langMessages.required, required),
-        },
-        inscription_id: {
-          required: helpers.withMessage(langMessages.required, required),
+          minLength: helpers.withMessage(
+            ({ $params }) => langMessages.minLength($params),
+            minLength(3)
+          ),
         },
       },
     };
@@ -259,20 +202,12 @@ export default {
       this.loading = true;
       this.records = [];
 
-      let requests = [
-        this.getDataFromApi(),
-        inscriptionApi.get(null, {
-          params: {
-            itemsPerPage: -1,
-          },
-        }),
-      ];
+      let requests = [this.getDataFromApi()];
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
       });
 
       if (responses) {
-        this.inscriptions = responses[1].data.data;
       }
 
       this.loading = false;
@@ -285,7 +220,7 @@ export default {
       clearTimeout(this.debounce);
       this.debounce = setTimeout(async () => {
         try {
-          const { data } = await attendanceApi.get(null, {
+          const { data } = await kinshipApi.get(null, {
             params: { ...options, search: this.search },
           });
 
@@ -296,10 +231,6 @@ export default {
           alert.error("No fue posible obtener los registros.");
         }
       });
-    },
-
-    created() {
-      this.initialize();
     },
 
     beforeMount() {
@@ -347,7 +278,7 @@ export default {
         );
 
         try {
-          const { data } = await attendanceApi.put(`/${edited.id}`, edited);
+          const { data } = await kinshipApi.put(`/${edited.id}`, edited);
           alert.success(data.message);
         } catch (error) {
           alert.error("No fue posible actualizar el registro.");
@@ -360,7 +291,7 @@ export default {
 
       // Creating record
       try {
-        const { data } = await attendanceApi.post(null, this.editedItem);
+        const { data } = await kinshipApi.post(null, this.editedItem);
         alert.success(data.message);
       } catch (error) {
         alert.error("No fue posible crear el registro.");
@@ -380,7 +311,7 @@ export default {
 
     async deleteItemConfirm() {
       try {
-        const { data } = await attendanceApi.delete(`/${this.editedItem.id}`, {
+        const { data } = await kinshipApi.delete(`/${this.editedItem.id}`, {
           params: { id: this.editedItem.id },
         });
 

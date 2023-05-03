@@ -156,18 +156,6 @@
                 </base-select>
               </v-col>
               <!-- municipality_name  -->
-              <!-- relative_name  -->
-              <v-col cols="12" sm="6" md="6">
-                <base-select
-                  label="Nombre del pariente"
-                  :items="relatives"
-                  item-title="full_name"
-                  item-value="full_name"
-                  v-model="v$.editedItem.full_name.$model"
-                  :rules="v$.editedItem.full_name"
-                />
-              </v-col>
-              <!-- relative_name  -->
             </v-row>
             <!-- Form -->
             <v-row>
@@ -227,7 +215,6 @@ import {
 } from "@vuelidate/validators";
 
 import studentApi from "@/services/studentApi";
-import relativeApi from "@/services/relativeApi";
 import municipalityApi from "@/services/municipalityApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
@@ -250,6 +237,7 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      editedIndex: -1,
       title: "ESTUDIANTE",
       headers: [
         { title: "NOMBRES", key: "name" },
@@ -261,7 +249,6 @@ export default {
         { title: "CORREO", key: "mail" },
         { title: "FECHA INGRESO", key: "admission_date" },
         { title: "MUNICIPIO ", key: "municipality_name" },
-        { title: "PARIENTE ", key: "full_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       total: 0,
@@ -282,7 +269,6 @@ export default {
         mail: "",
         admission_date: "",
         municipality_name: "",
-        full_name: "",
       },
       defaultItem: {
         name: "",
@@ -294,7 +280,6 @@ export default {
         mail: "",
         admission_date: "",
         municipality_name: "",
-        full_name: "",
       },
     };
   },
@@ -377,9 +362,6 @@ export default {
           required: helpers.withMessage(langMessages.required, required),
         },
         municipality_name: {
-          required: helpers.withMessage(langMessages.required, required),
-        },
-        full_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
       },

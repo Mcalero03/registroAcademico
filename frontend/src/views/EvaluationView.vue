@@ -169,6 +169,7 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      editedIndex: -1,
       title: "EVALUACIÓN",
       headers: [
         { title: "EVALUACIÓN", key: "evaluation_name" },

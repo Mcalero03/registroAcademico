@@ -13,14 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('relative', function (Blueprint $table) {
+        Schema::create('student', function (Blueprint $table) {
             $table->id();
-            $table->string('relationship', 45);
             $table->string('name');
             $table->string('last_name');
-            $table->integer('dui');
+            $table->integer('age');
+            $table->string('card', 45);
+            $table->integer('nie');
             $table->integer('phone_number');
             $table->string('mail');
+            $table->date('admission_date');
+            $table->foreignId('municipalities_id')->constrained('municipalities');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -33,6 +36,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('relative');
+        Schema::dropIfExists('student');
     }
 };

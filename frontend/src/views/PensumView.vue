@@ -221,6 +221,7 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      editedIndex: -1,
       title: "PENSUM",
       headers: [
         { title: "PROGRAMA", key: "program_name" },

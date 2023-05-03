@@ -28,7 +28,6 @@ class Student extends Model
         'mail',
         'admission_date',
         'municipalities_id',
-        'relative_id',
     ];
 
     public $hidden = [
@@ -40,11 +39,6 @@ class Student extends Model
     public function municipality()
     {
         return $this->belongsTo(Municipality::class, 'municipalities_id')->withDefault();
-    }
-
-    public function relative()
-    {
-        return $this->belongsTo(Relative::class, 'relative_id')->withDefault();
     }
 
     public function format()
@@ -60,7 +54,6 @@ class Student extends Model
             'mail' => $this->mail,
             'admission_date' => $this->admission_date,
             'municipality_name' => $this->municipality->municipality_name . ', ' . $this->municipality->department->department_name,
-            'full_name' => $this->relative->name . ', ' . $this->relative->last_name,
         ];
     }
 
@@ -76,7 +69,6 @@ class Student extends Model
             ->orWhere('student.mail', 'like', $search)
             ->orWhere('student.admission_date', 'like', $search)
             ->orWhere('student.municipalities_id', 'like', $search)
-            ->orWhere('student.relative_id', 'like', $search)
 
             ->skip($skip)
             ->take($itemsPerpage)
@@ -97,7 +89,6 @@ class Student extends Model
             ->orWhere('student.mail', 'like', $search)
             ->orWhere('student.admission_date', 'like', $search)
             ->orWhere('student.municipalities_id', 'like', $search)
-            ->orWhere('student.relative_id', 'like', $search)
 
             ->count();
     }
@@ -109,13 +100,5 @@ class Student extends Model
             ->where('municipalities.municipality_name', $municipality)
             ->where('department.department_name', $department)
             ->get('municipalities.id');
-    }
-
-    public static function relativeId($name, $last_name)
-    {
-        return Relative::select('relative.id')
-            ->where('name', $name)
-            ->where('last_name', $last_name)
-            ->get('relative.id');
     }
 }

@@ -155,6 +155,7 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      editedIndex: -1,
       title: "GRUPO",
       headers: [
         { title: "GRUPO", key: "group_name" },

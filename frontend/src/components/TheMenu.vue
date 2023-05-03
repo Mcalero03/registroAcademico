@@ -134,6 +134,11 @@ export default {
         icon: "mdi-human-male-female-child",
       },
       {
+        title: "Parentesco",
+        url: "/kinship",
+        icon: "mdi-family-tree",
+      },
+      {
         title: "Escuela",
         url: "/college",
         icon: "mdi-account-school",

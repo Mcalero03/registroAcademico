@@ -19,12 +19,13 @@ class Relative extends Model
 
     protected $fillable = [
         'id',
-        'relationship',
         'name',
         'last_name',
         'dui',
         'phone_number',
         'mail',
+        'student_id',
+        'kinship_id',
     ];
 
     public $hidden = [
@@ -38,7 +39,6 @@ class Relative extends Model
         return [
             'id' => Encrypt::encryptValue($this->id),
             'full_name' => $this->name . ', ' . $this->last_name,
-            'relationship' => $this->relationship,
             'name' => $this->name,
             'last_name' => $this->last_name,
             'dui' => $this->dui,
@@ -51,8 +51,7 @@ class Relative extends Model
     {
         return Relative::select('relative.*', 'relative.id as id')
 
-            ->where('relative.relationship', 'like', $search)
-            ->orWhere('relative.name', 'like', $search)
+            ->Where('relative.name', 'like', $search)
             ->orWhere('relative.last_name', 'like', $search)
             ->orWhere('relative.dui', 'like', $search)
             ->orWhere('relative.phone_number', 'like', $search)
@@ -69,8 +68,7 @@ class Relative extends Model
     {
         return Relative::select('relative.*', 'relative.id as id')
 
-            ->where('relative.relationship', 'like', $search)
-            ->orWhere('relative.name', 'like', $search)
+            ->Where('relative.name', 'like', $search)
             ->orWhere('relative.last_name', 'like', $search)
             ->orWhere('relative.dui', 'like', $search)
             ->orWhere('relative.phone_number', 'like', $search)

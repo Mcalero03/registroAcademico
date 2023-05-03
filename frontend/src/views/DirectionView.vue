@@ -137,6 +137,7 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      editedIndex: -1,
       headers: [
         { title: "DIRECCIÓN", key: "direction_name" },
         { title: "ACCIONES", key: "actions", sortable: false },

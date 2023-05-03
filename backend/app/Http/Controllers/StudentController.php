@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Municipality;
-use App\Models\Relative;
 use Illuminate\Http\Request;
 use App\Models\Student;
 use Encrypt;
@@ -49,11 +48,6 @@ class StudentController extends Controller
         $data = explode(', ', $municipality);
         $id = Student::municipalityId($data[0], $data[1])->pluck('id');
 
-        $relative = $request->full_name;
-        $rData = explode(', ', $relative);
-        $rId = Student::relativeId($rData[0], $rData[1])->pluck('id');
-
-
         $student = new Student;
         $student->name = $request->name;
         $student->last_name = $request->last_name;
@@ -64,7 +58,6 @@ class StudentController extends Controller
         $student->mail = $request->mail;
         $student->admission_date = $request->admission_date;
         $student->municipalities_id = Municipality::where('id', $id)->first()?->id;
-        $student->relative_id = Relative::where('id', $rId)->first()?->id;
 
         $student->save();
 
@@ -92,10 +85,6 @@ class StudentController extends Controller
         $info = explode(', ', $municipality);
         $id = Student::municipalityId($info[0], $info[1])->pluck('id');
 
-        $relative = $request->full_name;
-        $rData = explode(', ', $relative);
-        $rId = Student::relativeId($rData[0], $rData[1])->pluck('id');
-
         $student = Student::where('id', $data['id'])->first();
         $student->name = $request->name;
         $student->last_name = $request->last_name;
@@ -106,7 +95,6 @@ class StudentController extends Controller
         $student->mail = $request->mail;
         $student->admission_date = $request->admission_date;
         $student->municipalities_id = Municipality::where('id', $id)->first()?->id;
-        $student->relative_id = Relative::where('id', $rId)->first()?->id;
 
         $student->save();
 

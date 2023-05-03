@@ -141,6 +141,12 @@ const router = createRouter({
       meta: {requiresAuth: true} // add meta field to specify the route
     },
     {
+      path: '/kinship', 
+      name: 'kinship',
+      component: () => import("../views/KinshipView.vue"),
+      meta: {requiresAuth: true} // add meta field to specify the route
+    },
+    {
       path: "/:pathMatch(.*)*",
       name: "NotFound",
       component: NotFoundView,

@@ -194,6 +194,7 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      editedIndex: -1,
       title: "MUNICIPIOS",
       headers: [
         { title: "MUNICIPIO", key: "municipality" },

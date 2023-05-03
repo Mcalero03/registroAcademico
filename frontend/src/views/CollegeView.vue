@@ -159,6 +159,7 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      editedIndex: -1,
       title: "ESCUELA",
       headers: [
         { title: "ESCUELA", key: "college_name" },

@@ -18,6 +18,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\InscriptionController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\TeacherSubjectDetailController;
+use App\Http\Controllers\KinshipController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -55,3 +56,4 @@ Route::resource('/student', StudentController::class);
 Route::resource('/inscription', InscriptionController::class);
 Route::resource('/attendance', AttendanceController::class);
 Route::resource('/teacherSubjectDetail', TeacherSubjectDetailController::class);
+Route::resource('/kinship', kinshipController::class);

@@ -162,6 +162,7 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      editedIndex: -1,
       title: "PREREQUISITO",
       headers: [
         { title: "MATERIA PREREQUISITO", key: "detail_subject_name" },

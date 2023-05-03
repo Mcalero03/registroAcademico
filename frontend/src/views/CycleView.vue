@@ -187,6 +187,7 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      editedIndex: -1,
       title: "CICLO",
       headers: [
         { title: "CICLO", key: "cycle_number" },
