@@ -229,6 +229,7 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      editedIndex: -1,
       title: "INSCRIPCIÓN",
       headers: [
         { title: "INSCRIPCIÓN", key: "inscription_date" },

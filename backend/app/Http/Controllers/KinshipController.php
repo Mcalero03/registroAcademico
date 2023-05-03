@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Relative;
+use App\Models\Kinship;
 use Encrypt;
 
-class RelativeController extends Controller
+class KinshipController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,7 +18,7 @@ class RelativeController extends Controller
 
         // Getting all the records
         if (($request->itemsPerPage == -1)) {
-            $itemsPerPage =  Relative::count();
+            $itemsPerPage =  Kinship::count();
             $skip = 0;
         }
 
@@ -27,13 +27,14 @@ class RelativeController extends Controller
 
         $search = (isset($request->search)) ? "%$request->search%" : '%%';
 
-        $relative = Relative::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
+        $kinship = Kinship::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
+        $kinship = Encrypt::encryptObject($kinship, "id");
 
-        $total = Relative::counterPagination($search);
+        $total = Kinship::counterPagination($search);
 
         return response()->json([
             "message" => "Registros obtenidos correctamente.",
-            "data" => $relative,
+            "data" => $kinship,
             "total" => $total,
         ]);
     }
@@ -43,15 +44,9 @@ class RelativeController extends Controller
      */
     public function store(Request $request)
     {
-        $relative = new Relative;
-        $relative->relationship = $request->relationship;
-        $relative->name = $request->name;
-        $relative->last_name = $request->last_name;
-        $relative->dui = $request->dui;
-        $relative->phone_number = $request->phone_number;
-        $relative->mail = $request->mail;
-
-        $relative->save();
+        $kinship = new Kinship;
+        $kinship->kinship = $request->kinship;
+        $kinship->save();
 
         return response()->json([
             "message" => "Registro creado correctamente.",
@@ -73,15 +68,10 @@ class RelativeController extends Controller
     {
         $data = Encrypt::decryptArray($request->all(), 'id');
 
-        $relative = Relative::where('id', $data['id'])->first();
-        $relative->relationship = $request->relationship;
-        $relative->name = $request->name;
-        $relative->last_name = $request->last_name;
-        $relative->dui = $request->dui;
-        $relative->phone_number = $request->phone_number;
-        $relative->mail = $request->mail;
+        $kinship = Kinship::where('id', $data['id'])->first();
+        $kinship->kinship = $request->kinship;
 
-        $relative->save();
+        $kinship->save();
 
         return response()->json([
             "message" => "Registro modificado correctamente.",
@@ -95,7 +85,7 @@ class RelativeController extends Controller
     {
         $id = Encrypt::decryptValue($request->id);
 
-        Relative::where('id', $id)->delete();
+        Kinship::where('id', $id)->delete();
 
         return response()->json([
             "message" => "Registro eliminado correctamente.",

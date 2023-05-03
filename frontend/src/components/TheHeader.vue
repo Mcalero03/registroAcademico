@@ -9,7 +9,7 @@
             /></a>
           </div>
           <div class="ms-5 ps-3 me-2 d-none d-xs-flex d-sm-flex">
-            <h1>Name app</h1>
+            <h1>Registro Académico</h1>
           </div>
         </div>
         <div

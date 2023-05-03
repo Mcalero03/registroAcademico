@@ -135,6 +135,7 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      editedIndex: -1,
       headers: [
         { title: "TIPO PENSUM", key: "pensum_type_name" },
         { title: "ACCIONES", key: "actions", sortable: false },

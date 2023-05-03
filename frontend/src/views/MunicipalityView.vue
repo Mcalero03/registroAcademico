@@ -67,8 +67,8 @@
               <v-col cols="12" sm="12" md="6">
                 <base-input
                   label="Nombre del municipio"
-                  v-model="v$.editedItem.municipality_name.$model"
-                  :rules="v$.editedItem.municipality_name"
+                  v-model="v$.editedItem.municipality.$model"
+                  :rules="v$.editedItem.municipality"
                 />
               </v-col>
               <!-- municipality_name  -->
@@ -194,9 +194,10 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      editedIndex: -1,
       title: "MUNICIPIOS",
       headers: [
-        { title: "MUNICIPIO", key: "municipality_name" },
+        { title: "MUNICIPIO", key: "municipality" },
         { title: "MIN MUN", key: "mun_min" },
         { title: "MAY MUN", key: "mun_may" },
         { title: "DM COD", key: "dm_cod" },
@@ -211,7 +212,7 @@ export default {
       debounce: 0,
       options: {},
       editedItem: {
-        municipality_name: "",
+        municipality: "",
         mun_min: "",
         mun_may: "",
         dm_cod: "",
@@ -219,7 +220,7 @@ export default {
         department_name: "",
       },
       defaultItem: {
-        municipality_name: "",
+        municipality: "",
         mun_min: "",
         mun_may: "",
         dm_cod: "",
@@ -254,7 +255,7 @@ export default {
   validations() {
     return {
       editedItem: {
-        municipality_name: {
+        municipality: {
           required: helpers.withMessage(langMessages.required, required),
           minLength: helpers.withMessage(
             ({ $params }) => langMessages.minLength($params),

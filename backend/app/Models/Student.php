@@ -28,7 +28,6 @@ class Student extends Model
         'mail',
         'admission_date',
         'municipalities_id',
-        'relative_id',
     ];
 
     public $hidden = [
@@ -39,12 +38,7 @@ class Student extends Model
 
     public function municipality()
     {
-        return $this->belongsTo(Municipality::class, 'municipalities_id');
-    }
-
-    public function relative()
-    {
-        return $this->belongsTo(Relative::class, 'relative_id');
+        return $this->belongsTo(Municipality::class, 'municipalities_id')->withDefault();
     }
 
     public function format()
@@ -59,15 +53,13 @@ class Student extends Model
             'phone_number' => $this->phone_number,
             'mail' => $this->mail,
             'admission_date' => $this->admission_date,
-            'municipality_name' => $this->municipality->municipality_name,
-            'relative_name' => $this->relative->name,
+            'municipality_name' => $this->municipality->municipality_name . ', ' . $this->municipality->department->department_name,
         ];
     }
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
         return Student::select('student.*', 'student.id as id')
-
             ->where('student.name', 'like', $search)
             ->orWhere('student.last_name', 'like', $search)
             ->orWhere('student.age', 'like', $search)
@@ -77,7 +69,6 @@ class Student extends Model
             ->orWhere('student.mail', 'like', $search)
             ->orWhere('student.admission_date', 'like', $search)
             ->orWhere('student.municipalities_id', 'like', $search)
-            ->orWhere('student.relative_id', 'like', $search)
 
             ->skip($skip)
             ->take($itemsPerpage)
@@ -89,7 +80,6 @@ class Student extends Model
     public static function counterPagination($search)
     {
         return Student::select('student.*', 'student.id as id')
-
             ->where('student.name', 'like', $search)
             ->orWhere('student.last_name', 'like', $search)
             ->orWhere('student.age', 'like', $search)
@@ -99,8 +89,16 @@ class Student extends Model
             ->orWhere('student.mail', 'like', $search)
             ->orWhere('student.admission_date', 'like', $search)
             ->orWhere('student.municipalities_id', 'like', $search)
-            ->orWhere('student.relative_id', 'like', $search)
 
             ->count();
+    }
+
+    public static function municipalityId($municipality, $department)
+    {
+        return Municipality::select('municipalities.id')
+            ->join('department', 'municipalities.department_id', '=', 'department.id')
+            ->where('municipalities.municipality_name', $municipality)
+            ->where('department.department_name', $department)
+            ->get('municipalities.id');
     }
 }

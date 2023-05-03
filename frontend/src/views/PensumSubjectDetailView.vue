@@ -162,6 +162,7 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      editedIndex: -1,
       title: "DETALLE PENSUM MATERIA",
       headers: [
         { title: "PENSUM", key: "program_name" },

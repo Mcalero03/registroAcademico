@@ -36,18 +36,19 @@ class Municipality extends Model
 
     public function department()
     {
-        return $this->belongsTo(Department::class, 'department_id', 'id');
+        return $this->belongsTo(Department::class, 'department_id', 'id')->withDefault();
     }
 
     public function format()
     {
         return [
             'id' => Encrypt::encryptValue($this->id),
-            'municipality_name' => $this->municipality_name,
+            'municipality_name' => $this->municipality_name . ', ' . $this->department->department_name,
             'mun_min' => $this->mun_min,
             'mun_may' => $this->mun_may,
             'dm_cod' => $this->dm_cod,
             'cod_mun' => $this->cod_mun,
+            'municipality' => $this->municipality_name,
             'department_name' => $this->department->department_name,
         ];
     }

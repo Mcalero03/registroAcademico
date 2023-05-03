@@ -63,56 +63,15 @@
           <v-container>
             <!-- Form -->
             <v-row class="pt-0">
-              <!-- cycle_number  -->
-              <v-col cols="12" sm="12" md="6">
+              <!-- subject_name  -->
+              <v-col cols="12" sm="12" md="12">
                 <base-input
-                  label="Número de ciclo"
-                  v-model="v$.editedItem.cycle_number.$model"
-                  :rules="v$.editedItem.cycle_number"
+                  label="Parentesco"
+                  v-model="v$.editedItem.kinship.$model"
+                  :rules="v$.editedItem.kinship"
                 />
               </v-col>
-              <!-- cycle_number  -->
-              <!-- year  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Año lectivo"
-                  v-model="v$.editedItem.year.$model"
-                  :rules="v$.editedItem.year"
-                />
-              </v-col>
-              <!-- year  -->
-              <!-- start_date  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Fecha de inicio"
-                  v-model="v$.editedItem.start_date.$model"
-                  :rules="v$.editedItem.start_date"
-                  type="date"
-                />
-              </v-col>
-              <!-- start_date  -->
-              <!-- end_date  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Fecha de finalización"
-                  v-model="v$.editedItem.end_date.$model"
-                  :rules="v$.editedItem.end_date"
-                  type="date"
-                />
-              </v-col>
-              <!-- end_date  -->
-              <!-- status  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-select
-                  label="Estado del ciclo"
-                  :items="status"
-                  item-title="status"
-                  item-value="status"
-                  v-model="v$.editedItem.status.$model"
-                  :rules="v$.editedItem.status"
-                />
-              </v-col>
-              <!-- status  -->
+              <!-- subject_name  -->
             </v-row>
             <!-- Form -->
             <v-row>
@@ -163,12 +122,11 @@
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
-import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
+import { helpers, minLength, required } from "@vuelidate/validators";
 
-import cycleApi from "@/services/cycleApi";
+import kinshipApi from "@/services/kinshipApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
-import BaseSelect from "../components/base-components/BaseSelect.vue";
 
 import useAlert from "../composables/useAlert";
 
@@ -176,7 +134,7 @@ const { alert } = useAlert();
 const langMessages = messages["es"].validations;
 
 export default {
-  components: { BaseButton, BaseInput, BaseSelect },
+  components: { BaseButton, BaseInput },
 
   setup() {
     return { v$: useVuelidate() };
@@ -188,34 +146,21 @@ export default {
       dialog: false,
       dialogDelete: false,
       editedIndex: -1,
-      title: "CICLO",
+      title: "PARENTESCO",
       headers: [
-        { title: "CICLO", key: "cycle_number" },
-        { title: "AÑO", key: "year" },
-        { title: "INICIO", key: "start_date" },
-        { title: "FIN", key: "end_date" },
-        { title: "ESTADO", key: "status" },
+        { title: "PARENTESCO", key: "kinship" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       total: 0,
       records: [],
       loading: false,
       debounce: 0,
-      status: ["Creado", "En proceso", "Finalizado"],
       options: {},
       editedItem: {
-        cycle_number: "",
-        year: "",
-        start_date: "",
-        end_date: "",
-        status: "",
+        kinship: "",
       },
       defaultItem: {
-        cycle_number: "",
-        year: "",
-        start_date: "",
-        end_date: "",
-        status: "",
+        kinship: "",
       },
     };
   },
@@ -241,33 +186,11 @@ export default {
   validations() {
     return {
       editedItem: {
-        cycle_number: {
+        kinship: {
           required: helpers.withMessage(langMessages.required, required),
           minLength: helpers.withMessage(
             ({ $params }) => langMessages.minLength($params),
-            minLength(1)
-          ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(1)),
-        },
-        year: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(4)
-          ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(4)),
-        },
-        start_date: {
-          required: helpers.withMessage(langMessages.required, required),
-        },
-        end_date: {
-          required: helpers.withMessage(langMessages.required, required),
-        },
-        status: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(4)
+            minLength(3)
           ),
         },
       },
@@ -297,7 +220,7 @@ export default {
       clearTimeout(this.debounce);
       this.debounce = setTimeout(async () => {
         try {
-          const { data } = await cycleApi.get(null, {
+          const { data } = await kinshipApi.get(null, {
             params: { ...options, search: this.search },
           });
 
@@ -308,10 +231,6 @@ export default {
           alert.error("No fue posible obtener los registros.");
         }
       });
-    },
-
-    created() {
-      this.initialize();
     },
 
     beforeMount() {
@@ -359,7 +278,7 @@ export default {
         );
 
         try {
-          const { data } = await cycleApi.put(`/${edited.id}`, edited);
+          const { data } = await kinshipApi.put(`/${edited.id}`, edited);
           alert.success(data.message);
         } catch (error) {
           alert.error("No fue posible actualizar el registro.");
@@ -372,7 +291,7 @@ export default {
 
       // Creating record
       try {
-        const { data } = await cycleApi.post(null, this.editedItem);
+        const { data } = await kinshipApi.post(null, this.editedItem);
         alert.success(data.message);
       } catch (error) {
         alert.error("No fue posible crear el registro.");
@@ -392,7 +311,7 @@ export default {
 
     async deleteItemConfirm() {
       try {
-        const { data } = await cycleApi.delete(`/${this.editedItem.id}`, {
+        const { data } = await kinshipApi.delete(`/${this.editedItem.id}`, {
           params: { id: this.editedItem.id },
         });
 

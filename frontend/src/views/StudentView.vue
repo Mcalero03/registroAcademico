@@ -64,7 +64,7 @@
             <!-- Form -->
             <v-row class="pt-0">
               <!-- name  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Nombres del estudiante"
                   v-model="v$.editedItem.name.$model"
@@ -73,7 +73,7 @@
               </v-col>
               <!-- name  -->
               <!-- last_name  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Apellidos del estudiante"
                   v-model="v$.editedItem.last_name.$model"
@@ -82,37 +82,42 @@
               </v-col>
               <!-- last_name  -->
               <!-- age  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="6" sm="3" md="3">
                 <base-input
                   label="Edad"
                   v-model="v$.editedItem.age.$model"
                   :rules="v$.editedItem.age"
                   type="number"
+                  min="1"
                 />
               </v-col>
               <!-- age  -->
               <!-- card  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="6" sm="3" md="3">
                 <base-input
                   label="Carnet"
                   v-model="v$.editedItem.card.$model"
                   :rules="v$.editedItem.card"
+                  type="number"
+                  min="0"
                 />
               </v-col>
               <!-- card  -->
               <!-- nie  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="6" sm="3" md="3">
                 <base-input
                   label="NIE"
                   v-model="v$.editedItem.nie.$model"
                   :rules="v$.editedItem.nie"
+                  type="number"
+                  min="0"
                 />
               </v-col>
               <!-- nie  -->
               <!-- phone_number  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="6" sm="3" md="3">
                 <base-input
-                  label="Número de teléfono"
+                  label="Teléfono"
                   v-model="v$.editedItem.phone_number.$model"
                   :rules="v$.editedItem.phone_number"
                   type="number"
@@ -120,7 +125,7 @@
               </v-col>
               <!-- phone_number  -->
               <!-- mail  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Correo"
                   v-model="v$.editedItem.mail.$model"
@@ -129,7 +134,7 @@
               </v-col>
               <!-- mail  -->
               <!-- admission_date  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Fecha de ingreso"
                   v-model="v$.editedItem.admission_date.$model"
@@ -139,7 +144,7 @@
               </v-col>
               <!-- admission_date  -->
               <!-- municipality_name  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-select
                   label="Municipio de residencia"
                   :items="municipalities"
@@ -147,21 +152,10 @@
                   item-value="municipality_name"
                   v-model="v$.editedItem.municipality_name.$model"
                   :rules="v$.editedItem.municipality_name"
-                />
+                >
+                </base-select>
               </v-col>
               <!-- municipality_name  -->
-              <!-- relative_name  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-select
-                  label="Nombre del pariente"
-                  :items="relatives"
-                  item-title="name"
-                  item-value="name"
-                  v-model="v$.editedItem.relative_name.$model"
-                  :rules="v$.editedItem.relative_name"
-                />
-              </v-col>
-              <!-- relative_name  -->
             </v-row>
             <!-- Form -->
             <v-row>
@@ -221,7 +215,6 @@ import {
 } from "@vuelidate/validators";
 
 import studentApi from "@/services/studentApi";
-import relativeApi from "@/services/relativeApi";
 import municipalityApi from "@/services/municipalityApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
@@ -244,6 +237,7 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      editedIndex: -1,
       title: "ESTUDIANTE",
       headers: [
         { title: "NOMBRES", key: "name" },
@@ -255,12 +249,12 @@ export default {
         { title: "CORREO", key: "mail" },
         { title: "FECHA INGRESO", key: "admission_date" },
         { title: "MUNICIPIO ", key: "municipality_name" },
-        { title: "PARIENTE ", key: "relative_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       total: 0,
       records: [],
       municipalities: [],
+      departments: [],
       relatives: [],
       loading: false,
       debounce: 0,
@@ -275,7 +269,6 @@ export default {
         mail: "",
         admission_date: "",
         municipality_name: "",
-        relative_name: "",
       },
       defaultItem: {
         name: "",
@@ -287,7 +280,6 @@ export default {
         mail: "",
         admission_date: "",
         municipality_name: "",
-        relative_name: "",
       },
     };
   },
@@ -370,9 +362,6 @@ export default {
           required: helpers.withMessage(langMessages.required, required),
         },
         municipality_name: {
-          required: helpers.withMessage(langMessages.required, required),
-        },
-        relative_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
       },

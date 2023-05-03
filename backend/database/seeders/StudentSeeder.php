@@ -27,7 +27,6 @@ class StudentSeeder extends Seeder
                 "mail" => "marta.gonzalez@gmail.com",
                 "admission_date" => "2023-01-14",
                 "municipalities_id" => 111,
-                "relative_id" => 1,
             ],
             [
                 "id" => 2,
@@ -40,7 +39,6 @@ class StudentSeeder extends Seeder
                 "mail" => "pablo.garcia@gmail.com",
                 "admission_date" => "2023-01-14",
                 "municipalities_id" => 43,
-                "relative_id" => 2,
             ],
             [
                 "id" => 3,
@@ -53,7 +51,6 @@ class StudentSeeder extends Seeder
                 "mail" => "carla.ortiz@gmail.com",
                 "admission_date" => "2023-01-14",
                 "municipalities_id" => 96,
-                "relative_id" => 3,
             ],
             [
                 "id" => 4,
@@ -66,7 +63,6 @@ class StudentSeeder extends Seeder
                 "mail" => "diego.torres@gmail.com",
                 "admission_date" => "2023-01-14",
                 "municipalities_id" => 104,
-                "relative_id" => 4,
             ],
             [
                 "id" => 5,
@@ -79,7 +75,6 @@ class StudentSeeder extends Seeder
                 "mail" => "andrea.fernandez@gmail.com",
                 "admission_date" => "2023-01-14",
                 "municipalities_id" => 4,
-                "relative_id" => 5,
             ],
             [
                 "id" => 6,
@@ -92,7 +87,6 @@ class StudentSeeder extends Seeder
                 "mail" => "javier.lopez@gmail.com",
                 "admission_date" => "2023-01-14",
                 "municipalities_id" => 25,
-                "relative_id" => 6,
             ],
             [
                 "id" => 7,
@@ -105,7 +99,6 @@ class StudentSeeder extends Seeder
                 "mail" => "lucia.sanchez@gmail.com",
                 "admission_date" => "2023-01-14",
                 "municipalities_id" => 104,
-                "relative_id" => 7,
             ],
             [
                 "id" => 8,
@@ -118,7 +111,6 @@ class StudentSeeder extends Seeder
                 "mail" => "david.hernández@gmail.com",
                 "admission_date" => "2023-01-14",
                 "municipalities_id" => 104,
-                "relative_id" => 8,
             ],
             [
                 "id" => 9,
@@ -131,7 +123,6 @@ class StudentSeeder extends Seeder
                 "mail" => "alba.perez@gmail.com",
                 "admission_date" => "2023-01-14",
                 "municipalities_id" => 111,
-                "relative_id" => 9,
             ],
             [
                 "id" => 10,
@@ -144,7 +135,6 @@ class StudentSeeder extends Seeder
                 "mail" => "juan.castro@gmail.com",
                 "admission_date" => "2023-01-14",
                 "municipalities_id" => 4,
-                "relative_id" => 10,
             ],
             [
                 "id" => 11,
@@ -157,7 +147,6 @@ class StudentSeeder extends Seeder
                 "mail" => "mario.castro@gmail.com",
                 "admission_date" => "2023-01-14",
                 "municipalities_id" => 4,
-                "relative_id" => 11,
             ],
             [
                 "id" => 12,
@@ -170,7 +159,6 @@ class StudentSeeder extends Seeder
                 "mail" => "alejandro.ruiz@gmail.com",
                 "admission_date" => "2023-01-14",
                 "municipalities_id" => 9,
-                "relative_id" => 12,
             ],
         ]);
     }

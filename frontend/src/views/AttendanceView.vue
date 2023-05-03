@@ -6,11 +6,11 @@
           {{ title }}
         </h2>
         <div class="options-table">
-          <base-button
+          <!-- <base-button
             type="primary"
             title="Agregar"
             @click="addRecord()"
-          ></base-button>
+          ></base-button> -->
           <v-col cols="12" sm="4" lg="4" xl="4" class="pl-0 pb-0 pr-0">
             <v-text-field
               class="mt-3"
@@ -22,6 +22,76 @@
             </v-text-field>
           </v-col>
         </div>
+      </v-container>
+      <v-container>
+        <!-- Form -->
+        <v-row class="pt-0">
+          <!-- attendance_date  -->
+          <v-col cols="12" sm="12" md="6">
+            <base-input
+              label="Fecha de asistencia"
+              v-model="v$.editedItem.attendance_date.$model"
+              :rules="v$.editedItem.attendance_date"
+              type="date"
+            />
+          </v-col>
+          <!-- attendance_date  -->
+          <!-- attendance_time  -->
+          <v-col cols="12" sm="12" md="6">
+            <base-input
+              label="Hora de asistencia"
+              v-model="v$.editedItem.attendance_time.$model"
+              :rules="v$.editedItem.attendance_time"
+              type="time"
+            />
+          </v-col>
+          <!-- attendance_time  -->
+          <!-- status  -->
+          <v-col cols="12" sm="12" md="6">
+            <base-input
+              label="Estado"
+              v-model="v$.editedItem.status.$model"
+              :rules="v$.editedItem.status"
+            />
+          </v-col>
+          <!-- status  -->
+          <!-- inscription_id  -->
+          <v-col cols="12" sm="12" md="6">
+            <base-select
+              label="Inscripción"
+              :items="inscriptions"
+              item-title="id"
+              item-value="id"
+              v-model="v$.editedItem.inscription_id.$model"
+              :rules="v$.editedItem.inscription_id"
+            />
+          </v-col>
+          <!-- inscription_id  -->
+          <!-- groups  -->
+          <!-- <v-col cols="12" sm="12" md="6">
+            <base-select
+              label="Grupos"
+              :items="groups"
+              item-title="group_name"
+              item-value="group_name"
+              v-model="v$.editedItem.group_name.$model"
+              :rules="v$.editedItem.group_name"
+            />
+          </v-col> -->
+          <!-- groups  -->
+        </v-row>
+        <!-- Form -->
+        <v-row>
+          <v-col align="center">
+            <base-button type="primary" title="Guardar" @click="save" />
+            <base-button
+              class="ms-1"
+              type="secondary"
+              title="Cancelar"
+              @click="close"
+            />
+          </v-col>
+        </v-row>
       </v-container>
       <v-data-table-server
         :headers="headers"
@@ -51,7 +121,7 @@
         </template>
       </v-data-table-server>
     </v-card>
-
+    <!-- 
     <v-dialog v-model="dialog" max-width="800px" persistent>
       <v-card>
         <v-card-title>
@@ -60,67 +130,10 @@
           </h2>
         </v-card-title>
         <v-card-text class="pt-0">
-          <v-container>
-            <!-- Form -->
-            <v-row class="pt-0">
-              <!-- attendance_date  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Fecha de asistencia"
-                  v-model="v$.editedItem.attendance_date.$model"
-                  :rules="v$.editedItem.attendance_date"
-                  type="date"
-                />
-              </v-col>
-              <!-- attendance_date  -->
-              <!-- attendance_time  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Hora de asistencia"
-                  v-model="v$.editedItem.attendance_time.$model"
-                  :rules="v$.editedItem.attendance_time"
-                  type="time"
-                />
-              </v-col>
-              <!-- attendance_time  -->
-              <!-- status  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-input
-                  label="Estado"
-                  v-model="v$.editedItem.status.$model"
-                  :rules="v$.editedItem.status"
-                />
-              </v-col>
-              <!-- status  -->
-              <!-- inscription_id  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-select
-                  label="Inscripción"
-                  :items="inscriptions"
-                  item-title="id"
-                  item-value="id"
-                  v-model="v$.editedItem.inscription_id.$model"
-                  :rules="v$.editedItem.inscription_id"
-                />
-              </v-col>
-              <!-- inscription_id  -->
-            </v-row>
-            <!-- Form -->
-            <v-row>
-              <v-col align="center">
-                <base-button type="primary" title="Guardar" @click="save" />
-                <base-button
-                  class="ms-1"
-                  type="secondary"
-                  title="Cancelar"
-                  @click="close"
-                />
-              </v-col>
-            </v-row>
-          </v-container>
+         
         </v-card-text>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
 
     <v-dialog v-model="dialogDelete" max-width="400px">
       <v-card class="h-100">
@@ -158,6 +171,7 @@ import { helpers, required } from "@vuelidate/validators";
 
 import attendanceApi from "@/services/attendanceApi";
 import inscriptionApi from "@/services/inscriptionApi";
+import groupApi from "@/services/groupApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
@@ -185,14 +199,15 @@ export default {
         { title: "HORA", key: "attendance_time" },
         { title: "ESTADO", key: "status" },
         // { title: "INSCRIPCIÓN", key: "inscription_id" },
-        { title: "CARNET", key: "card" },
+        { title: "CARNET", key: "student_card" },
         { title: "MATERIA", key: "subject_name" },
-        { title: "GROUP", key: "group_name" },
+        // { title: "GROUP", key: "group_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       total: 0,
       records: [],
       inscriptions: [],
+      groups: [],
       loading: false,
       debounce: 0,
       options: {},
@@ -201,14 +216,16 @@ export default {
         attendance_time: "",
         status: "",
         inscription_id: "",
-        card: "",
+        student_card: "",
+        // group_name: "",
       },
       defaultItem: {
         attendance_date: "",
         attendance_time: "",
         status: "",
         inscription_id: "",
-        card: "",
+        student_card: "",
+        // group_name: "",
       },
     };
   },
@@ -266,6 +283,11 @@ export default {
             itemsPerPage: -1,
           },
         }),
+        groupApi.get(null, {
+          params: {
+            itemsPerPage: -1,
+          },
+        }),
       ];
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
@@ -273,6 +295,7 @@ export default {
 
       if (responses) {
         this.inscriptions = responses[1].data.data;
+        this.groups = responses[2].data.data;
       }
 
       this.loading = false;
@@ -319,18 +342,18 @@ export default {
       });
     },
 
-    addRecord() {
-      this.dialog = true;
-      this.editedIndex = -1;
-      this.editedItem = Object.assign({}, this.defaultItem);
-      this.v$.$reset();
-    },
+    // addRecord() {
+    //   this.dialog = true;
+    //   this.editedIndex = -1;
+    //   this.editedItem = Object.assign({}, this.defaultItem);
+    //   this.v$.$reset();
+    // },
 
-    editItem(item) {
-      this.editedIndex = this.records.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialog = true;
-    },
+    // editItem(item) {
+    //   this.editedIndex = this.records.indexOf(item);
+    //   this.editedItem = Object.assign({}, item);
+    //   this.dialog = true;
+    // },
 
     async save() {
       this.v$.$validate();
