@@ -148,15 +148,172 @@
                 <base-select
                   label="Municipio de residencia"
                   :items="municipalities"
-                  item-title="municipality_name"
-                  item-value="municipality_name"
+                  item-title="municipality"
+                  item-value="municipality"
                   v-model="v$.editedItem.municipality_name.$model"
                   :rules="v$.editedItem.municipality_name"
                 >
                 </base-select>
               </v-col>
               <!-- municipality_name  -->
+              <!-- relative -->
+              <v-col class="pt-5 pb-5 mt-2">
+                <base-button
+                  type="primary"
+                  title="Agregar pariente"
+                  @click="addRelative()"
+                />
+              </v-col>
             </v-row>
+            <!-- relative -->
+            <!-- Relative Table -->
+            <v-row>
+              <v-col align="center" cols="12" md="12" sm="12" class="pt-4">
+                <div class="table-responsive-md">
+                  <v-table>
+                    <thead>
+                      <tr>
+                        <th>NOMBRE</th>
+                        <th>APELLIDO</th>
+                        <th>DUI</th>
+                        <th>TELÉFONO</th>
+                        <!-- <th>CORREO</th> -->
+                        <th>PARENTESCO</th>
+                        <th class="text-center">ACCIÓN</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(relative, index) in editedItem.relatives"
+                        :key="index"
+                      >
+                        <td>
+                          {{ relative.name }}
+                        </td>
+                        <td>
+                          {{ relative.last_name }}
+                        </td>
+                        <td>
+                          {{ relative.dui }}
+                        </td>
+                        <td>
+                          {{ relative.phone_number }}
+                        </td>
+                        <!-- <td>
+                          {{ relative.mail }}
+                        </td> -->
+                        <td>
+                          {{ relative.kinship }}
+                        </td>
+                        <td class="text-center">
+                          <v-icon
+                            size="20"
+                            class="mr-2"
+                            @click="deleteRelative(index)"
+                            icon="mdi-delete"
+                          />
+                        </td>
+                      </tr>
+                      <tr v-if="editedItem.relatives.length == 0">
+                        <td colspan="5" class="text-center pt-3">
+                          <p>No se ha ingresado ningun pariente</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </v-table>
+                </div>
+                <!-- Modal -->
+                <v-dialog v-model="dialogRelative" max-width="600px" persistent>
+                  <v-card height="100%">
+                    <v-container>
+                      <h2 class="black-secondary text-center mt-4 mb-4">
+                        Agregar parientes del estudiante
+                      </h2>
+                      <v-row>
+                        <!-- name  -->
+                        <v-col cols="6" sm="6" md="6">
+                          <base-input
+                            label="Nombres"
+                            v-model="v$.relative.name.$model"
+                            :rules="v$.relative.name"
+                          />
+                        </v-col>
+                        <!-- name  -->
+                        <!-- last_name  -->
+                        <v-col cols="6" sm="6" md="6">
+                          <base-input
+                            label="Apellidos"
+                            v-model="v$.relative.last_name.$model"
+                            :rules="v$.relative.last_name"
+                          />
+                        </v-col>
+                        <!-- last_name  -->
+                        <!-- dui  -->
+                        <v-col cols="6" sm="6" md="6">
+                          <base-input
+                            label="DUI"
+                            v-model="v$.relative.dui.$model"
+                            :rules="v$.relative.dui"
+                            type="number"
+                          />
+                        </v-col>
+                        <!-- dui  -->
+                        <!-- phone_number  -->
+                        <v-col cols="6" sm="6" md="6">
+                          <base-input
+                            label="Teléfono"
+                            v-model="v$.relative.phone_number.$model"
+                            :rules="v$.relative.phone_number"
+                            type="number"
+                          />
+                        </v-col>
+                        <!-- phone_number  -->
+                        <!-- mail  -->
+                        <v-col cols="6" sm="6" md="6">
+                          <base-input
+                            label="Correo electrónico"
+                            v-model="v$.relative.mail.$model"
+                            :rules="v$.relative.mail"
+                          />
+                        </v-col>
+                        <!-- mail  -->
+                        <!-- kinship -->
+                        <v-col cols="6" sm="6" md="6">
+                          <base-select
+                            label="Parentesco"
+                            :items="kinship"
+                            item-title="kinship"
+                            item-value="kinship"
+                            v-model="v$.relative.kinship.$model"
+                            :rules="v$.relative.kinship"
+                          >
+                          </base-select>
+                        </v-col>
+                        <!-- kinship -->
+                      </v-row>
+                      <v-row>
+                        <v-col align="center">
+                          <base-button
+                            type="primary"
+                            title="Agregar"
+                            @click="addNewRelative()"
+                          />
+                          <base-button
+                            class="ms-1"
+                            type="secondary"
+                            title="Cancelar"
+                            @click="closeRelativeDialog()"
+                          />
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </v-card>
+                </v-dialog>
+                <!-- Modal -->
+              </v-col>
+            </v-row>
+            <!-- Image Table -->
+
             <!-- Form -->
             <v-row>
               <v-col align="center">
@@ -216,6 +373,7 @@ import {
 
 import studentApi from "@/services/studentApi";
 import municipalityApi from "@/services/municipalityApi";
+import kinshipApi from "@/services/kinshipApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
@@ -237,6 +395,7 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      dialogRelative: false,
       editedIndex: -1,
       title: "ESTUDIANTE",
       headers: [
@@ -254,8 +413,7 @@ export default {
       total: 0,
       records: [],
       municipalities: [],
-      departments: [],
-      relatives: [],
+      kinship: [],
       loading: false,
       debounce: 0,
       options: {},
@@ -269,6 +427,7 @@ export default {
         mail: "",
         admission_date: "",
         municipality_name: "",
+        relatives: [],
       },
       defaultItem: {
         name: "",
@@ -280,6 +439,15 @@ export default {
         mail: "",
         admission_date: "",
         municipality_name: "",
+        relatives: [],
+      },
+      relative: {
+        name: "",
+        last_name: "",
+        dui: "",
+        phone_number: "",
+        mail: "",
+        kinship: "",
       },
     };
   },
@@ -365,6 +533,46 @@ export default {
           required: helpers.withMessage(langMessages.required, required),
         },
       },
+      relative: {
+        name: {
+          required: helpers.withMessage(langMessages.required, required),
+          minLength: helpers.withMessage(
+            ({ $params }) => langMessages.minLength($params),
+            minLength(3)
+          ),
+        },
+        last_name: {
+          required: helpers.withMessage(langMessages.required, required),
+          minLength: helpers.withMessage(
+            ({ $params }) => langMessages.minLength($params),
+            minLength(3)
+          ),
+        },
+        dui: {
+          required: helpers.withMessage(langMessages.required, required),
+          required: helpers.withMessage(langMessages.required, required),
+          minLength: helpers.withMessage(
+            ({ $params }) => langMessages.minLength($params),
+            minLength(9)
+          ),
+          maxLength: (({ $params }) => maxLength($params), maxLength(9)),
+        },
+        phone_number: {
+          required: helpers.withMessage(langMessages.required, required),
+          minLength: helpers.withMessage(
+            ({ $params }) => langMessages.minLength($params),
+            minLength(8)
+          ),
+          maxLength: (({ $params }) => maxLength($params), maxLength(8)),
+        },
+        mail: {
+          required: helpers.withMessage(langMessages.required, required),
+          email: helpers.withMessage(langMessages.email, email),
+        },
+        kinship: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
+      },
     };
   },
 
@@ -380,7 +588,7 @@ export default {
             itemsPerPage: -1,
           },
         }),
-        relativeApi.get(null, {
+        kinshipApi.get(null, {
           params: {
             itemsPerPage: -1,
           },
@@ -392,7 +600,7 @@ export default {
 
       if (responses) {
         this.municipalities = responses[1].data.data;
-        this.relatives = responses[2].data.data;
+        this.kinship = responses[2].data.data;
       }
 
       this.loading = false;
@@ -429,6 +637,45 @@ export default {
         sortBy: [],
         search: "",
       });
+    },
+    addRelative() {
+      this.dialogRelative = true;
+      this.v$.relative.name.$model = "";
+      this.v$.relative.last_name.$model = "";
+      this.v$.relative.dui.$model = "";
+      this.v$.relative.phone_number.$model = "";
+      this.v$.relative.mail.$model = "";
+      this.v$.relative.kinship.$model = "";
+      this.v$.relative.$reset();
+    },
+
+    async addNewRelative() {
+      this.v$.relative.$validate();
+      if (this.v$.relative.$invalid) {
+        alert.error("Campo obligatorio");
+        return;
+      }
+
+      // Creating record
+      try {
+        this.editedItem.relatives.push({ ...this.relative });
+        console.log(this.relative);
+      } catch (error) {
+        alert.error("No fue posible crear el registro.");
+      }
+
+      this.closeRelativeDialog();
+      this.initialize();
+      return;
+    },
+
+    closeRelativeDialog() {
+      this.v$.relative.$reset();
+      this.dialogRelative = false;
+    },
+
+    deleteRelative(index) {
+      this.editedItem.relatives.splice(index, 1);
     },
 
     close() {

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Municipality;
 use Illuminate\Http\Request;
 use App\Models\Student;
+use App\Models\Relative;
+use App\Models\Kinship;
 use Encrypt;
 
 class StudentController extends Controller
@@ -30,6 +32,13 @@ class StudentController extends Controller
 
 
         $student = Student::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
+
+        // var_dump($student);
+        foreach ($student as $item) {
+            // dd($item);
+            $item->relatives = Relative::where('student_id', $item->id)->get();
+        }
+
         $total = Student::counterPagination($search);
 
         return response()->json([
@@ -44,22 +53,39 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        $municipality = $request->municipality_name;
-        $data = explode(', ', $municipality);
-        $id = Student::municipalityId($data[0], $data[1])->pluck('id');
+        // $municipality = $request->municipality_name;
+        // $data = explode(', ', $municipality);
+        // $id = Student::municipalityId($data[0], $data[1])->pluck('id');
 
-        $student = new Student;
-        $student->name = $request->name;
-        $student->last_name = $request->last_name;
-        $student->age = $request->age;
-        $student->card = $request->card;
-        $student->nie = $request->nie;
-        $student->phone_number = $request->phone_number;
-        $student->mail = $request->mail;
-        $student->admission_date = $request->admission_date;
-        $student->municipalities_id = Municipality::where('id', $id)->first()?->id;
+        $data = $request->all();
 
+        $municipality_id = Municipality::where('municipality_name', $data['municipality_name'])->first()?->id;
+
+
+        $student = Student::create([
+            'name' => $data['name'],
+            'last_name' => $data['last_name'],
+            'age' => $data['age'],
+            'card' => $data['card'],
+            'nie' => $data['nie'],
+            'phone_number' => $data['phone_number'],
+            'mail' => $data['mail'],
+            'admission_date' => $data['admission_date'],
+            'municipalities_id' => $municipality_id,
+        ]);
         $student->save();
+
+        foreach ($data['relatives'] as $value) {
+            Relative::create([
+                'name' => $value['name'],
+                'last_name' => $value['last_name'],
+                'dui' => $value['dui'],
+                'phone_number' => $value['phone_number'],
+                'mail' => $value['mail'],
+                'student_id' => $student->id,
+                'kinship_id' => Kinship::where('kinship', $value['kinship'])->first()?->id,
+            ]);
+        }
 
         return response()->json([
             'message' => 'Registro creado correctamente.',
