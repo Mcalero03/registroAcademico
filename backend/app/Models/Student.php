@@ -44,7 +44,8 @@ class Student extends Model
     public function format()
     {
         return [
-            'id' => Encrypt::encryptValue($this->id),
+            // 'id' => Encrypt::encryptValue($this->id),
+            'id' => $this->id,
             'name' => $this->name,
             'last_name' => $this->last_name,
             'age' => $this->age,
@@ -59,7 +60,9 @@ class Student extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Student::select('student.*', 'student.id as id')
+        return Student::select('student.*', 'municipalities.*', 'municipality_name')
+            ->join('municipalities', 'student.municipalities_id', '=', 'municipalities.id')
+            // ->join('department', 'municipalities.department_id', '=', 'department.id')
             ->where('student.name', 'like', $search)
             ->orWhere('student.last_name', 'like', $search)
             ->orWhere('student.age', 'like', $search)
@@ -68,18 +71,20 @@ class Student extends Model
             ->orWhere('student.phone_number', 'like', $search)
             ->orWhere('student.mail', 'like', $search)
             ->orWhere('student.admission_date', 'like', $search)
-            ->orWhere('student.municipalities_id', 'like', $search)
+            ->orWhere('municipalities.municipality_name', 'like', $search)
+
 
             ->skip($skip)
             ->take($itemsPerpage)
             ->orderBy("student.$sortBy", $sort)
-            ->get()
-            ->map(fn ($student) => $student->format());
+            ->get();
+        // ->map(fn ($student) => $student->format());
     }
 
     public static function counterPagination($search)
     {
-        return Student::select('student.*', 'student.id as id')
+        return Student::select('student.*', 'municipalities.*')
+            ->join('municipalities', 'student.municipalities_id', '=', 'municipalities.id')
             ->where('student.name', 'like', $search)
             ->orWhere('student.last_name', 'like', $search)
             ->orWhere('student.age', 'like', $search)
@@ -88,7 +93,7 @@ class Student extends Model
             ->orWhere('student.phone_number', 'like', $search)
             ->orWhere('student.mail', 'like', $search)
             ->orWhere('student.admission_date', 'like', $search)
-            ->orWhere('student.municipalities_id', 'like', $search)
+            ->orWhere('municipalities.municipality_name', 'like', $search)
 
             ->count();
     }

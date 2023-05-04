@@ -69,9 +69,21 @@ const { isLoggedIn, logout } = useAuth();
 export default {
   data: () => ({
     items: [
-      { title: "Direccion", url: "/direction", icon: "mdi-town-hall" },
-      { title: "Tipo Pensum", url: "/pensumType", icon: "mdi-school" },
-      { title: "Pensum", url: "/pensum", icon: "mdi-view-list" },
+      {
+        title: "Direccion",
+        url: "/direction",
+        icon: "mdi-town-hall",
+      },
+      {
+        title: "Tipo Pensum",
+        url: "/pensumType",
+        icon: "mdi-school",
+      },
+      {
+        title: "Pensum",
+        url: "/pensum",
+        icon: "mdi-view-list",
+      },
       {
         title: "Detalle Pensum Materia",
         url: "/pensumSubjectDetail",
@@ -127,11 +139,6 @@ export default {
         title: "Estudiante",
         url: "/student",
         icon: "mdi-account",
-      },
-      {
-        title: "Pariente",
-        url: "/relative",
-        icon: "mdi-human-male-female-child",
       },
       {
         title: "Parentesco",

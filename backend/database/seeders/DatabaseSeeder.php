@@ -30,7 +30,6 @@ class DatabaseSeeder extends Seeder
             Pensum_Subject_DetailSeeder::class,
             PrerequisiteSeeder::class,
             TeacherSeeder::class,
-            Teacher_Subject_DetailSeeder::class,
             EvaluationSeeder::class,
             CycleSeeder::class,
             GroupSeeder::class,
@@ -41,6 +40,7 @@ class DatabaseSeeder extends Seeder
             InscriptionSeeder::class,
             AttendanceSeeder::class,
             GradeSeeder::class,
+            Teacher_Subject_DetailSeeder::class,
         ]);
     }
 }
