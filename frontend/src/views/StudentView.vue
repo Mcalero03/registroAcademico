@@ -148,8 +148,8 @@
                 <base-select
                   label="Municipio de residencia"
                   :items="municipalities"
-                  item-title="municipality"
-                  item-value="municipality"
+                  item-title="municipality_name"
+                  item-value="municipality_name"
                   v-model="v$.editedItem.municipality_name.$model"
                   :rules="v$.editedItem.municipality_name"
                 >
@@ -185,38 +185,26 @@
                     <tbody>
                       <tr
                         v-for="(relative, index) in editedItem.relatives"
+                        v-bind:index="index"
                         :key="index"
                       >
-                        <td>
-                          {{ relative.name }}
-                        </td>
-                        <td>
-                          {{ relative.last_name }}
-                        </td>
-                        <td>
-                          {{ relative.dui }}
-                        </td>
-                        <td>
-                          {{ relative.phone_number }}
-                        </td>
-                        <!-- <td>
-                          {{ relative.mail }}
-                        </td> -->
-                        <td>
-                          {{ relative.kinship }}
-                        </td>
+                        <td v-text="relative.name"></td>
+                        <td v-text="relative.last_name"></td>
+                        <td v-text="relative.dui"></td>
+                        <td v-text="relative.phone_number"></td>
+                        <td v-text="relative.kinship"></td>
                         <td class="text-center">
                           <v-icon
                             size="20"
                             class="mr-2"
-                            @click="deleteRelative(index)"
+                            @click="deleteRelative(relative.id, index)"
                             icon="mdi-delete"
                           />
                         </td>
                       </tr>
                       <tr v-if="editedItem.relatives.length == 0">
                         <td colspan="5" class="text-center pt-3">
-                          <p>No se ha ingresado ningun pariente</p>
+                          <p>No se ha ingresado ningún pariente</p>
                         </td>
                       </tr>
                     </tbody>
@@ -227,7 +215,7 @@
                   <v-card height="100%">
                     <v-container>
                       <h2 class="black-secondary text-center mt-4 mb-4">
-                        Agregar parientes del estudiante
+                        Agregar pariente
                       </h2>
                       <v-row>
                         <!-- name  -->
@@ -317,7 +305,12 @@
             <!-- Form -->
             <v-row>
               <v-col align="center">
-                <base-button type="primary" title="Guardar" @click="save" />
+                <base-button
+                  type="primary"
+                  title="Guardar"
+                  @click="save"
+                  :disable="loading != false"
+                />
                 <base-button
                   class="ms-1"
                   type="secondary"
@@ -373,6 +366,7 @@ import {
 
 import studentApi from "@/services/studentApi";
 import municipalityApi from "@/services/municipalityApi";
+import relativeApi from "@/services/relativeApi";
 import kinshipApi from "@/services/kinshipApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
@@ -397,6 +391,7 @@ export default {
       dialogDelete: false,
       dialogRelative: false,
       editedIndex: -1,
+      editedRelative: -1,
       title: "ESTUDIANTE",
       headers: [
         { title: "NOMBRES", key: "name" },
@@ -459,6 +454,9 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? "Nuevo registro" : "Editar registro";
     },
+    dialogRelativeTitle() {
+      return this.editedRelative === -1 ? "Nuevo registro" : "Editar registro";
+    },
   },
 
   watch: {
@@ -470,6 +468,9 @@ export default {
     },
     dialogDelete(val) {
       val || this.closeDelete();
+    },
+    dialogRelative(val) {
+      val || this.closeRelativeDialog();
     },
   },
 
@@ -638,8 +639,10 @@ export default {
         search: "",
       });
     },
+
     addRelative() {
       this.dialogRelative = true;
+      this.editedRelative = -1;
       this.v$.relative.name.$model = "";
       this.v$.relative.last_name.$model = "";
       this.v$.relative.dui.$model = "";
@@ -666,16 +669,29 @@ export default {
 
       this.closeRelativeDialog();
       this.initialize();
+      this.loading = false;
       return;
     },
 
     closeRelativeDialog() {
       this.v$.relative.$reset();
       this.dialogRelative = false;
+      this.editedRelative = -1;
     },
 
-    deleteRelative(index) {
+    async deleteRelative(id, index) {
       this.editedItem.relatives.splice(index, 1);
+      console.log(id);
+
+      try {
+        const { data } = await relativeApi.delete(`/${id}`, {
+          params: { id: id },
+        });
+
+        alert.success(data.message);
+      } catch (error) {
+        alert.error("No fue posible eliminar el registro.");
+      }
     },
 
     close() {
@@ -695,7 +711,9 @@ export default {
 
     editItem(item) {
       this.editedIndex = this.records.indexOf(item);
+      console.log(this.editedIndex);
       this.editedItem = Object.assign({}, item);
+      console.log(this.editedItem);
       this.dialog = true;
     },
 
@@ -722,6 +740,7 @@ export default {
 
         this.close();
         this.initialize();
+        this.loading = false;
         return;
       }
 

@@ -49,8 +49,8 @@ class Relative extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Relative::select('relative.*', 'relative.id as id')
-
+        return Relative::select('relative.*', 'relative.id as id', 'kinship.kinship')
+            ->join('kinship', 'relative.kinship_id', '=', 'kinship.id')
             ->Where('relative.name', 'like', $search)
             ->orWhere('relative.last_name', 'like', $search)
             ->orWhere('relative.dui', 'like', $search)
@@ -60,14 +60,14 @@ class Relative extends Model
             ->skip($skip)
             ->take($itemsPerpage)
             ->orderBy("relative.$sortBy", $sort)
-            ->get()
-            ->map(fn ($relative) => $relative->format());
+            ->get();
+        // ->map(fn ($relative) => $relative->format());
     }
 
     public static function counterPagination($search)
     {
-        return Relative::select('relative.*', 'relative.id as id')
-
+        return Relative::select('relative.*', 'relative.id as id', 'kinship.kinship')
+            ->join('kinship', 'relative.kinship_id', '=', 'kinship.id')
             ->Where('relative.name', 'like', $search)
             ->orWhere('relative.last_name', 'like', $search)
             ->orWhere('relative.dui', 'like', $search)
