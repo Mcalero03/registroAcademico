@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 use Encrypt;
 
 class Student extends Model
@@ -60,9 +61,9 @@ class Student extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Student::select('student.*', 'municipalities.*', 'municipality_name')
+        return Student::select(DB::raw("CONCAT(municipalities.municipality_name, ', ', department.department_name) as municipality_name"), 'student.*')
             ->join('municipalities', 'student.municipalities_id', '=', 'municipalities.id')
-            // ->join('department', 'municipalities.department_id', '=', 'department.id')
+            ->join('department', 'municipalities.department_id', '=', 'department.id')
             ->where('student.name', 'like', $search)
             ->orWhere('student.last_name', 'like', $search)
             ->orWhere('student.age', 'like', $search)
@@ -83,8 +84,9 @@ class Student extends Model
 
     public static function counterPagination($search)
     {
-        return Student::select('student.*', 'municipalities.*')
+        return Student::select(DB::raw("CONCAT(municipalities.municipality_name, ', ', department.department_name) as municipality_name"), 'student.*', 'municipalities.municipality_name')
             ->join('municipalities', 'student.municipalities_id', '=', 'municipalities.id')
+            ->join('department', 'municipalities.department_id', '=', 'department.id')
             ->where('student.name', 'like', $search)
             ->orWhere('student.last_name', 'like', $search)
             ->orWhere('student.age', 'like', $search)
@@ -105,5 +107,12 @@ class Student extends Model
             ->where('municipalities.municipality_name', $municipality)
             ->where('department.department_name', $department)
             ->get('municipalities.id');
+    }
+
+    public static function clean($string)
+    {
+        $change = str_replace('[', '', $string);
+        $change = str_replace(']', '', $change);
+        return $change;
     }
 }

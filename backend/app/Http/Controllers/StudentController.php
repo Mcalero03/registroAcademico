@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Municipality;
 use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\Relative;
@@ -33,11 +32,15 @@ class StudentController extends Controller
 
         $student = Student::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
 
-        // var_dump($student);
         foreach ($student as $item) {
-            // dd($item);
-            $item->relatives = Relative::where('student_id', $item->id)->get();
+            $item->relatives = Relative::select('relative.*', 'relative.id as id', 'kinship.kinship')
+                ->join('kinship', 'relative.kinship_id', '=', 'kinship.id')
+                ->where('student_id', $item->id)
+                ->get();
+            $item->relatives = Encrypt::encryptObject($item->relatives, "id");
         }
+
+        $student = Encrypt::encryptObject($student, "id");
 
         $total = Student::counterPagination($search);
 
@@ -53,14 +56,10 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        // $municipality = $request->municipality_name;
-        // $data = explode(', ', $municipality);
-        // $id = Student::municipalityId($data[0], $data[1])->pluck('id');
-
         $data = $request->all();
-
-        $municipality_id = Municipality::where('municipality_name', $data['municipality_name'])->first()?->id;
-
+        $info = explode(', ', $data['municipality_name']);
+        $id = Student::municipalityId($info[0], $info[1])->pluck('id');
+        $municipality_id = Student::clean($id);
 
         $student = Student::create([
             'name' => $data['name'],
@@ -107,22 +106,35 @@ class StudentController extends Controller
     {
         $data = Encrypt::decryptArray($request->all(), 'id');
 
-        $municipality = $request->municipality_name;
-        $info = explode(', ', $municipality);
+        $info = explode(', ', $data['municipality_name']);
         $id = Student::municipalityId($info[0], $info[1])->pluck('id');
+        $municipality_id = Student::clean($id);;
 
-        $student = Student::where('id', $data['id'])->first();
-        $student->name = $request->name;
-        $student->last_name = $request->last_name;
-        $student->age = $request->age;
-        $student->card = $request->card;
-        $student->nie = $request->nie;
-        $student->phone_number = $request->phone_number;
-        $student->mail = $request->mail;
-        $student->admission_date = $request->admission_date;
-        $student->municipalities_id = Municipality::where('id', $id)->first()?->id;
+        Student::where('id', $data['id'])->update([
+            'name' => $data['name'],
+            'last_name' => $data['last_name'],
+            'age' => $data['age'],
+            'card' => $data['card'],
+            'nie' => $data['nie'],
+            'phone_number' => $data['phone_number'],
+            'mail' => $data['mail'],
+            'admission_date' => $data['admission_date'],
+            'municipalities_id' => $municipality_id,
+        ]);
 
-        $student->save();
+        Relative::where('student_id', $data['id'])->delete();
+
+        foreach ($data['relatives'] as $value) {
+            Relative::create([
+                'name' => $value['name'],
+                'last_name' => $value['last_name'],
+                'dui' => $value['dui'],
+                'phone_number' => $value['phone_number'],
+                'mail' => $value['mail'],
+                'student_id' => $data['id'],
+                'kinship_id' => Kinship::where('kinship', $value['kinship'])->first()?->id,
+            ]);
+        }
 
         return response()->json([
             'message' => 'Registro modificado correctamente.',
@@ -137,6 +149,7 @@ class StudentController extends Controller
         $id = Encrypt::decryptValue($request->id);
 
         Student::where('id', $id)->delete();
+        Relative::where('student_id', $id)->delete();
 
         return response()->json([
             'message' => 'Registro eliminado correctamente.',
