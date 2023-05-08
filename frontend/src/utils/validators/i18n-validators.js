@@ -15,8 +15,11 @@ export const messages = {
   en: {
     validations: {
       required: "This value is required.",
-      minLength: "This value is requiredss.",
+      minLength: ($params) =>
+        `This field has a minimum length of ${$params.min}.`,
       email: "This field must be a valid email address",
+      maxLength: ($params) =>
+        `This field has a maximum length of ${$params.max}.`,
     },
   },
   es: {
@@ -25,6 +28,8 @@ export const messages = {
       minLength: ($params) =>
         `Este campo posee una longitud mínima de ${$params.min}.`,
       email: "Este campo debe ser un correo electrónico válido.",
+      maxLength: ($params) =>
+        `Este campo posee una longitud máxima de ${$params.max}.`,
     },
   },
 };

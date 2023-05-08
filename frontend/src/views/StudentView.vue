@@ -140,7 +140,8 @@
                   v-model="v$.editedItem.admission_date.$model"
                   :rules="v$.editedItem.admission_date"
                   type="date"
-                />
+                >
+                </base-input>
               </v-col>
               <!-- admission_date  -->
               <!-- municipality_name  -->
@@ -197,9 +198,10 @@
                           <v-icon
                             size="20"
                             class="mr-2"
-                            @click="deleteRelative(relative.id, index)"
+                            @click="deleteRelative(index)"
                             icon="mdi-delete"
                           />
+                          <!-- @click="deleteRelative(relative.id, index)" -->
                         </td>
                       </tr>
                       <tr v-if="editedItem.relatives.length == 0">
@@ -300,7 +302,7 @@
                 <!-- Modal -->
               </v-col>
             </v-row>
-            <!-- Image Table -->
+            <!-- Relative Table -->
 
             <!-- Form -->
             <v-row>
@@ -366,7 +368,6 @@ import {
 
 import studentApi from "@/services/studentApi";
 import municipalityApi from "@/services/municipalityApi";
-import relativeApi from "@/services/relativeApi";
 import kinshipApi from "@/services/kinshipApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
@@ -375,7 +376,7 @@ import BaseSelect from "../components/base-components/BaseSelect.vue";
 import useAlert from "../composables/useAlert";
 
 const { alert } = useAlert();
-const langMessages = messages["es"].validations;
+const langMessages = messages["en"].validations;
 
 export default {
   components: { BaseButton, BaseInput, BaseSelect },
@@ -497,7 +498,10 @@ export default {
             ({ $params }) => langMessages.minLength($params),
             minLength(1)
           ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(2)),
+          maxLength: helpers.withMessage(
+            ({ $params }) => langMessages.maxLength($params),
+            maxLength(2)
+          ),
         },
         card: {
           required: helpers.withMessage(langMessages.required, required),
@@ -505,7 +509,10 @@ export default {
             ({ $params }) => langMessages.minLength($params),
             minLength(4)
           ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(4)),
+          maxLength: helpers.withMessage(
+            ({ $params }) => langMessages.maxLength($params),
+            maxLength(4)
+          ),
         },
         nie: {
           required: helpers.withMessage(langMessages.required, required),
@@ -513,7 +520,10 @@ export default {
             ({ $params }) => langMessages.minLength($params),
             minLength(7)
           ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(7)),
+          maxLength: helpers.withMessage(
+            ({ $params }) => langMessages.maxLength($params),
+            maxLength(7)
+          ),
         },
         phone_number: {
           required: helpers.withMessage(langMessages.required, required),
@@ -521,7 +531,10 @@ export default {
             ({ $params }) => langMessages.minLength($params),
             minLength(8)
           ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(8)),
+          maxLength: helpers.withMessage(
+            ({ $params }) => langMessages.maxLength($params),
+            maxLength(8)
+          ),
         },
         mail: {
           required: helpers.withMessage(langMessages.required, required),
@@ -556,7 +569,10 @@ export default {
             ({ $params }) => langMessages.minLength($params),
             minLength(9)
           ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(9)),
+          maxLength: helpers.withMessage(
+            ({ $params }) => langMessages.maxLength($params),
+            maxLength(9)
+          ),
         },
         phone_number: {
           required: helpers.withMessage(langMessages.required, required),
@@ -564,7 +580,10 @@ export default {
             ({ $params }) => langMessages.minLength($params),
             minLength(8)
           ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(8)),
+          maxLength: helpers.withMessage(
+            ({ $params }) => langMessages.maxLength($params),
+            maxLength(8)
+          ),
         },
         mail: {
           required: helpers.withMessage(langMessages.required, required),
@@ -662,7 +681,6 @@ export default {
       // Creating record
       try {
         this.editedItem.relatives.push({ ...this.relative });
-        console.log(this.relative);
       } catch (error) {
         alert.error("No fue posible crear el registro.");
       }
@@ -679,19 +697,8 @@ export default {
       this.editedRelative = -1;
     },
 
-    async deleteRelative(id, index) {
+    async deleteRelative(index) {
       this.editedItem.relatives.splice(index, 1);
-      console.log(id);
-
-      try {
-        const { data } = await relativeApi.delete(`/${id}`, {
-          params: { id: id },
-        });
-
-        alert.success(data.message);
-      } catch (error) {
-        alert.error("No fue posible eliminar el registro.");
-      }
     },
 
     close() {
@@ -711,9 +718,7 @@ export default {
 
     editItem(item) {
       this.editedIndex = this.records.indexOf(item);
-      console.log(this.editedIndex);
       this.editedItem = Object.assign({}, item);
-      console.log(this.editedItem);
       this.dialog = true;
     },
 

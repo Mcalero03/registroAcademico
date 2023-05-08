@@ -51,12 +51,6 @@ const router = createRouter({
       meta: { requiresAuth: true }, // add meta field to specify the route
     },
     {
-      path: "/relative",
-      name: "relative",
-      component: () => import("../views/RelativeView.vue"), 
-      meta: { requiresAuth: true }, // add meta field to specify the route
-    }, 
-    {
       path: "/subject",
       name: "subject",
       component: () => import("../views/SubjectView.vue"), 
