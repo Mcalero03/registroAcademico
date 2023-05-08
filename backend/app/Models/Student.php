@@ -42,22 +42,22 @@ class Student extends Model
         return $this->belongsTo(Municipality::class, 'municipalities_id')->withDefault();
     }
 
-    public function format()
-    {
-        return [
-            // 'id' => Encrypt::encryptValue($this->id),
-            'id' => $this->id,
-            'name' => $this->name,
-            'last_name' => $this->last_name,
-            'age' => $this->age,
-            'card' => $this->card,
-            'nie' => $this->nie,
-            'phone_number' => $this->phone_number,
-            'mail' => $this->mail,
-            'admission_date' => $this->admission_date,
-            'municipality_name' => $this->municipality->municipality_name . ', ' . $this->municipality->department->department_name,
-        ];
-    }
+    // public function format()
+    // {
+    //     return [
+    //         // 'id' => Encrypt::encryptValue($this->id),
+    //         'id' => $this->id,
+    //         'name' => $this->name,
+    //         'last_name' => $this->last_name,
+    //         'age' => $this->age,
+    //         'card' => $this->card,
+    //         'nie' => $this->nie,
+    //         'phone_number' => $this->phone_number,
+    //         'mail' => $this->mail,
+    //         'admission_date' => $this->admission_date,
+    //         'municipality_name' => $this->municipality->municipality_name . ', ' . $this->municipality->department->department_name,
+    //     ];
+    // }
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
