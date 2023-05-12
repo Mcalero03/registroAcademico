@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Inscription;
 use App\Models\Cycle;
 use App\Models\Subject;
-use App\Models\Student;
+// use App\Models\Student;
 use App\Models\Group;
+// use App\Models\Grade;
+// use App\Models\Evaluation;
 use Encrypt;
 
 class InscriptionController extends Controller
@@ -33,6 +35,16 @@ class InscriptionController extends Controller
 
         $inscription = Inscription::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
 
+        // foreach ($inscription as $item) {
+        //     $item->grades = Grade::select('grade.*', 'evaluation.evaluation_name')
+        //         ->join('evaluation', 'grade.evaluation_id', '=',  'evaluation.id')
+        //         ->where('inscription_id', $item->id)
+        //         ->get();
+        //     $item->grades = Encrypt::encryptObject($item->grades, "id");
+        // }
+
+        $inscription = Encrypt::encryptObject($inscription, "id");
+
         $total = Inscription::counterPagination($search);
 
         return response()->json([
@@ -47,18 +59,33 @@ class InscriptionController extends Controller
      */
     public function store(Request $request)
     {
-        $inscription = new Inscription;
-        $inscription->inscription_date = $request->inscription_date;
-        $inscription->subject_average = $request->subject_average;
-        $inscription->attendance_quantity = $request->attendance_quantity;
-        $inscription->status = $request->status;
-        $inscription->cycle_id = Cycle::where('cycle_number', $request->cycle_number)->first()?->id;
-        $inscription->student_id = Student::where('name', $request->student_name)->first()?->id;
-        $inscription->group_id = Group::where('group_name', $request->group_name)->first()?->id;
-        $inscription->subject_id = Subject::where('subject_name', $request->subject_name)->first()?->id;
+        $data = $request->all();
+        $info = explode(', ', $data['full_name']);
+        $id = Inscription::studentId($info[0], $info[1])->pluck('id');
+        $student_id = Inscription::clean($id);
+
+        $inscription = Inscription::create([
+            'inscription_date' => $data['inscription_date'],
+            'subject_average' => $data['subject_average'],
+            'attendance_quantity' => $data['attendance_quantity'],
+            'status' => $data['status'],
+            'cycle_id' => Cycle::where('cycle_number', $data['cycle_number'])->first()?->id,
+            'student_id' => $student_id,
+            'group_id' => Group::where('group_name', $data['group_name'])->first()?->id,
+            'subject_id' => Subject::where('subject_name', $data['subject_name'])->first()?->id,
+        ]);
 
         $inscription->save();
 
+        // foreach ($data['grades'] as $value) {
+        //     Grade::create([
+        //         'score' => $value['score'],
+        //         'score_date' => $value['score_date'],
+        //         'status' => $value['status'],
+        //         'evaluation_id' => Evaluation::where('evaluation_name',  $value['evaluation_name'])->first()?->id,
+        //         'inscription_id' => $inscription->id,
+        //     ]);
+        // }
         return response()->json([
             'message' => 'Registro creado correctamente.',
         ]);
@@ -79,17 +106,32 @@ class InscriptionController extends Controller
     {
         $data = Encrypt::decryptArray($request->all(), 'id');
 
-        $inscription = Inscription::where('id', $data['id'])->first();
-        $inscription->inscription_date = $request->inscription_date;
-        $inscription->subject_average = $request->subject_average;
-        $inscription->attendance_quantity = $request->attendance_quantity;
-        $inscription->status = $request->status;
-        $inscription->cycle_id = Cycle::where('cycle_number', $request->cycle_number)->first()?->id;
-        $inscription->student_id = Student::where('name', $request->student_name)->first()?->id;
-        $inscription->group_id = Group::where('group_name', $request->group_name)->first()?->id;
-        $inscription->subject_id = Subject::where('subject_name', $request->subject_name)->first()?->id;
+        $info = explode(', ', $data['full_name']);
+        $id = Inscription::studentId($info[0], $info[1])->pluck('id');
+        $student_id = Inscription::clean($id);
 
-        $inscription->save();
+        Inscription::where('id', $data['id'])->update([
+            'inscription_date' => $data['inscription_date'],
+            'subject_average' => $data['subject_average'],
+            'attendance_quantity' => $data['attendance_quantity'],
+            'status' => $data['status'],
+            'cycle_id' => Cycle::where('cycle_number', $data['cycle_number'])->first()?->id,
+            'student_id' => $student_id,
+            'group_id' => Group::where('group_name', $data['group_name'])->first()?->id,
+            'subject_id' => Subject::where('subject_name', $data['subject_name'])->first()?->id,
+        ]);
+
+        // Grade::where('inscription_id', $data['id'])->delete();
+
+        // foreach ($data['grades'] as $value) {
+        //     Grade::create([
+        //         'score' => $value['score'],
+        //         'score_date ' => $value['score_date'],
+        //         'status' => $value['status'],
+        //         'evaluation_id' => Evaluation::where('evaluation_name',  $value['evaluation_name'])->first()?->id,
+        //         'inscription_id' => $data['id'],
+        //     ]);
+        // }
 
         return response()->json([
             'message' => 'Registro modificado correctamente.',
@@ -104,6 +146,7 @@ class InscriptionController extends Controller
         $id = Encrypt::decryptValue($request->id);
 
         Inscription::where('id', $id)->delete();
+        // Grade::where('inscription_id', $id)->delete();
 
         return response()->json([
             'message' => 'Registro eliminado correctamente.',

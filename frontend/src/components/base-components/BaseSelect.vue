@@ -5,8 +5,9 @@
       :value="modelValue"
       class="mt-4"
       variant="outlined"
-      hide-details
+      hide-details="false"
       @input="$emit('update:modelValue', $event.target.value)"
+      @change="$emit('change:modelValue', $event.target.value)"
     />
 
     <base-error :rules="rules" />

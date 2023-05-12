@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PensumSubjectDetail;
 use App\Models\Pensum;
+use App\Models\Prerequisite;
 use App\Models\Subject;
 use Encrypt;
 use Illuminate\Http\Request;
@@ -29,7 +30,19 @@ class PensumSubjectDetailController extends Controller
 
         $search = (isset($request->search)) ? "%$request->search%" : '%%';
 
-        $pensum_subject_detail = PensumSubjectDetail::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
+        $pensum_subject_detail = PensumSubjectDetail::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage)->unique();
+
+
+        foreach ($pensum_subject_detail as $item) {
+            $item->prerequisites = Prerequisite::select('prerequisite.*', 'subject.subject_name as prerequisite')
+                ->join('subject', 'prerequisite.subject_id', '=', 'subject.id')
+                ->where('pensum_subject_detail_id', $item->id)
+                ->get();
+
+            $item->prerequisites = Encrypt::encryptObject($item->prerequisites, 'id');
+        }
+
+        $pensum_subject_detail = Encrypt::encryptObject($pensum_subject_detail, 'id');
 
         $total = PensumSubjectDetail::counterPagination($search);
 
@@ -45,11 +58,21 @@ class PensumSubjectDetailController extends Controller
      */
     public function store(Request $request)
     {
-        $pensum_subject_detail = new PensumSubjectDetail;
-        $pensum_subject_detail->pensum_id = Pensum::where('program_name', $request->program_name)->first()?->id;
-        $pensum_subject_detail->subject_id = Subject::where('subject_name', $request->subject_name)->first()?->id;
+        $data = $request->all();
+
+        $pensum_subject_detail = PensumSubjectDetail::create([
+            'pensum_id' => Pensum::where('program_name', $data['program_name'])->first()?->id,
+            'subject_id' => Subject::where('subject_name', $data['subject_name'])->first()?->id,
+        ]);
 
         $pensum_subject_detail->save();
+
+        foreach ($data['prerequisites'] as $value) {
+            Prerequisite::create([
+                'subject_id' => Subject::where('subject_name', $value['prerequisite'])->first()?->id,
+                'pensum_subject_detail_id' => $pensum_subject_detail->id,
+            ]);
+        }
 
         return response()->json([
             "message" => "Registro creado correctamente",
@@ -59,9 +82,20 @@ class PensumSubjectDetailController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function pensum(Request $request)
     {
-        //
+
+        $subject = PensumSubjectDetail::select('pensum_subject_detail.*', 'subject.subject_name', 'pensum.program_name')
+            ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+            ->join('subject', 'pensum_subject_detail.subject_id', '=', 'subject.id')
+            ->where('pensum.program_name', 'like', $request->pensum)
+            ->where('subject.subject_name', 'not like', $request->subject)
+            ->get();
+
+        return response()->json([
+            "message" => "Registros obtenidos correctamente.",
+            "subject" => $subject,
+        ]);
     }
 
     /**
@@ -71,11 +105,19 @@ class PensumSubjectDetailController extends Controller
     {
         $data = Encrypt::decryptArray($request->all(), 'id');
 
-        $pensum_subject_detail = PensumSubjectDetail::where('id', $data['id'])->first();
-        $pensum_subject_detail->pensum_id = Pensum::where('program_name', $request->program_name)->first()?->id;
-        $pensum_subject_detail->subject_id = Subject::where('subject_name', $request->subject_name)->first()?->id;
+        PensumSubjectDetail::where('id', $data['id'])->update([
+            'pensum_id' => Pensum::where('program_name', $data['program_name'])->first()?->id,
+            'subject_id' => Subject::where('subject_name', $data['subject_name'])->first()?->id,
+        ]);
 
-        $pensum_subject_detail->save();
+        Prerequisite::where('pensum_subject_detail_id', $data['id'])->delete();
+
+        foreach ($data['prerequisites'] as $value) {
+            Prerequisite::create([
+                'subject_id' => Subject::where('subject_name', $value['prerequisite'])->first()?->id,
+                'pensum_subject_detail_id' => $data['id'],
+            ]);
+        }
 
         return response()->json([
             "message" => "Registro modificado correctamente",
@@ -90,6 +132,7 @@ class PensumSubjectDetailController extends Controller
         $id = Encrypt::decryptValue($request->id);
 
         PensumSubjectDetail::where('id', $id)->delete();
+        Prerequisite::where('id', $id)->delete();
 
         return response()->json([
             "message" => "Registro eliminado correctamente",

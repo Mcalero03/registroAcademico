@@ -64,18 +64,17 @@
             <!-- Form -->
             <v-row class="pt-0">
               <!-- inscription_date  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="6" sm="4" md="4">
                 <base-input
                   label="Fecha de inscripción"
                   v-model="v$.editedItem.inscription_date.$model"
                   :rules="v$.editedItem.inscription_date"
                   type="date"
                 />
-                <!-- {{ currentDate() }} -->
               </v-col>
               <!-- inscription_date  -->
               <!-- subject_average  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="6" sm="4" md="4">
                 <base-input
                   label="Promedio de la materia"
                   v-model="v$.editedItem.subject_average.$model"
@@ -84,7 +83,7 @@
               </v-col>
               <!-- subject_average  -->
               <!-- attendance_quantity  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="6" sm="4" md="4">
                 <base-input
                   label="Cantidad de asistencias"
                   v-model="v$.editedItem.attendance_quantity.$model"
@@ -94,7 +93,7 @@
               </v-col>
               <!-- attendance_quantity  -->
               <!-- status  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="6" sm="4" md="4">
                 <base-input
                   label="Estado"
                   v-model="v$.editedItem.status.$model"
@@ -104,7 +103,7 @@
               </v-col>
               <!-- status  -->
               <!-- cycle_number  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="6" sm="4" md="4">
                 <base-select
                   label="Número de ciclo"
                   :items="cycles"
@@ -115,20 +114,8 @@
                 />
               </v-col>
               <!-- cycle_number  -->
-              <!-- student_name  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-select
-                  label="Estudiante"
-                  :items="students"
-                  item-title="name"
-                  item-value="name"
-                  v-model="v$.editedItem.student_name.$model"
-                  :rules="v$.editedItem.student_name"
-                />
-              </v-col>
-              <!-- student_name  -->
               <!-- group_name  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="6" sm="4" md="4">
                 <base-select
                   label="Grupo"
                   :items="groups"
@@ -138,9 +125,21 @@
                   :rules="v$.editedItem.group_name"
                 />
               </v-col>
-              <!-- units_value  -->
               <!-- group_name  -->
-              <v-col cols="12" sm="12" md="6">
+              <!-- student_name  -->
+              <v-col cols="6" sm="7" md="7">
+                <base-select
+                  label="Estudiante"
+                  :items="students"
+                  item-title="full_name"
+                  item-value="full_name"
+                  v-model="v$.editedItem.full_name.$model"
+                  :rules="v$.editedItem.full_name"
+                />
+              </v-col>
+              <!-- student_name  -->
+              <!-- subject_name  -->
+              <v-col cols="6" sm="5" md="5">
                 <base-select
                   label="Materia"
                   :items="subjects"
@@ -151,7 +150,128 @@
                 />
               </v-col>
               <!-- subject_name  -->
+              <!-- relative -->
+              <!-- <v-col class="pt-5 pb-5 mt-2">
+                <base-button
+                  type="primary"
+                  title="Agregar nota"
+                  @click="addGrade()"
+                />
+              </v-col> -->
             </v-row>
+            <!-- relative -->
+            <!-- Grade Table -->
+            <!--<v-row>
+              <v-col align="center" cols="12" md="12" sm="12" class="pt-4">
+                <div class="table-responsive-md">
+                  <v-table>
+                    <thead>
+                      <tr>
+                        <th>NOTA</th>
+                        <th>FECHA</th>
+                        <th>ESTADO</th>
+                        <th>EVALUACIÓN</th>
+                        <th class="text-center">ACCIÓN</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(grade, index) in editedItem.grades"
+                        v-bind:index="index"
+                        :key="index"
+                      >
+                        <td v-text="grade.score"></td>
+                        <td v-text="grade.score_date"></td>
+                        <td v-text="grade.status"></td>
+                        <td v-text="grade.evaluation_name"></td>
+                        <td class="text-center">
+                          <v-icon
+                            size="20"
+                            class="mr-2"
+                            @click="deleteGrade(index)"
+                            icon="mdi-delete"
+                          />
+                        </td>
+                      </tr>
+                      <tr v-if="editedItem.grades.length == 0">
+                        <td colspan="5" class="text-center pt-3">
+                          <p>No se ha ingresado ninguna nota</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </v-table>
+                </div>-->
+            <!-- Modal -->
+            <!-- <v-dialog v-model="dialogGrade" max-width="600px" persistent>
+                  <v-card height="100%">
+                    <v-container>
+                      <h2 class="black-secondary text-center mt-4 mb-4">
+                        Agregar nota
+                      </h2> -->
+            <!-- <v-row> -->
+            <!-- score  -->
+            <!-- <v-col cols="6" sm="6" md="6">
+                          <base-input
+                            label="Nota"
+                            v-model="v$.grade.score.$model"
+                            :rules="v$.grade.score"
+                          />
+                        </v-col> -->
+            <!-- score  -->
+            <!-- score_date  -->
+            <!-- <v-col cols="6" sm="6" md="6">
+                          <base-input
+                            label="Fecha"
+                            v-model="v$.grade.score_date.$model"
+                            :rules="v$.grade.score_date"
+                            type="date"
+                          />
+                        </v-col> -->
+            <!-- score_date  -->
+            <!-- status  -->
+            <!-- <v-col cols="6" sm="6" md="6">
+                          <base-input
+                            label="Estado"
+                            v-model="v$.grade.status.$model"
+                            :rules="v$.grade.status"
+                          />
+                        </v-col> -->
+            <!-- status  -->
+            <!-- evaluation_name  -->
+            <!-- <v-col cols="6" sm="6" md="6">
+                          <base-select
+                            label="Evaluación"
+                            :items="evaluations"
+                            item-title="evaluation_name"
+                            item-value="evaluation_name"
+                            v-model="v$.grade.evaluation_name.$model"
+                            :rules="v$.grade.evaluation_name"
+                          />
+                        </v-col> -->
+            <!-- evaluation_name  -->
+            <!-- </v-row>
+                      <v-row>
+                        <v-col align="center">
+                          <base-button
+                            type="primary"
+                            title="Agregar"
+                            @click="addNewGrade()"
+                          />
+                          <base-button
+                            class="ms-1"
+                            type="secondary"
+                            title="Cancelar"
+                            @click="closeGradeDialog()"
+                          />
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </v-card>
+                </v-dialog> -->
+            <!-- Modal -->
+            <!-- </v-col>
+            </v-row> -->
+            <!-- Grade Table -->
             <!-- Form -->
             <v-row>
               <v-col align="center">
@@ -208,6 +328,7 @@ import cycleApi from "@/services/cycleApi";
 import studentApi from "@/services/studentApi";
 import groupApi from "@/services/groupApi";
 import subjectApi from "@/services/subjectApi";
+import evaluationApi from "@/services/evaluationApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
@@ -229,7 +350,9 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      dialogGrade: false,
       editedIndex: -1,
+      editedGrade: -1,
       title: "INSCRIPCIÓN",
       headers: [
         { title: "INSCRIPCIÓN", key: "inscription_date" },
@@ -237,7 +360,7 @@ export default {
         { title: "ASISTENCIAS", key: "attendance_quantity" },
         { title: "ESTADO", key: "status" },
         { title: "CICLO", key: "cycle_number" },
-        { title: "ESTUDIANTE", key: "student_name" },
+        { title: "ESTUDIANTE", key: "full_name" },
         { title: "GRUPO", key: "group_name" },
         { title: "MATERIA", key: "subject_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
@@ -248,6 +371,7 @@ export default {
       students: [],
       groups: [],
       subjects: [],
+      // evaluations: [],
       loading: false,
       debounce: 0,
       options: {},
@@ -257,9 +381,10 @@ export default {
         attendance_quantity: "",
         status: "",
         cycle_number: "",
-        student_name: "",
+        full_name: "",
         group_name: "",
         subject_name: "",
+        // grades: [],
       },
       defaultItem: {
         inscription_date: "",
@@ -267,15 +392,21 @@ export default {
         attendance_quantity: "",
         status: "",
         cycle_number: "",
-        student_name: "",
+        full_name: "",
         group_name: "",
         subject_name: "",
+        // grades: [],
       },
+      // grade: {
+      //   score: "",
+      //   score_date: "",
+      //   status: "",
+      //   evaluation_name: "",
+      // },
     };
   },
   mounted() {
     this.initialize();
-    // this.currentDate();
   },
 
   computed: {
@@ -293,6 +424,9 @@ export default {
     },
     dialogDelete(val) {
       val || this.closeDelete();
+    },
+    dialogGrade(val) {
+      val || this.closeGradeDialog();
     },
   },
 
@@ -319,7 +453,7 @@ export default {
         cycle_number: {
           required: helpers.withMessage(langMessages.required, required),
         },
-        student_name: {
+        full_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
         group_name: {
@@ -329,17 +463,24 @@ export default {
           required: helpers.withMessage(langMessages.required, required),
         },
       },
+      // grade: {
+      //   score: {
+      //     required: helpers.withMessage(langMessages.required, required),
+      //   },
+      //   score_date: {
+      //     required: helpers.withMessage(langMessages.required, required),
+      //   },
+      //   status: {
+      //     required: helpers.withMessage(langMessages.required, required),
+      //   },
+      //   evaluation_name: {
+      //     required: helpers.withMessage(langMessages.required, required),
+      //   },
+      // },
     };
   },
 
   methods: {
-    // currentDate() {
-    //   const current = new Date();
-    //   const date = `${current.getDate()}/${
-    //     current.getMonth() + 1
-    //   }/${current.getFullYear()}`;
-    //   return date;
-    // },
     async initialize() {
       this.loading = true;
       this.records = [];
@@ -366,6 +507,11 @@ export default {
             itemsPerPage: -1,
           },
         }),
+        evaluationApi.get(null, {
+          params: {
+            itemsPerPage: -1,
+          },
+        }),
       ];
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
@@ -376,6 +522,7 @@ export default {
         this.students = responses[2].data.data;
         this.groups = responses[3].data.data;
         this.subjects = responses[4].data.data;
+        this.evaluations = responses[5].data.data;
       }
 
       this.loading = false;
@@ -412,6 +559,47 @@ export default {
         sortBy: [],
         search: "",
       });
+    },
+
+    addGrade() {
+      this.dialogGrade = true;
+      this.editedGrade = -1;
+      this.v$.grade.score.$model = "";
+      this.v$.grade.score_date.$model = "";
+      this.v$.grade.status.$model = "";
+      this.v$.grade.evaluation_name.$model = "";
+      this.v$.grade.$reset();
+    },
+
+    async addNewGrade() {
+      this.v$.grade.$validate();
+      if (this.v$.grade.$invalid) {
+        alert.error("Campo obligatorio");
+        return;
+      }
+
+      // Creating record
+      try {
+        this.editedItem.grades.push({ ...this.grade });
+        console.log(this.grade);
+      } catch (error) {
+        alert.error("No fue posible crear el registro.");
+      }
+
+      this.closeGradeDialog();
+      this.initialize();
+      this.loading = false;
+      return;
+    },
+
+    closeGradeDialog() {
+      this.v$.grade.$reset();
+      this.dialogGrade = false;
+      this.editedGrade = -1;
+    },
+
+    async deleteGrade(index) {
+      this.editedItem.grades.splice(index, 1);
     },
 
     close() {

@@ -61,7 +61,7 @@ class Student extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Student::select(DB::raw("CONCAT(municipalities.municipality_name, ', ', department.department_name) as municipality_name"), 'student.*')
+        return Student::select(DB::raw("CONCAT(municipalities.municipality_name, ', ', department.department_name) as municipality_name"), DB::raw("CONCAT(student.name, ', ', student.last_name) as full_name"), 'student.*')
             ->join('municipalities', 'student.municipalities_id', '=', 'municipalities.id')
             ->join('department', 'municipalities.department_id', '=', 'department.id')
             ->where('student.name', 'like', $search)
@@ -84,7 +84,7 @@ class Student extends Model
 
     public static function counterPagination($search)
     {
-        return Student::select(DB::raw("CONCAT(municipalities.municipality_name, ', ', department.department_name) as municipality_name"), 'student.*', 'municipalities.municipality_name')
+        return Student::select(DB::raw("CONCAT(municipalities.municipality_name, ', ', department.department_name) as municipality_name"), DB::raw("CONCAT(student.name, ', ', student.last_name) as full_name"), 'student.*', 'municipalities.municipality_name')
             ->join('municipalities', 'student.municipalities_id', '=', 'municipalities.id')
             ->join('department', 'municipalities.department_id', '=', 'department.id')
             ->where('student.name', 'like', $search)
