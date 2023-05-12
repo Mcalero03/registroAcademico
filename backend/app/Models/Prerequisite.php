@@ -28,4 +28,27 @@ class Prerequisite extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
+    {
+        return Subject::select('prerequisite.*', 'subject.subject_name as prerequisite')
+            ->join('subject', 'prerequisite.subject_id', '=', 'subject.id')
+            ->where('prerequisite.subject_id', 'like', $search)
+            ->orWhere('prerequisite.pensum_subject_detail_id', 'like', $search)
+
+            ->skip($skip)
+            ->take($itemsPerpage)
+            ->orderBy("subject.$sortBy", $sort)
+            ->get();
+    }
+
+    public static function counterPagination($search)
+    {
+        return Subject::select('prerequisite.*', 'subject.subject_name  as prerequisite')
+            ->join('subject', 'prerequisite.subject_id', '=', 'subject.id')
+            ->where('prerequisite.subject_id', 'like', $search)
+            ->orWhere('prerequisite.pensum_subject_detail_id', 'like', $search)
+
+            ->count();
+    }
 }

@@ -30,6 +30,7 @@
         :loading="loading"
         items-title="id"
         item-value="id"
+        hover
         @update:options="getDataFromApi"
       >
         <template v-slot:[`item.actions`]="{ item }">
@@ -63,20 +64,8 @@
           <v-container>
             <!-- Form -->
             <v-row class="pt-0">
-              <!-- program_name  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-select
-                  label="Nombre del programa"
-                  :items="pensums"
-                  item-title="program_name"
-                  item-value="program_name"
-                  v-model="v$.editedItem.program_name.$model"
-                  :rules="v$.editedItem.program_name"
-                />
-              </v-col>
-              <!-- program_name  -->
               <!-- subject_name  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="4" md="4">
                 <base-select
                   label="Nombre de la materia"
                   :items="subjects"
@@ -87,7 +76,120 @@
                 />
               </v-col>
               <!-- subject_name  -->
+              <!-- program_name  -->
+              <v-col cols="12" sm="8" md="8">
+                <select
+                  v-model="v$.editedItem.program_name.$model"
+                  @change="change"
+                  label="Nombre del programa"
+                  class="mt-4 form-select"
+                  v-if="v$.editedItem.subject_name.$model"
+                >
+                  <option
+                    v-for="(option, index) in pensums"
+                    :key="index"
+                    :value="option.program_name"
+                  >
+                    {{ option.program_name }}
+                  </option>
+                </select>
+              </v-col>
+              <!-- program_name  -->
+              <!-- relative -->
+              <v-col class="pt-5 pb-5 mt-2">
+                <base-button
+                  type="primary"
+                  title="Agregar prerequisito"
+                  @click="addPrerequisite()"
+                />
+              </v-col>
             </v-row>
+            <!-- relative -->
+            <!-- Prerequisite Table -->
+            <v-row>
+              <v-col align="center" cols="12" md="12" sm="12" class="pt-4">
+                <div class="table-responsive-md">
+                  <v-table>
+                    <thead>
+                      <tr>
+                        <th>MATERIA</th>
+                        <th class="text-center">ACCIÓN</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(
+                          prerequisite, index
+                        ) in editedItem.prerequisites"
+                        v-bind:index="index"
+                        :key="index"
+                      >
+                        <td v-text="prerequisite.prerequisite"></td>
+                        <td class="text-center">
+                          <v-icon
+                            size="20"
+                            class="mr-2"
+                            @click="deletePrerequisite(index)"
+                            icon="mdi-delete"
+                          />
+                        </td>
+                      </tr>
+                      <tr v-if="editedItem.prerequisites.length == 0">
+                        <td colspan="5" class="text-center pt-3">
+                          <p>No se ha ingresado ningún prerequisito</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </v-table>
+                </div>
+                <!-- Modal -->
+                <v-dialog
+                  v-model="dialogPrerequisite"
+                  max-width="600px"
+                  persistent
+                >
+                  <v-card height="100%">
+                    <v-container>
+                      <h2 class="black-secondary text-center mt-4 mb-4">
+                        Agregar prerequisito
+                      </h2>
+                      <v-row>
+                        <!-- subject_name -->
+                        <v-col cols="12" sm="12" md="12">
+                          <base-select
+                            label="Materia prerequisito"
+                            :items="pensumSubject"
+                            item-title="subject_name"
+                            item-value="subject_name"
+                            v-model="v$.prerequisite.prerequisite.$model"
+                            :rules="v$.prerequisite.prerequisite"
+                          >
+                          </base-select>
+                        </v-col>
+                        <!-- subject_name -->
+                      </v-row>
+                      <v-row>
+                        <v-col align="center">
+                          <base-button
+                            type="primary"
+                            title="Agregar"
+                            @click="addNewPrerequisite()"
+                          />
+                          <base-button
+                            class="ms-1"
+                            type="secondary"
+                            title="Cancelar"
+                            @click="closePrerequisiteDialog()"
+                          />
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </v-card>
+                </v-dialog>
+                <!-- Modal -->
+              </v-col>
+            </v-row>
+            <!-- Prerequisite Table -->
             <!-- Form -->
             <v-row>
               <v-col align="center">
@@ -138,6 +240,7 @@
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, required } from "@vuelidate/validators";
+import "bootstrap-select/dist/css/bootstrap-select.css";
 
 import pensumSubjectDetailApi from "@/services/pensumSubjectDetailApi";
 import pensumApi from "@/services/pensumApi";
@@ -162,27 +265,37 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      dialogPrerequisite: false,
       editedIndex: -1,
+      editedPrerequisite: -1,
       title: "DETALLE PENSUM MATERIA",
       headers: [
-        { title: "PENSUM", key: "program_name" },
         { title: "MATERIA", key: "subject_name" },
+        { title: "PREREQUISITO", key: "prerequisite" },
+        { title: "PENSUM", key: "program_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
+
       total: 0,
       records: [],
       pensums: [],
       subjects: [],
+      pensumSubject: [],
       loading: false,
       debounce: 0,
       options: {},
       editedItem: {
         program_name: "",
         subject_name: "",
+        prerequisites: [],
       },
       defaultItem: {
         program_name: "",
         subject_name: "",
+        prerequisites: [],
+      },
+      prerequisite: {
+        prerequisite: "",
       },
     };
   },
@@ -207,6 +320,9 @@ export default {
     dialogDelete(val) {
       val || this.closeDelete();
     },
+    dialogPrerequisite(val) {
+      val || this.closePrerequisiteDialog();
+    },
   },
 
   validations() {
@@ -219,10 +335,34 @@ export default {
           required: helpers.withMessage(langMessages.required, required),
         },
       },
+      prerequisite: {
+        prerequisite: {
+          // required: helpers.withMessage(langMessages.required, required),
+        },
+      },
     };
   },
 
   methods: {
+    async change() {
+      const { data } = await pensumSubjectDetailApi
+        .get(
+          "/byPensum/" +
+            this.v$.editedItem.program_name.$model +
+            "/" +
+            this.v$.editedItem.subject_name.$model
+        )
+        .catch((error) => {
+          alert.error(
+            true,
+            "No fue posible obtener la información de los espacios.",
+            "fail"
+          );
+        });
+
+      this.pensumSubject = data.subject;
+    },
+
     async initialize() {
       this.loading = true;
       this.records = [];
@@ -261,7 +401,10 @@ export default {
       this.debounce = setTimeout(async () => {
         try {
           const { data } = await pensumSubjectDetailApi.get(null, {
-            params: { ...options, search: this.search },
+            params: {
+              ...options,
+              search: this.search,
+            },
           });
 
           this.records = data.data;
@@ -284,6 +427,43 @@ export default {
         sortBy: [],
         search: "",
       });
+    },
+
+    addPrerequisite() {
+      this.dialogPrerequisite = true;
+      this.editedPrerequisite = -1;
+      this.v$.prerequisite.prerequisite.$model = "";
+      this.v$.prerequisite.$reset();
+    },
+
+    async addNewPrerequisite() {
+      this.v$.prerequisite.$validate();
+      if (this.v$.prerequisite.$invalid) {
+        alert.error("Campo obligatorio");
+        return;
+      }
+
+      // Creating record
+      try {
+        this.editedItem.prerequisites.push({ ...this.prerequisite });
+      } catch (error) {
+        alert.error("No fue posible crear el registro.");
+      }
+
+      this.closePrerequisiteDialog();
+      this.initialize();
+      this.loading = false;
+      return;
+    },
+
+    closePrerequisiteDialog() {
+      this.v$.prerequisite.$reset();
+      this.dialogPrerequisite = false;
+      this.editedPrerequisite = -1;
+    },
+
+    async deletePrerequisite(index) {
+      this.editedItem.prerequisites.splice(index, 1);
     },
 
     close() {
@@ -332,6 +512,10 @@ export default {
         }
 
         this.close();
+        this.editedItem.prerequisites.splice(
+          0,
+          this.editedItem.prerequisites.length
+        );
         this.initialize();
         return;
       }
@@ -348,6 +532,10 @@ export default {
       }
 
       this.close();
+      this.editedItem.prerequisites.splice(
+        0,
+        this.editedItem.prerequisites.length
+      );
       this.initialize();
       return;
     },

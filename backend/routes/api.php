@@ -57,3 +57,4 @@ Route::resource('/inscription', InscriptionController::class);
 Route::resource('/attendance', AttendanceController::class);
 Route::resource('/teacherSubjectDetail', TeacherSubjectDetailController::class);
 Route::resource('/kinship', kinshipController::class);
+Route::get('/pensumSubjectDetail/byPensum/{pensum}/{subject}', [PensumSubjectDetailController::class, 'pensum']);

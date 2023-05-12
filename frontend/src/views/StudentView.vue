@@ -178,7 +178,6 @@
                         <th>APELLIDO</th>
                         <th>DUI</th>
                         <th>TELÉFONO</th>
-                        <!-- <th>CORREO</th> -->
                         <th>PARENTESCO</th>
                         <th class="text-center">ACCIÓN</th>
                       </tr>
@@ -201,7 +200,6 @@
                             @click="deleteRelative(index)"
                             icon="mdi-delete"
                           />
-                          <!-- @click="deleteRelative(relative.id, index)" -->
                         </td>
                       </tr>
                       <tr v-if="editedItem.relatives.length == 0">
@@ -376,7 +374,7 @@ import BaseSelect from "../components/base-components/BaseSelect.vue";
 import useAlert from "../composables/useAlert";
 
 const { alert } = useAlert();
-const langMessages = messages["en"].validations;
+const langMessages = messages["es"].validations;
 
 export default {
   components: { BaseButton, BaseInput, BaseSelect },
@@ -397,13 +395,9 @@ export default {
       headers: [
         { title: "NOMBRES", key: "name" },
         { title: "APELLIDOS", key: "last_name" },
-        { title: "EDAD ", key: "age" },
         { title: "CARNET", key: "card" },
-        { title: "NIE", key: "nie" },
-        { title: "TELÉFONO ", key: "phone_number" },
         { title: "CORREO", key: "mail" },
         { title: "FECHA INGRESO", key: "admission_date" },
-        { title: "MUNICIPIO ", key: "municipality_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       total: 0,
@@ -454,9 +448,6 @@ export default {
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "Nuevo registro" : "Editar registro";
-    },
-    dialogRelativeTitle() {
-      return this.editedRelative === -1 ? "Nuevo registro" : "Editar registro";
     },
   },
 
@@ -745,6 +736,7 @@ export default {
 
         this.close();
         this.initialize();
+        this.editedItem.relatives.splice(0, this.editedItem.relatives.length);
         this.loading = false;
         return;
       }
@@ -758,6 +750,7 @@ export default {
       }
 
       this.close();
+      this.editedItem.relatives.splice(0, this.editedItem.relatives.length);
       this.initialize();
       return;
     },
