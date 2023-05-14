@@ -64,7 +64,7 @@
             <!-- Form -->
             <v-row class="pt-0">
               <!-- name  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Nombres del profesor"
                   v-model="v$.editedItem.name.$model"
@@ -73,7 +73,7 @@
               </v-col>
               <!-- name  -->
               <!-- last_name  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Apellidos del profesor"
                   v-model="v$.editedItem.last_name.$model"
@@ -82,7 +82,7 @@
               </v-col>
               <!-- last_name  -->
               <!-- card  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="4" sm="3" md="3">
                 <base-input
                   label="Carnet"
                   v-model="v$.editedItem.card.$model"
@@ -92,7 +92,7 @@
               </v-col>
               <!-- card  -->
               <!-- dui  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="8" sm="4" md="4">
                 <base-input
                   label="Número único de identificación"
                   v-model="v$.editedItem.dui.$model"
@@ -102,7 +102,7 @@
               </v-col>
               <!-- dui  -->
               <!-- nit  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="7" sm="5" md="5">
                 <base-input
                   label="Número de Identificación Tributaria"
                   v-model="v$.editedItem.nit.$model"
@@ -112,7 +112,7 @@
               </v-col>
               <!-- nit  -->
               <!-- phone_number  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="5" sm="4" md="4">
                 <base-input
                   label="Número de teléfono"
                   v-model="v$.editedItem.phone_number.$model"
@@ -122,7 +122,7 @@
               </v-col>
               <!-- phone_number  -->
               <!-- mails  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="8" md="8">
                 <base-input
                   label="Correo electrónico"
                   v-model="v$.editedItem.mail.$model"
@@ -216,8 +216,8 @@ export default {
         { title: "APELLIDO", key: "last_name" },
         { title: "CARNET", key: "card" },
         { title: "DUI", key: "dui" },
-        { title: "NIT", key: "nit" },
-        { title: "TELÉFONO", key: "phone_number" },
+        // { title: "NIT", key: "nit" },
+        // { title: "TELÉFONO", key: "phone_number" },
         { title: "CORREO", key: "mail" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],

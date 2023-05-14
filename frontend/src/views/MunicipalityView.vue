@@ -64,7 +64,7 @@
             <!-- Form -->
             <v-row class="pt-0">
               <!-- municipality_name  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Nombre del municipio"
                   v-model="v$.editedItem.municipality.$model"
@@ -73,7 +73,7 @@
               </v-col>
               <!-- municipality_name  -->
               <!-- mun_min  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Municipio en minúsculas"
                   v-model="v$.editedItem.mun_min.$model"
@@ -82,7 +82,7 @@
               </v-col>
               <!-- mun_min  -->
               <!-- mun_may  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Municipio en mayúsculas"
                   v-model="v$.editedItem.mun_may.$model"
@@ -91,7 +91,7 @@
               </v-col>
               <!-- mun_may  -->
               <!-- dm_cod  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Código departamento y municipio"
                   v-model="v$.editedItem.dm_cod.$model"
@@ -100,7 +100,7 @@
               </v-col>
               <!-- dm_cod  -->
               <!-- cod_mun  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Código de municipio"
                   v-model="v$.editedItem.cod_mun.$model"
@@ -109,7 +109,7 @@
               </v-col>
               <!-- cod_mun  -->
               <!-- department_name  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-select
                   label="Departamento"
                   :items="depas"

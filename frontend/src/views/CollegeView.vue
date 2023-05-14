@@ -64,7 +64,7 @@
             <!-- Form -->
             <v-row class="pt-0">
               <!-- college_name  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Nombre de la escuela"
                   v-model="v$.editedItem.college_name.$model"
@@ -73,7 +73,7 @@
               </v-col>
               <!-- college_name  -->
               <!-- direction_name  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-select
                   label="Dirección"
                   :items="directions"

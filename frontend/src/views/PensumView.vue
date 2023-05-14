@@ -64,7 +64,7 @@
             <!-- Form -->
             <v-row class="pt-0">
               <!-- program_name  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="8" md="8">
                 <base-input
                   label="Nombre del programa"
                   v-model="v$.editedItem.program_name.$model"
@@ -73,9 +73,9 @@
               </v-col>
               <!-- program_name  -->
               <!-- uv_total  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="4" sm="4" md="4">
                 <base-input
-                  label="Total de unidades valorativas"
+                  label="Total U.V"
                   v-model="v$.editedItem.uv_total.$model"
                   :rules="v$.editedItem.uv_total"
                   type="number"
@@ -83,7 +83,7 @@
               </v-col>
               <!-- uv_total  -->
               <!-- required_subject  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="8" sm="4" md="4">
                 <base-input
                   label="Materias requeridas"
                   v-model="v$.editedItem.required_subject.$model"
@@ -93,7 +93,7 @@
               </v-col>
               <!-- required_subject  -->
               <!-- optional_subject  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="8" sm="4" md="4">
                 <base-input
                   label="Materias opcionales"
                   v-model="v$.editedItem.optional_subject.$model"
@@ -103,9 +103,9 @@
               </v-col>
               <!-- optional_subject  -->
               <!-- cycle_quantity  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="4" sm="2" md="2">
                 <base-input
-                  label="Cantidad de ciclos"
+                  label="Ciclos"
                   v-model="v$.editedItem.cycle_quantity.$model"
                   :rules="v$.editedItem.cycle_quantity"
                   type="number"
@@ -113,16 +113,16 @@
               </v-col>
               <!-- cycle_quantity  -->
               <!-- study_plan_year  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="4" sm="2" md="2">
                 <base-input
-                  label="Año de plan de estudio"
+                  label="Año"
                   v-model="v$.editedItem.study_plan_year.$model"
                   :rules="v$.editedItem.study_plan_year"
                 />
               </v-col>
               <!-- study_plan_year  -->
               <!-- college_name  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="8" sm="6" md="6">
                 <base-select
                   label="Escuela"
                   :items="colleges"
@@ -134,7 +134,7 @@
               </v-col>
               <!-- college_name  -->
               <!-- pensum_type_name  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-select
                   label="Tipo de pensum"
                   :items="pensumTypes"
@@ -226,8 +226,6 @@ export default {
       headers: [
         { title: "PROGRAMA", key: "program_name" },
         { title: "TOTAL U.V", key: "uv_total" },
-        { title: "MATERIAS OBLIGATORIAS", key: "required_subject" },
-        { title: "MATERIAS OPCIONALES", key: "optional_subject" },
         { title: "CICLOS", key: "cycle_quantity" },
         { title: "PLAN DE ESTUDIO", key: "study_plan_year" },
         { title: "ESCUELA", key: "college_name" },

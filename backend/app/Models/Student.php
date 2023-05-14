@@ -37,28 +37,6 @@ class Student extends Model
         'deleted_at',
     ];
 
-    public function municipality()
-    {
-        return $this->belongsTo(Municipality::class, 'municipalities_id')->withDefault();
-    }
-
-    // public function format()
-    // {
-    //     return [
-    //         // 'id' => Encrypt::encryptValue($this->id),
-    //         'id' => $this->id,
-    //         'name' => $this->name,
-    //         'last_name' => $this->last_name,
-    //         'age' => $this->age,
-    //         'card' => $this->card,
-    //         'nie' => $this->nie,
-    //         'phone_number' => $this->phone_number,
-    //         'mail' => $this->mail,
-    //         'admission_date' => $this->admission_date,
-    //         'municipality_name' => $this->municipality->municipality_name . ', ' . $this->municipality->department->department_name,
-    //     ];
-    // }
-
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
         return Student::select(DB::raw("CONCAT(municipalities.municipality_name, ', ', department.department_name) as municipality_name"), DB::raw("CONCAT(student.name, ', ', student.last_name) as full_name"), 'student.*')
@@ -79,7 +57,6 @@ class Student extends Model
             ->take($itemsPerpage)
             ->orderBy("student.$sortBy", $sort)
             ->get();
-        // ->map(fn ($student) => $student->format());
     }
 
     public static function counterPagination($search)

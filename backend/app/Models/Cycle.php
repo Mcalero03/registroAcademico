@@ -59,4 +59,12 @@ class Cycle extends Model
 
             ->count();
     }
+
+    public static function cycle()
+    {
+        return Cycle::select('cycle.*', 'cycle.id as id')
+            ->where('cycle.status', 'not like', 'Finalizado')
+
+            ->get();
+    }
 }

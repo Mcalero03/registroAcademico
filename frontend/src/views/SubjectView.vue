@@ -64,7 +64,7 @@
             <!-- Form -->
             <v-row class="pt-0">
               <!-- subject_name  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="5" md="5">
                 <base-input
                   label="Nombre de la materia"
                   v-model="v$.editedItem.subject_name.$model"
@@ -73,7 +73,7 @@
               </v-col>
               <!-- subject_name  -->
               <!-- average_approval  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="6" sm="4" md="4">
                 <base-input
                   label="Promedio de aprobación"
                   v-model="v$.editedItem.average_approval.$model"
@@ -82,7 +82,7 @@
               </v-col>
               <!-- average_approval  -->
               <!-- units_value  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="6" sm="3" md="3">
                 <base-input
                   label="Unidades valorativas"
                   v-model="v$.editedItem.units_value.$model"

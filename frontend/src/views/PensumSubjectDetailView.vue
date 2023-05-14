@@ -65,9 +65,9 @@
             <!-- Form -->
             <v-row class="pt-0">
               <!-- subject_name  -->
-              <v-col cols="12" sm="4" md="4">
+              <v-col cols="12" sm="6" md="4">
                 <base-select
-                  label="Nombre de la materia"
+                  label="Materia"
                   :items="subjects"
                   item-title="subject_name"
                   item-value="subject_name"
@@ -77,7 +77,7 @@
               </v-col>
               <!-- subject_name  -->
               <!-- program_name  -->
-              <v-col cols="12" sm="8" md="8">
+              <v-col cols="12" sm="6" md="8">
                 <select
                   v-model="v$.editedItem.program_name.$model"
                   @change="change"

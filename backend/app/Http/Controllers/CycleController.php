@@ -30,11 +30,13 @@ class CycleController extends Controller
         $cycle = Cycle::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
         $cycle = Encrypt::encryptObject($cycle, "id");
 
+        $cycles = Cycle::cycle();
         $total = Cycle::counterPagination($search);
 
         return response()->json([
             "message" => "Registros obtenidos correctamente.",
             "data" => $cycle,
+            "cycles" => $cycles,
             "total" => $total,
         ]);
     }

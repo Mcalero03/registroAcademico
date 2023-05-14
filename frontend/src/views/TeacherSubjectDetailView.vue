@@ -80,10 +80,10 @@
                 <base-select
                   label="Profesor"
                   :items="teachers"
-                  item-title="name"
-                  item-value="name"
-                  v-model="v$.editedItem.teacher_name.$model"
-                  :rules="v$.editedItem.teacher_name"
+                  item-title="full_name"
+                  item-value="full_name"
+                  v-model="v$.editedItem.full_name.$model"
+                  :rules="v$.editedItem.full_name"
                 />
               </v-col>
               <!-- teacher_name  -->
@@ -179,7 +179,7 @@ export default {
       title: "DETALLE PROFESOR MATERIA",
       headers: [
         { title: "MATERIA", key: "subject_name" },
-        { title: "PROFESOR", key: "teacher_name" },
+        { title: "PROFESOR", key: "full_name" },
         { title: "GRUPO", key: "group_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
@@ -193,12 +193,12 @@ export default {
       options: {},
       editedItem: {
         subject_name: "",
-        teacher_name: "",
+        full_name: "",
         group_name: "",
       },
       defaultItem: {
         subject_name: "",
-        teacher_name: "",
+        full_name: "",
         group_name: "",
       },
     };
@@ -230,7 +230,7 @@ export default {
         subject_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
-        teacher_name: {
+        full_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
         group_name: {

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DB;
 
 class Teacher extends Model
 {
@@ -35,7 +36,7 @@ class Teacher extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Teacher::select('teacher.*', 'teacher.id as id')
+        return Teacher::select(DB::raw("CONCAT(teacher.name, ', ', teacher.last_name) as full_name"), 'teacher.*', 'teacher.id as id')
 
             ->where('teacher.name', 'like', $search)
             ->orWhere('teacher.last_name', 'like', $search)

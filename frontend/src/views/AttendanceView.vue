@@ -60,8 +60,8 @@
             <base-select
               label="Inscripción"
               :items="inscriptions"
-              item-title="id"
-              item-value="id"
+              item-title="full_name"
+              item-value="full_name"
               v-model="v$.editedItem.inscription_id.$model"
               :rules="v$.editedItem.inscription_id"
             />
