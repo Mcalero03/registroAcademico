@@ -58,7 +58,7 @@
             <!-- Form -->
             <v-row class="pt-3">
               <!-- department_name -->
-              <v-col cols="12" sm="12" md="4">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Department Name"
                   v-model="v$.editedItem.department_name.$model"
@@ -68,7 +68,7 @@
               <!-- department_name -->
 
               <!-- min_dpto -->
-              <v-col cols="12" sm="12" md="4">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Min Dpto"
                   v-model="v$.editedItem.min_dpto.$model"
@@ -78,7 +78,7 @@
               <!-- min_dpto -->
 
               <!-- may_dpto -->
-              <v-col cols="12" sm="12" md="4">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="May Dpto"
                   v-model="v$.editedItem.may_dpto.$model"
@@ -88,7 +88,7 @@
               <!-- may_dpto -->
 
               <!-- cod_dpto -->
-              <v-col cols="12" sm="12" md="4">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Cod Dpto"
                   v-model="v$.editedItem.cod_dpto.$model"

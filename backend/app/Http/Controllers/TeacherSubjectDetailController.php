@@ -32,6 +32,8 @@ class TeacherSubjectDetailController extends Controller
 
         $teacherSubjectDetail = TeacherSubjectDetail::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
 
+        $teacherSubjectDetail = Encrypt::encryptObject($teacherSubjectDetail, "id");
+
         $total = TeacherSubjectDetail::counterPagination($search);
 
         return response()->json([
@@ -46,9 +48,14 @@ class TeacherSubjectDetailController extends Controller
      */
     public function store(Request $request)
     {
+        $data = $request->all();
+        $info = explode(', ', $data['full_name']);
+        $id = TeacherSubjectDetail::teacherId($info[0], $info[1])->pluck('id');
+        $teacher = TeacherSubjectDetail::clean($id);
+
         $teacherSubjectDetail = new TeacherSubjectDetail;
         $teacherSubjectDetail->subject_id = Subject::where('subject_name', $request->subject_name)->first()?->id;
-        $teacherSubjectDetail->teacher_id = Teacher::where('name', $request->teacher_name)->first()?->id;
+        $teacherSubjectDetail->teacher_id = $teacher;
         $teacherSubjectDetail->group_id = Group::where('group_name', $request->group_name)->first()?->id;
 
         $teacherSubjectDetail->save();
@@ -72,10 +79,13 @@ class TeacherSubjectDetailController extends Controller
     public function update(Request $request)
     {
         $data = Encrypt::decryptArray($request->all(), 'id');
+        $info = explode(', ', $data['full_name']);
+        $id = TeacherSubjectDetail::teacherId($info[0], $info[1])->pluck('id');
+        $teacher = TeacherSubjectDetail::clean($id);
 
         $teacherSubjectDetail = TeacherSubjectDetail::where('id', $data['id'])->first();
         $teacherSubjectDetail->subject_id = Subject::where('subject_name', $request->subject_name)->first()?->id;
-        $teacherSubjectDetail->teacher_id = Teacher::where('name', $request->teacher_name)->first()?->id;
+        $teacherSubjectDetail->teacher_id = $teacher;
         $teacherSubjectDetail->group_id = Group::where('group_name', $request->group_name)->first()?->id;
 
         $teacherSubjectDetail->save();

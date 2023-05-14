@@ -149,130 +149,7 @@
                   :rules="v$.editedItem.subject_name"
                 />
               </v-col>
-              <!-- subject_name  -->
-              <!-- relative -->
-              <!-- <v-col class="pt-5 pb-5 mt-2">
-                <base-button
-                  type="primary"
-                  title="Agregar nota"
-                  @click="addGrade()"
-                />
-              </v-col> -->
             </v-row>
-            <!-- relative -->
-            <!-- Grade Table -->
-            <!--<v-row>
-              <v-col align="center" cols="12" md="12" sm="12" class="pt-4">
-                <div class="table-responsive-md">
-                  <v-table>
-                    <thead>
-                      <tr>
-                        <th>NOTA</th>
-                        <th>FECHA</th>
-                        <th>ESTADO</th>
-                        <th>EVALUACIÓN</th>
-                        <th class="text-center">ACCIÓN</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr
-                        v-for="(grade, index) in editedItem.grades"
-                        v-bind:index="index"
-                        :key="index"
-                      >
-                        <td v-text="grade.score"></td>
-                        <td v-text="grade.score_date"></td>
-                        <td v-text="grade.status"></td>
-                        <td v-text="grade.evaluation_name"></td>
-                        <td class="text-center">
-                          <v-icon
-                            size="20"
-                            class="mr-2"
-                            @click="deleteGrade(index)"
-                            icon="mdi-delete"
-                          />
-                        </td>
-                      </tr>
-                      <tr v-if="editedItem.grades.length == 0">
-                        <td colspan="5" class="text-center pt-3">
-                          <p>No se ha ingresado ninguna nota</p>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </v-table>
-                </div>-->
-            <!-- Modal -->
-            <!-- <v-dialog v-model="dialogGrade" max-width="600px" persistent>
-                  <v-card height="100%">
-                    <v-container>
-                      <h2 class="black-secondary text-center mt-4 mb-4">
-                        Agregar nota
-                      </h2> -->
-            <!-- <v-row> -->
-            <!-- score  -->
-            <!-- <v-col cols="6" sm="6" md="6">
-                          <base-input
-                            label="Nota"
-                            v-model="v$.grade.score.$model"
-                            :rules="v$.grade.score"
-                          />
-                        </v-col> -->
-            <!-- score  -->
-            <!-- score_date  -->
-            <!-- <v-col cols="6" sm="6" md="6">
-                          <base-input
-                            label="Fecha"
-                            v-model="v$.grade.score_date.$model"
-                            :rules="v$.grade.score_date"
-                            type="date"
-                          />
-                        </v-col> -->
-            <!-- score_date  -->
-            <!-- status  -->
-            <!-- <v-col cols="6" sm="6" md="6">
-                          <base-input
-                            label="Estado"
-                            v-model="v$.grade.status.$model"
-                            :rules="v$.grade.status"
-                          />
-                        </v-col> -->
-            <!-- status  -->
-            <!-- evaluation_name  -->
-            <!-- <v-col cols="6" sm="6" md="6">
-                          <base-select
-                            label="Evaluación"
-                            :items="evaluations"
-                            item-title="evaluation_name"
-                            item-value="evaluation_name"
-                            v-model="v$.grade.evaluation_name.$model"
-                            :rules="v$.grade.evaluation_name"
-                          />
-                        </v-col> -->
-            <!-- evaluation_name  -->
-            <!-- </v-row>
-                      <v-row>
-                        <v-col align="center">
-                          <base-button
-                            type="primary"
-                            title="Agregar"
-                            @click="addNewGrade()"
-                          />
-                          <base-button
-                            class="ms-1"
-                            type="secondary"
-                            title="Cancelar"
-                            @click="closeGradeDialog()"
-                          />
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                  </v-card>
-                </v-dialog> -->
-            <!-- Modal -->
-            <!-- </v-col>
-            </v-row> -->
-            <!-- Grade Table -->
-            <!-- Form -->
             <v-row>
               <v-col align="center">
                 <base-button type="primary" title="Guardar" @click="save" />
@@ -518,7 +395,7 @@ export default {
       });
 
       if (responses) {
-        this.cycles = responses[1].data.data;
+        this.cycles = responses[1].data.cycles;
         this.students = responses[2].data.data;
         this.groups = responses[3].data.data;
         this.subjects = responses[4].data.data;

@@ -64,7 +64,7 @@
             <!-- Form -->
             <v-row class="pt-0">
               <!-- cycle_number  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="6" sm="3" md="3">
                 <base-input
                   label="Número de ciclo"
                   v-model="v$.editedItem.cycle_number.$model"
@@ -73,7 +73,7 @@
               </v-col>
               <!-- cycle_number  -->
               <!-- year  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="6" sm="3" md="3">
                 <base-input
                   label="Año lectivo"
                   v-model="v$.editedItem.year.$model"
@@ -82,7 +82,7 @@
               </v-col>
               <!-- year  -->
               <!-- start_date  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Fecha de inicio"
                   v-model="v$.editedItem.start_date.$model"
@@ -92,7 +92,7 @@
               </v-col>
               <!-- start_date  -->
               <!-- end_date  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Fecha de finalización"
                   v-model="v$.editedItem.end_date.$model"
@@ -102,7 +102,7 @@
               </v-col>
               <!-- end_date  -->
               <!-- status  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-select
                   label="Estado del ciclo"
                   :items="status"

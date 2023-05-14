@@ -64,7 +64,7 @@
             <!-- Form -->
             <v-row class="pt-0">
               <!-- group_name  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Nombre de grupo"
                   v-model="v$.editedItem.group_name.$model"
@@ -73,7 +73,7 @@
               </v-col>
               <!-- group_name  -->
               <!-- student_quantity  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Cantidad de estudiantes"
                   v-model="v$.editedItem.students_quantity.$model"

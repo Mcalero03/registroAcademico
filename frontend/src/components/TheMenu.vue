@@ -75,9 +75,39 @@ export default {
         icon: "mdi-town-hall",
       },
       {
+        title: "Escuela",
+        url: "/college",
+        icon: "mdi-account-school",
+      },
+      {
         title: "Tipo Pensum",
         url: "/pensumType",
         icon: "mdi-school",
+      },
+      {
+        title: "Profesor",
+        url: "/teacher",
+        icon: "mdi-human-male-board",
+      },
+      {
+        title: "Materia",
+        url: "/subject",
+        icon: "mdi-bookshelf",
+      },
+      {
+        title: "Grupo",
+        url: "/group",
+        icon: "mdi-account-group",
+      },
+      {
+        title: "Ciclo",
+        url: "/cycle",
+        icon: "mdi-list-status",
+      },
+      {
+        title: "Parentesco",
+        url: "/kinship",
+        icon: "mdi-family-tree",
       },
       {
         title: "Pensum",
@@ -89,27 +119,18 @@ export default {
         url: "/pensumSubjectDetail",
         icon: "mdi-details",
       },
-      {
-        title: "Materia",
-        url: "/subject",
-        icon: "mdi-bookshelf",
-      },
+
       {
         title: "Detalle Profesor Materia",
         url: "/teacherSubjectDetail",
         icon: "mdi-details",
       },
-      {
-        title: "Profesor",
-        url: "/teacher",
-        icon: "mdi-human-male-board",
-      },
+
       {
         title: "Evaluación",
         url: "/evaluation",
         icon: "mdi-playlist-edit",
       },
-      { title: "Grupo", url: "/group", icon: "mdi-account-group" },
       {
         title: "Inscripción",
         url: "/inscription",
@@ -139,21 +160,6 @@ export default {
         title: "Estudiante",
         url: "/student",
         icon: "mdi-account",
-      },
-      {
-        title: "Parentesco",
-        url: "/kinship",
-        icon: "mdi-family-tree",
-      },
-      {
-        title: "Escuela",
-        url: "/college",
-        icon: "mdi-account-school",
-      },
-      {
-        title: "Ciclo",
-        url: "/cycle",
-        icon: "mdi-list-status",
       },
     ],
     // settings: [

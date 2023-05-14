@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DB;
 use Encrypt;
 
 class TeacherSubjectDetail extends Model
@@ -57,8 +58,10 @@ class TeacherSubjectDetail extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return TeacherSubjectDetail::select('teacher_subject_detail.*', 'teacher_subject_detail.id as id')
-
+        return TeacherSubjectDetail::select(DB::raw("CONCAT(teacher.name, ', ', teacher.last_name) as full_name"), 'teacher_subject_detail.*', 'subject.subject_name', 'group.group_name')
+            ->join('teacher', 'teacher_subject_detail.teacher_id', '=', 'teacher.id')
+            ->join('subject', 'teacher_subject_detail.subject_id', '=', 'subject.id')
+            ->join('group', 'teacher_subject_detail.group_id', '=', 'group.id')
             ->where('teacher_subject_detail.subject_id', 'like', $search)
             ->orWhere('teacher_subject_detail.teacher_id', 'like', $search)
             ->orWhere('teacher_subject_detail.group_id', 'like', $search)
@@ -66,18 +69,34 @@ class TeacherSubjectDetail extends Model
             ->skip($skip)
             ->take($itemsPerpage)
             ->orderBy("teacher_subject_detail.$sortBy", $sort)
-            ->get()
-            ->map(fn ($teacherSubjectDetail) => $teacherSubjectDetail->format());
+            ->get();
+        // ->map(fn ($teacherSubjectDetail) => $teacherSubjectDetail->format());
     }
 
     public static function counterPagination($search)
     {
-        return TeacherSubjectDetail::select('teacher_subject_detail.*', 'teacher_subject_detail.id as id')
-
+        return TeacherSubjectDetail::select(DB::raw("CONCAT(teacher.name, ', ', teacher.last_name) as full_name"), 'teacher_subject_detail.*', 'subject.subject_name', 'group.group_name')
+            ->join('teacher', 'teacher_subject_detail.teacher_id', '=', 'teacher.id')
+            ->join('subject', 'teacher_subject_detail.subject_id', '=', 'subject.id')
+            ->join('group', 'teacher_subject_detail.group_id', '=', 'group.id')
             ->where('teacher_subject_detail.subject_id', 'like', $search)
             ->orWhere('teacher_subject_detail.teacher_id', 'like', $search)
             ->orWhere('teacher_subject_detail.group_id', 'like', $search)
-
             ->count();
+    }
+
+    public static function teacherId($name, $last_name)
+    {
+        return Teacher::select('teacher.id')
+            ->where('teacher.name', $name)
+            ->where('teacher.last_name', $last_name)
+            ->get('teacher.id');
+    }
+
+    public static function clean($string)
+    {
+        $change = str_replace('[', '', $string);
+        $change = str_replace(']', '', $change);
+        return $change;
     }
 }
