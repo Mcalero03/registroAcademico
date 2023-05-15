@@ -694,6 +694,7 @@ export default {
 
     close() {
       this.dialog = false;
+      this.editedItem.relatives.splice(0, this.editedItem.relatives.length);
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;

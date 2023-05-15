@@ -63,18 +63,6 @@
           <v-container>
             <!-- Form -->
             <v-row class="pt-0">
-              <!-- subject_name  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-select
-                  label="Materia"
-                  :items="subjects"
-                  item-title="subject_name"
-                  item-value="subject_name"
-                  v-model="v$.editedItem.subject_name.$model"
-                  :rules="v$.editedItem.subject_name"
-                />
-              </v-col>
-              <!-- subject_name  -->
               <!-- teacher_name  -->
               <v-col cols="12" sm="12" md="6">
                 <base-select
@@ -87,6 +75,18 @@
                 />
               </v-col>
               <!-- teacher_name  -->
+              <!-- subject_name  -->
+              <v-col cols="12" sm="12" md="6">
+                <base-select
+                  label="Materia"
+                  :items="subjects"
+                  item-title="subject_name"
+                  item-value="subject_name"
+                  v-model="v$.editedItem.subject_name.$model"
+                  :rules="v$.editedItem.subject_name"
+                />
+              </v-col>
+              <!-- subject_name  -->
               <!-- group_name  -->
               <v-col cols="12" sm="12" md="6">
                 <base-select

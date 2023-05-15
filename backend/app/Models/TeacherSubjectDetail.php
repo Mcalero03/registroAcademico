@@ -31,30 +31,30 @@ class TeacherSubjectDetail extends Model
         'deleted_at',
     ];
 
-    public function subject()
-    {
-        return $this->belongsTo(Subject::class, 'subject_id');
-    }
+    // public function subject()
+    // {
+    //     return $this->belongsTo(Subject::class, 'subject_id');
+    // }
 
-    public function teacher()
-    {
-        return $this->belongsTo(Teacher::class, 'teacher_id');
-    }
+    // public function teacher()
+    // {
+    //     return $this->belongsTo(Teacher::class, 'teacher_id');
+    // }
 
-    public function group()
-    {
-        return $this->belongsTo(Group::class, 'group_id');
-    }
+    // public function group()
+    // {
+    //     return $this->belongsTo(Group::class, 'group_id');
+    // }
 
-    public function format()
-    {
-        return [
-            'id' => Encrypt::encryptValue($this->id),
-            'subject_name' => $this->subject->subject_name,
-            'teacher_name' => $this->teacher->name,
-            'group_name' => $this->group->group_name,
-        ];
-    }
+    // public function format()
+    // {
+    //     return [
+    //         'id' => Encrypt::encryptValue($this->id),
+    //         'subject_name' => $this->subject->subject_name,
+    //         'teacher_name' => $this->teacher->name,
+    //         'group_name' => $this->group->group_name,
+    //     ];
+    // }
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {

@@ -78,6 +78,9 @@
                   label="Promedio de aprobación"
                   v-model="v$.editedItem.average_approval.$model"
                   :rules="v$.editedItem.average_approval"
+                  type="number"
+                  step=".10"
+                  min="0"
                 />
               </v-col>
               <!-- average_approval  -->
@@ -88,6 +91,7 @@
                   v-model="v$.editedItem.units_value.$model"
                   :rules="v$.editedItem.units_value"
                   type="number"
+                  min="1"
                 />
               </v-col>
               <!-- units_value  -->

@@ -105,17 +105,12 @@ export default {
         icon: "mdi-list-status",
       },
       {
-        title: "Parentesco",
-        url: "/kinship",
-        icon: "mdi-family-tree",
-      },
-      {
         title: "Pensum",
         url: "/pensum",
         icon: "mdi-view-list",
       },
       {
-        title: "Detalle Pensum Materia",
+        title: "Detalle Prerequisitos",
         url: "/pensumSubjectDetail",
         icon: "mdi-details",
       },
@@ -125,11 +120,10 @@ export default {
         url: "/teacherSubjectDetail",
         icon: "mdi-details",
       },
-
       {
-        title: "Evaluación",
-        url: "/evaluation",
-        icon: "mdi-playlist-edit",
+        title: "Estudiante",
+        url: "/student",
+        icon: "mdi-account",
       },
       {
         title: "Inscripción",
@@ -137,14 +131,19 @@ export default {
         icon: "mdi-file",
       },
       {
+        title: "Evaluación",
+        url: "/evaluation",
+        icon: "mdi-playlist-edit",
+      },
+      {
         title: "Asistencia",
         url: "/attendance",
         icon: "mdi-checkbox-multiple-outline",
-      },
+      }, 
       {
-        title: "Horario",
-        url: "/schedule",
-        icon: "mdi-calendar-clock",
+        title: "Parentesco",
+        url: "/kinship",
+        icon: "mdi-family-tree",
       },
       {
         title: "Departamento",
@@ -156,16 +155,15 @@ export default {
         url: "/municipality",
         icon: "mdi-home-city-outline",
       },
-      {
-        title: "Estudiante",
-        url: "/student",
-        icon: "mdi-account",
-      },
+
     ],
     // settings: [
     //   ["Escuela", "mdi-account-school", "/college"],
     //   ["Cycle", "mdi-list-status"],
-    // ],
+    // ], 
+    // title: "Horario",
+    //     url: "/schedule",
+    //     icon: "mdi-calendar-clock",
   }),
 };
 </script> 

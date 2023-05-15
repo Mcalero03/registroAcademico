@@ -64,6 +64,7 @@ class Cycle extends Model
     {
         return Cycle::select('cycle.*', 'cycle.id as id')
             ->where('cycle.status', 'not like', 'Finalizado')
+            ->where('cycle.status', 'not like', 'Creado')
 
             ->get();
     }

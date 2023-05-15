@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Attendance;
+use App\Models\Inscription;
+use App\Models\TeacherSubjectDetail;
 use Encrypt;
+use Illuminate\Support\Facades\DB; 
 
 class AttendanceController extends Controller
 {
@@ -95,6 +98,54 @@ class AttendanceController extends Controller
 
         return response()->json([
             "message" => "Registro eliminado correctamente",
+        ]);
+    } 
+
+    public function teacherSubject($name, $last_name)
+    { 
+        $subject = TeacherSubjectDetail::select('subject.subject_name')
+        ->join('subject', 'teacher_subject_detail.subject_id', '=', 'subject.id') 
+        ->join('teacher', 'teacher_subject_detail.teacher_id', '=', 'teacher.id')
+        ->where('teacher.name', $name)
+        ->where('teacher.last_name', $last_name)
+        ->get('subject.subject_name');
+
+        return response()->json([
+            "message" => "Registro encontrado correctamente",
+            "subject" => $subject
+        ]);
+    } 
+
+    public function subject($name, $last_name, $subject)
+    {
+        $group = TeacherSubjectDetail::select('group.group_name as group')
+        ->join('subject', 'teacher_subject_detail.subject_id', '=', 'subject.id') 
+        ->join('teacher', 'teacher_subject_detail.teacher_id', '=', 'teacher.id')
+        ->join('group', 'teacher_subject_detail.group_id', '=', 'group.id')
+        ->where('teacher.name', $name)
+        ->where('teacher.last_name', $last_name)
+        ->where('subject.subject_name', $subject)
+        ->get('group.group_name');
+
+        return response()->json([
+            "message" => "Registro encontrado correctamente",
+            "group" => $group
+        ]);
+    } 
+
+    public function student($group, $subject)
+    {
+        $student = Inscription::select(DB::raw("CONCAT(student.name, ', ', student.last_name) as full_name"),'inscription.attendance_quantity')
+        ->join('subject', 'inscription.subject_id', '=', 'subject.id') 
+        ->join('group', 'inscription.group_id', '=', 'group.id')
+        ->join('student', 'inscription.student_id', '=', 'student.id' )
+        ->where('group.group_name', $group)
+        ->where('subject.subject_name', $subject)
+        ->get();
+
+        return response()->json([
+            "message" => "Registro encontrado correctamente",
+            "student" => $student
         ]);
     }
 }

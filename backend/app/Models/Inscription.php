@@ -36,43 +36,6 @@ class Inscription extends Model
         'deleted_at',
     ];
 
-    public function cycle()
-    {
-        return $this->belongsTo(Cycle::class, 'cycle_id');
-    }
-
-    public function student()
-    {
-        return $this->belongsTo(Student::class, 'student_id');
-    }
-
-    public function group()
-    {
-        return $this->belongsTo(Group::class, 'group_id');
-    }
-
-    public function subject()
-    {
-        return $this->belongsTo(Subject::class, 'subject_id');
-    }
-
-    // public function format()
-    // {
-
-    //     return [
-    //         // 'id' => Encrypt::encryptValue($this->id),
-    //         'id' => $this->id,
-    //         'inscription_date' => $this->inscription_date,
-    //         'subject_average' => $this->subject_average,
-    //         'attendance_quantity' => $this->attendance_quantity,
-    //         'status' => $this->status,
-    //         'cycle_number' => $this->cycle->cycle_number,
-    //         'student_name' => $this->student->name . ", " . $this->student->last_name,
-    //         'group_name' => $this->group->group_name,
-    //         'subject_name' => $this->subject->subject_name,
-    //     ];
-    // }
-
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
         return Inscription::select(DB::raw("CONCAT(student.name, ', ', student.last_name) as full_name"), 'inscription.*', 'cycle.cycle_number', 'subject.subject_name', 'group.group_name')
@@ -93,7 +56,6 @@ class Inscription extends Model
             ->take($itemsPerpage)
             ->orderBy("inscription.$sortBy", $sort)
             ->get();
-        // ->map(fn ($inscription) => $inscription->format());
     }
 
     public static function counterPagination($search)

@@ -79,6 +79,7 @@
                   v-model="v$.editedItem.uv_total.$model"
                   :rules="v$.editedItem.uv_total"
                   type="number"
+                  min="1"
                 />
               </v-col>
               <!-- uv_total  -->
@@ -89,6 +90,7 @@
                   v-model="v$.editedItem.required_subject.$model"
                   :rules="v$.editedItem.required_subject"
                   type="number"
+                  min="1"
                 />
               </v-col>
               <!-- required_subject  -->
@@ -99,6 +101,7 @@
                   v-model="v$.editedItem.optional_subject.$model"
                   :rules="v$.editedItem.optional_subject"
                   type="number"
+                  min="0"
                 />
               </v-col>
               <!-- optional_subject  -->
@@ -109,6 +112,8 @@
                   v-model="v$.editedItem.cycle_quantity.$model"
                   :rules="v$.editedItem.cycle_quantity"
                   type="number"
+                  max="10" 
+                  min="1"
                 />
               </v-col>
               <!-- cycle_quantity  -->
@@ -117,7 +122,10 @@
                 <base-input
                   label="Año"
                   v-model="v$.editedItem.study_plan_year.$model"
-                  :rules="v$.editedItem.study_plan_year"
+                  :rules="v$.editedItem.study_plan_year" 
+                  type="number" 
+                  min="1900" 
+                  max="2099" 
                 />
               </v-col>
               <!-- study_plan_year  -->
@@ -324,7 +332,7 @@ export default {
             ({ $params }) => langMessages.minLength($params),
             minLength(1)
           ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(2)),
+          maxLength: helpers.withMessage(({ $params }) => langMessages.maxLength($params), maxLength(2)),
         },
         study_plan_year: {
           required: helpers.withMessage(langMessages.required, required),
@@ -332,7 +340,7 @@ export default {
             ({ $params }) => langMessages.minLength($params),
             minLength(4)
           ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(4)),
+          maxLength: helpers.withMessage(({ $params }) => langMessages.maxLength($params), maxLength(4)),
         },
         college_name: {
           required: helpers.withMessage(langMessages.required, required),

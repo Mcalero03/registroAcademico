@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class Group extends Model
 {
@@ -30,8 +31,10 @@ class Group extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Group::select('group.*', 'group.id as id')
-
+        return Group::select(DB::raw('CASE WHEN schedule.group_id IS NULL THEN "No asignado" ELSE "Asignado" END as Schedule'),'group.*', 'group.id as id')
+            ->leftjoin('schedule', 'group.id', '=', 'schedule.group_id')
+            ->whereNull('schedule.group_id')
+            ->whereNull('schedule.deleted_at')
             ->where('group.group_name', 'like', $search)
             ->orWhere('group.students_quantity', 'like', $search)
 
@@ -43,10 +46,13 @@ class Group extends Model
 
     public static function counterPagination($search)
     {
-        return Group::select('group.*', 'group.id as id')
-
+        return Group::select('group.*', 'group.id as id', )
+            ->join('schedule', 'group.id', '=', 'schedule.group_id')
+            ->whereNull('schedule.group_id')
+            ->whereNull('schedule.deleted_at')
             ->where('group.group_name', 'like', $search)
             ->orWhere('group.students_quantity', 'like', $search)
+
             ->count();
     }
 }

@@ -79,10 +79,120 @@
                   v-model="v$.editedItem.students_quantity.$model"
                   :rules="v$.editedItem.students_quantity"
                   type="number"
+                  min="1"
                 />
               </v-col>
               <!-- student_quantity  -->
+            <!-- Schedule -->
+            <v-col class="pt-5 pb-5 mt-2">
+                <base-button
+                  type="primary"
+                  title="Agregar horario"
+                  @click="addSchedule()"
+                />
+              </v-col>
             </v-row>
+            <!-- Schedule -->
+            <!-- Schedule Table -->
+            <v-row>
+              <v-col align="center" cols="12" md="12" sm="12" class="pt-4">
+                <div class="table-responsive-md">
+                  <v-table>
+                    <thead>
+                      <tr>
+                        <th>DÍA</th>
+                        <th>INICIO</th>
+                        <th>FIN</th>
+                        <th class="text-center">ACCIÓN</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(schedule, index) in editedItem.schedules"
+                        v-bind:index="index"
+                        :key="index"
+                      >
+                        <td v-text="schedule.week_day"></td>
+                        <td v-text="schedule.start_time"></td>
+                        <td v-text="schedule.end_time"></td>
+                        <td class="text-center">
+                          <v-icon
+                            size="20"
+                            class="mr-2"
+                            @click="deleteSchedule(index)"
+                            icon="mdi-delete"
+                          />
+                        </td>
+                      </tr>
+                      <tr v-if="editedItem.schedules.length == 0">
+                        <td colspan="5" class="text-center pt-3">
+                          <p>No se ha ingresado ningún horario</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </v-table>
+                </div>
+                <!-- Modal -->
+                <v-dialog v-model="dialogSchedule" max-width="600px" persistent>
+                  <v-card height="100%">
+                    <v-container>
+                      <h2 class="black-secondary text-center mt-4 mb-4">
+                        Agregar horario
+                      </h2>
+                      <v-row>
+              <!-- week_day  -->
+              <v-col cols="12" sm="12" md="6">
+                <base-select
+                  label="Día de la semana"
+                  :items="weekdays"
+                  v-model="v$.schedule.week_day.$model"
+                  :rules="v$.schedule.week_day"
+                />
+              </v-col>
+              <!-- week_day  -->
+              <!-- start_time  -->
+              <v-col cols="12" sm="12" md="6">
+                <base-input
+                  label="Hora de inicio"
+                  v-model="v$.schedule.start_time.$model"
+                  :rules="v$.schedule.start_time"
+                  type="time"
+                />
+              </v-col>
+              <!-- start_time  -->
+              <!-- end_time  -->
+              <v-col cols="12" sm="12" md="6">
+                <base-input
+                  label="Hora de fin"
+                  v-model="v$.schedule.end_time.$model"
+                  :rules="v$.schedule.end_time"
+                  type="time"
+                />
+              </v-col>
+              <!-- end_time  -->
+                      </v-row>
+                      <v-row>
+                        <v-col align="center">
+                          <base-button
+                            type="primary"
+                            title="Agregar"
+                            @click="addNewSchedule()"
+                          />
+                          <base-button
+                            class="ms-1"
+                            type="secondary"
+                            title="Cancelar"
+                            @click="closeScheduleDialog()"
+                          />
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </v-card>
+                </v-dialog>
+                <!-- Modal -->
+              </v-col>
+            </v-row>
+            <!-- Schedule Table -->
             <!-- Form -->
             <v-row>
               <v-col align="center">
@@ -137,6 +247,7 @@ import { helpers, minLength, required } from "@vuelidate/validators";
 import groupApi from "@/services/groupApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
+import BaseSelect from "../components/base-components/BaseSelect.vue";
 
 import useAlert from "../composables/useAlert";
 
@@ -144,7 +255,7 @@ const { alert } = useAlert();
 const langMessages = messages["es"].validations;
 
 export default {
-  components: { BaseButton, BaseInput },
+  components: { BaseButton, BaseInput, BaseSelect },
 
   setup() {
     return { v$: useVuelidate() };
@@ -155,11 +266,15 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      dialogSchedule: false,
       editedIndex: -1,
+      editedSchedule: -1,
       title: "GRUPO",
+      weekdays: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"],
       headers: [
         { title: "GRUPO", key: "group_name" },
         { title: "CANTIDAD", key: "students_quantity" },
+        { title: "HORARIO", key: "Schedule" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       total: 0,
@@ -170,11 +285,18 @@ export default {
       editedItem: {
         group_name: "",
         students_quantity: "",
+        schedules: [],
       },
       defaultItem: {
         group_name: "",
         students_quantity: "",
-      },
+        schedules: [],
+      }, 
+      schedule: {
+        week_day: "",
+        start_time: "",
+        end_time: "",
+      }
     };
   },
 
@@ -193,6 +315,9 @@ export default {
     },
     dialogDelete(val) {
       val || this.closeDelete();
+    }, 
+    dialogSchedule(val) {
+      val || this.closeScheduleDialog();
     },
   },
 
@@ -209,7 +334,18 @@ export default {
         students_quantity: {
           required: helpers.withMessage(langMessages.required, required),
         },
-      },
+      }, 
+      schedule: {
+        week_day: {
+          // required: helpers.withMessage(langMessages.required, required),
+        },
+        start_time : {
+          // required: helpers.withMessage(langMessages.required, required),
+        } ,
+        end_time: {
+          // required: helpers.withMessage(langMessages.required, required),
+        }
+      }
     };
   },
 
@@ -260,10 +396,53 @@ export default {
         sortBy: [],
         search: "",
       });
+    }, 
+
+    addSchedule() {
+      this.dialogSchedule = true;
+      this.editedSchedule = -1;
+      this.v$.schedule.week_day.$model = "";
+      this.v$.schedule.start_time.$model = "";
+      this.v$.schedule.end_time.$model = "";
+      this.v$.schedule.$reset();
+    },
+
+    async addNewSchedule() {
+      this.v$.schedule.$validate();
+      if (this.v$.schedule.$invalid) {
+        alert.error("Campo obligatorio");
+        return;
+      }
+
+      // Creating record
+      try {
+        this.editedItem.schedules.push({ ...this.schedule });
+      } catch (error) {
+        alert.error("No fue posible crear el registro.");
+      }
+
+      this.closeScheduleDialog();
+      this.initialize();
+      this.loading = false;
+      return;
+    },
+
+    closeScheduleDialog() {
+      this.v$.schedule.$reset();
+      this.dialogSchedule = false;
+      this.editedSchedule = -1;
+    },
+
+    async deleteSchedule(index) {
+      this.editedItem.schedules.splice(index, 1);
     },
 
     close() {
       this.dialog = false;
+      this.editedItem.schedules.splice(
+          0,
+          this.editedItem.schedules.length
+        );
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
@@ -305,6 +484,10 @@ export default {
         }
 
         this.close();
+        this.editedItem.schedules.splice(
+          0,
+          this.editedItem.schedules.length
+        );
         this.initialize();
         return;
       }
@@ -319,6 +502,10 @@ export default {
       }
 
       this.close();
+      this.editedItem.schedules.splice(
+          0,
+          this.editedItem.schedules.length
+        );
       this.initialize();
       return;
     },

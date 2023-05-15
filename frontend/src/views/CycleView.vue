@@ -69,6 +69,8 @@
                   label="Número de ciclo"
                   v-model="v$.editedItem.cycle_number.$model"
                   :rules="v$.editedItem.cycle_number"
+                  type="number"
+                  min="1"
                 />
               </v-col>
               <!-- cycle_number  -->
@@ -78,6 +80,9 @@
                   label="Año lectivo"
                   v-model="v$.editedItem.year.$model"
                   :rules="v$.editedItem.year"
+                  type="number" 
+                  min="1900" 
+                  max="2099"
                 />
               </v-col>
               <!-- year  -->

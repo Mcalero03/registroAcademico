@@ -6,7 +6,7 @@ use App\Models\Group;
 use App\Models\TeacherSubjectDetail;
 use Illuminate\Http\Request;
 use App\Models\Subject;
-use App\Models\Teacher;
+// use App\Models\Teacher;
 use Encrypt;
 
 class TeacherSubjectDetailController extends Controller

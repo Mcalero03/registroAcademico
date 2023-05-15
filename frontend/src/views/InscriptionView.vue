@@ -79,6 +79,9 @@
                   label="Promedio de la materia"
                   v-model="v$.editedItem.subject_average.$model"
                   :rules="v$.editedItem.subject_average"
+                  type="number" 
+                  step="0.10"
+                  min="0"
                 />
               </v-col>
               <!-- subject_average  -->
@@ -89,16 +92,19 @@
                   v-model="v$.editedItem.attendance_quantity.$model"
                   :rules="v$.editedItem.attendance_quantity"
                   type="number"
+                  min="0"
                 />
               </v-col>
               <!-- attendance_quantity  -->
               <!-- status  -->
               <v-col cols="6" sm="4" md="4">
-                <base-input
+                <base-select
                   label="Estado"
+                  :items="status"
+                  item-title="status"
+                  item-value="status"
                   v-model="v$.editedItem.status.$model"
                   :rules="v$.editedItem.status"
-                  value="Inscrito"
                 />
               </v-col>
               <!-- status  -->
@@ -110,7 +116,7 @@
                   item-title="cycle_number"
                   item-value="cycle_number"
                   v-model="v$.editedItem.cycle_number.$model"
-                  :rules="v$.editedItem.cycle_number"
+                  :rules="v$.editedItem.cycle_number" 
                 />
               </v-col>
               <!-- cycle_number  -->
@@ -232,14 +238,12 @@ export default {
       editedGrade: -1,
       title: "INSCRIPCIÓN",
       headers: [
-        { title: "INSCRIPCIÓN", key: "inscription_date" },
-        { title: "PROMEDIO", key: "subject_average" },
-        { title: "ASISTENCIAS", key: "attendance_quantity" },
-        { title: "ESTADO", key: "status" },
-        { title: "CICLO", key: "cycle_number" },
         { title: "ESTUDIANTE", key: "full_name" },
         { title: "GRUPO", key: "group_name" },
         { title: "MATERIA", key: "subject_name" },
+        { title: "ESTADO", key: "status" },
+        { title: "CICLO", key: "cycle_number" },
+        { title: "INSCRIPCIÓN", key: "inscription_date" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       total: 0,
@@ -247,7 +251,8 @@ export default {
       cycles: [],
       students: [],
       groups: [],
-      subjects: [],
+      subjects: [], 
+      status: ["Inscrito", "Aprobado", "Reprobado", ],
       // evaluations: [],
       loading: false,
       debounce: 0,
@@ -314,15 +319,10 @@ export default {
           required: helpers.withMessage(langMessages.required, required),
         },
         subject_average: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(1)
-          ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(2)),
+          // required: helpers.withMessage(langMessages.required, required),
         },
         attendance_quantity: {
-          required: helpers.withMessage(langMessages.required, required),
+          // required: helpers.withMessage(langMessages.required, required),
         },
         status: {
           required: helpers.withMessage(langMessages.required, required),

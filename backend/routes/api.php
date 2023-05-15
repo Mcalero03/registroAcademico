@@ -58,3 +58,6 @@ Route::resource('/attendance', AttendanceController::class);
 Route::resource('/teacherSubjectDetail', TeacherSubjectDetailController::class);
 Route::resource('/kinship', kinshipController::class);
 Route::get('/pensumSubjectDetail/byPensum/{pensum}/{subject}', [PensumSubjectDetailController::class, 'pensum']);
+Route::get('/attendance/byTeacher/{name}/{last_name}', [AttendanceController::class, 'teacherSubject']);
+Route::get('/attendance/bySubject/{name}/{last_name}/{subject}', [AttendanceController::class, 'subject']);
+Route::get('/attendance/byGroup/{group}/{subject}', [AttendanceController::class, 'student']);

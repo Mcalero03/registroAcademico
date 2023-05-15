@@ -65,24 +65,29 @@
             <!-- Form -->
             <v-row class="pt-0">
               <!-- subject_name  -->
-              <v-col cols="12" sm="6" md="4">
-                <base-select
-                  label="Materia"
-                  :items="subjects"
-                  item-title="subject_name"
-                  item-value="subject_name"
+              <v-col cols="12" sm="6" md="6">
+              <v-label>Materia</v-label>
+                <select
                   v-model="v$.editedItem.subject_name.$model"
-                  :rules="v$.editedItem.subject_name"
-                />
+                  class="form-select"
+                >
+                  <option
+                    v-for="(option, index) in subjects"
+                    :key="index"
+                    :value="option.subject_name"
+                  >
+                    {{ option.subject_name }}
+                  </option>
+                </select>
               </v-col>
               <!-- subject_name  -->
               <!-- program_name  -->
-              <v-col cols="12" sm="6" md="8">
+              <v-col cols="12" sm="6" md="6">
+                <v-label>Nombre del programa</v-label>
                 <select
                   v-model="v$.editedItem.program_name.$model"
                   @change="change"
-                  label="Nombre del programa"
-                  class="mt-4 form-select"
+                  class="form-select"
                   v-if="v$.editedItem.subject_name.$model"
                 >
                   <option
@@ -268,7 +273,7 @@ export default {
       dialogPrerequisite: false,
       editedIndex: -1,
       editedPrerequisite: -1,
-      title: "DETALLE PENSUM MATERIA",
+      title: "DETALLE PREREQUISITOS",
       headers: [
         { title: "MATERIA", key: "subject_name" },
         { title: "PREREQUISITO", key: "prerequisite" },
@@ -468,6 +473,10 @@ export default {
 
     close() {
       this.dialog = false;
+      this.editedItem.prerequisites.splice(
+          0,
+          this.editedItem.prerequisites.length
+        );
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
