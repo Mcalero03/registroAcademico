@@ -31,7 +31,7 @@ class Group extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Group::select(DB::raw('CASE WHEN schedule.group_id IS NULL THEN "No asignado" ELSE "Asignado" END as Schedule'),'group.*', 'group.id as id')
+        return Group::select(DB::raw('CASE WHEN schedule.group_id IS NULL THEN "No asignado" ELSE "Asignado" END as Schedule'), 'group.*', 'group.id as id')
             ->leftjoin('schedule', 'group.id', '=', 'schedule.group_id')
             ->whereNull('schedule.group_id')
             ->whereNull('schedule.deleted_at')
@@ -46,7 +46,7 @@ class Group extends Model
 
     public static function counterPagination($search)
     {
-        return Group::select('group.*', 'group.id as id', )
+        return Group::select('group.*', 'group.id as id',)
             ->join('schedule', 'group.id', '=', 'schedule.group_id')
             ->whereNull('schedule.group_id')
             ->whereNull('schedule.deleted_at')
@@ -54,5 +54,11 @@ class Group extends Model
             ->orWhere('group.students_quantity', 'like', $search)
 
             ->count();
+    }
+
+    public static function Groups()
+    {
+        return Group::select('group.*', 'group.id as id',)
+            ->get();
     }
 }

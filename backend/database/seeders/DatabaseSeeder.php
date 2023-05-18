@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
             RelativeSeeder::class,
             InscriptionSeeder::class,
             AttendanceSeeder::class,
+            Attendance_DetailSeeder::class,
             GradeSeeder::class,
             Teacher_Subject_DetailSeeder::class,
         ]);

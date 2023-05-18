@@ -79,7 +79,7 @@
                   label="Promedio de la materia"
                   v-model="v$.editedItem.subject_average.$model"
                   :rules="v$.editedItem.subject_average"
-                  type="number" 
+                  type="number"
                   step="0.10"
                   min="0"
                 />
@@ -116,7 +116,7 @@
                   item-title="cycle_number"
                   item-value="cycle_number"
                   v-model="v$.editedItem.cycle_number.$model"
-                  :rules="v$.editedItem.cycle_number" 
+                  :rules="v$.editedItem.cycle_number"
                 />
               </v-col>
               <!-- cycle_number  -->
@@ -251,8 +251,8 @@ export default {
       cycles: [],
       students: [],
       groups: [],
-      subjects: [], 
-      status: ["Inscrito", "Aprobado", "Reprobado", ],
+      subjects: [],
+      status: ["Inscrito", "Aprobado", "Reprobado"],
       // evaluations: [],
       loading: false,
       debounce: 0,
@@ -397,7 +397,7 @@ export default {
       if (responses) {
         this.cycles = responses[1].data.cycles;
         this.students = responses[2].data.data;
-        this.groups = responses[3].data.data;
+        this.groups = responses[3].data.groups;
         this.subjects = responses[4].data.data;
         this.evaluations = responses[5].data.data;
       }

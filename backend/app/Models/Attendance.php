@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Encrypt;
 
 class Attendance extends Model
 {
@@ -19,10 +18,9 @@ class Attendance extends Model
 
     protected $fillable = [
         'id',
+        'attendance_time',
         'attendance_date',
-        'attendance_time	',
-        'status',
-        'inscription_id',
+        'group_id',
     ];
 
     public $hidden = [
@@ -33,18 +31,21 @@ class Attendance extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Attendance::select('attendance.*', 's.card as student_card', 'sub.subject_name', 'g.group_name')
-            ->join('inscription as i', 'attendance.inscription_id', '=', 'i.id')
-            ->join('student as s', 'i.student_id', '=', 's.id')
-            ->join('subject as sub', 'i.subject_id', '=', 'sub.id')
-            ->join('group as g', 'i.group_id', '=', 'g.id')
+        return Attendance::select('attendance.*', 'sub.subject_name', 'g.group_name')
+            ->join('attendance_detail as ad', 'attendance.id', '=', 'ad.attendance_id')
+            ->leftjoin('inscription as i', 'ad.inscription_id', '=', 'i.id')
+            ->leftjoin('student as s', 'i.student_id', '=', 's.id')
+            ->leftjoin('subject as sub', 'i.subject_id', '=', 'sub.id')
+            ->leftjoin('group as g', 'i.group_id', '=', 'g.id')
             ->where('attendance.attendance_date', 'like', $search)
-            ->orWhere('attendance.attendance_time', 'like', $search)
-            ->orWhere('attendance.status', 'like', $search)
-            ->orWhere('attendance.inscription_id', 'like', $search)
-            ->orWhere('s.card', 'like', $search)
+            ->orwhere('attendance.attendance_time', 'like', $search)
+            ->orWhere('attendance.group_id', 'like', $search)
             ->orWhere('sub.subject_name', 'like', $search)
-            ->orWhere('g.group_name', 'like', $search)
+            ->orWhere('attendance.group_id', 'like', 'g.id')
+            ->groupBy('attendance.attendance_date')
+            ->groupBy('g.group_name')
+            ->groupBy('sub.subject_name')
+
 
             ->skip($skip)
             ->take($itemsPerpage)
@@ -54,18 +55,20 @@ class Attendance extends Model
 
     public static function counterPagination($search)
     {
-        return Attendance::select('attendance.*', 's.card', 'sub.subject_name', 'g.group_name')
-            ->join('inscription as i', 'attendance.inscription_id', '=', 'i.id')
-            ->join('student as s', 'i.student_id', '=', 's.id')
-            ->join('subject as sub', 'i.subject_id', '=', 'sub.id')
-            ->join('group as g', 'i.group_id', '=', 'g.id')
+        return Attendance::select('attendance.*', 'sub.subject_name', 'g.group_name')
+            ->join('attendance_detail as ad', 'attendance.id', '=', 'ad.attendance_id')
+            ->leftjoin('inscription as i', 'ad.inscription_id', '=', 'i.id')
+            ->leftjoin('student as s', 'i.student_id', '=', 's.id')
+            ->leftjoin('subject as sub', 'i.subject_id', '=', 'sub.id')
+            ->leftjoin('group as g', 'i.group_id', '=', 'g.id')
             ->where('attendance.attendance_date', 'like', $search)
-            ->orWhere('attendance.attendance_time', 'like', $search)
-            ->orWhere('attendance.status', 'like', $search)
-            ->orWhere('attendance.inscription_id', 'like', $search)
-            ->orWhere('s.card', 'like', $search)
+            ->orwhere('attendance.attendance_time', 'like', $search)
+            ->orWhere('attendance.group_id', 'like', $search)
             ->orWhere('sub.subject_name', 'like', $search)
-            ->orWhere('g.group_name', 'like', $search)
+            ->orWhere('attendance.group_id', 'like', 'g.id')
+            ->groupBy('attendance.attendance_date')
+            ->groupBy('g.group_name')
+            ->groupBy('sub.subject_name')
 
             ->count();
     }

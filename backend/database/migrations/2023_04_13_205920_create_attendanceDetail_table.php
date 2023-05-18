@@ -13,11 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('attendance', function (Blueprint $table) {
+        Schema::create('attendance_detail', function (Blueprint $table) {
             $table->id();
-            $table->date('attendance_date');
-            $table->time('attendance_time');
-            $table->integer('group_id');
+            $table->string('status', 100);
+            $table->foreignId('inscription_id')->constrained('inscription');
+            $table->foreignId('attendance_id')->constrained('attendance');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('attendance');
+        Schema::dropIfExists('attendance_detail');
     }
 };

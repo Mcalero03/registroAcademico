@@ -66,7 +66,7 @@
             <v-row class="pt-0">
               <!-- subject_name  -->
               <v-col cols="12" sm="6" md="6">
-              <v-label>Materia</v-label>
+                <v-label>Materia</v-label>
                 <select
                   v-model="v$.editedItem.subject_name.$model"
                   class="form-select"
@@ -88,7 +88,6 @@
                   v-model="v$.editedItem.program_name.$model"
                   @change="change"
                   class="form-select"
-                  v-if="v$.editedItem.subject_name.$model"
                 >
                   <option
                     v-for="(option, index) in pensums"
@@ -474,9 +473,9 @@ export default {
     close() {
       this.dialog = false;
       this.editedItem.prerequisites.splice(
-          0,
-          this.editedItem.prerequisites.length
-        );
+        0,
+        this.editedItem.prerequisites.length
+      );
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;

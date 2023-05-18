@@ -29,22 +29,25 @@ class GroupController extends Controller
         $search = (isset($request->search)) ? "%$request->search%" : '%%';
 
         $group = Group::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage)->unique();
-        
+        $groups = Group::Groups();
+
         foreach ($group as $item) {
             $item->schedules = Schedule::select('schedule.*')
-            ->where('group_id', $item->id)
-            ->get();
+                ->where('group_id', $item->id)
+                ->get();
 
             $item->schedules = Encrypt::encryptObject($item->schedules, "id");
         }
-        
+
         $group = Encrypt::encryptObject($group, "id");
+        $groups = Encrypt::encryptObject($groups, "id");
 
         $total = Group::counterPagination($search);
 
         return response()->json([
             "message" => "Registros obtenidos correctamente.",
             "data" => $group,
+            "groups" => $groups,
             "total" => $total,
         ]);
     }
@@ -57,18 +60,18 @@ class GroupController extends Controller
         $data = $request->all();
 
         $group = Group::create([
-            'group_name' =>$data['group_name'],
+            'group_name' => $data['group_name'],
             'students_quantity' => $data['students_quantity'],
         ]);
 
-        $group->save(); 
+        $group->save();
 
         foreach ($data['schedules'] as $item) {
             Schedule::create([
                 'week_day' => $item['week_day'],
-                'start_time'=> $item['start_time'],
-                'end_time'=> $item['end_time'],
-                'group_id'=> $group->id,
+                'start_time' => $item['start_time'],
+                'end_time' => $item['end_time'],
+                'group_id' => $group->id,
             ]);
         }
 
@@ -93,7 +96,7 @@ class GroupController extends Controller
         $data = Encrypt::decryptArray($request->all(), 'id');
 
         Group::where('id', $data['id'])->update([
-            'group_name' =>$data['group_name'],
+            'group_name' => $data['group_name'],
             'students_quantity' => $data['students_quantity'],
         ]);
 
@@ -102,9 +105,9 @@ class GroupController extends Controller
         foreach ($data['schedules'] as $item) {
             Schedule::create([
                 'week_day' => $item['week_day'],
-                'start_time'=> $item['start_time'],
-                'end_time'=> $item['end_time'],
-                'group_id'=> $data['id'],
+                'start_time' => $item['start_time'],
+                'end_time' => $item['end_time'],
+                'group_id' => $data['id'],
             ]);
         }
 

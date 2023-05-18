@@ -121,6 +121,7 @@
                   v-model="v$.editedItem.phone_number.$model"
                   :rules="v$.editedItem.phone_number"
                   type="number"
+                  min="1"
                 />
               </v-col>
               <!-- phone_number  -->

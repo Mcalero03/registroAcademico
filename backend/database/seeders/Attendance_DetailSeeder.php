@@ -4,9 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Attendance;
+use App\Models\Attendance_Detail;
 
-class AttendanceSeeder extends Seeder
+class Attendance_DetailSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,12 +15,12 @@ class AttendanceSeeder extends Seeder
      */
     public function run()
     {
-        Attendance::insert([
+        Attendance_Detail::insert([
             [
                 "id" => 1,
-                "attendance_date" => "2023-01-16",
-                "attendance_time" => "07:31:00",
-                "group_id" => 1,
+                "status" => "Asistió",
+                "inscription_id" => 1,
+                "attendance_id" => 1,
             ],
             // [
             //     "id" => 2,
