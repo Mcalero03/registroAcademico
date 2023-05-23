@@ -15,7 +15,9 @@ return new class extends Migration
     {
         Schema::create('group', function (Blueprint $table) {
             $table->id();
-            $table->string('group_name', 100);
+            $table->string('group_code', 100);
+            $table->foreignId('subject_id')->constrained('subject');
+            $table->foreignId('teacher_id')->constrained('teacher');
             $table->integer('students_quantity');
             $table->softDeletes();
             $table->timestamps();

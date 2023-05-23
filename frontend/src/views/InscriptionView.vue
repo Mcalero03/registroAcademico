@@ -73,29 +73,6 @@
                 />
               </v-col>
               <!-- inscription_date  -->
-              <!-- subject_average  -->
-              <v-col cols="6" sm="4" md="4">
-                <base-input
-                  label="Promedio de la materia"
-                  v-model="v$.editedItem.subject_average.$model"
-                  :rules="v$.editedItem.subject_average"
-                  type="number"
-                  step="0.10"
-                  min="0"
-                />
-              </v-col>
-              <!-- subject_average  -->
-              <!-- attendance_quantity  -->
-              <v-col cols="6" sm="4" md="4">
-                <base-input
-                  label="Cantidad de asistencias"
-                  v-model="v$.editedItem.attendance_quantity.$model"
-                  :rules="v$.editedItem.attendance_quantity"
-                  type="number"
-                  min="0"
-                />
-              </v-col>
-              <!-- attendance_quantity  -->
               <!-- status  -->
               <v-col cols="6" sm="4" md="4">
                 <base-select
@@ -120,18 +97,6 @@
                 />
               </v-col>
               <!-- cycle_number  -->
-              <!-- group_name  -->
-              <v-col cols="6" sm="4" md="4">
-                <base-select
-                  label="Grupo"
-                  :items="groups"
-                  item-title="group_name"
-                  item-value="group_name"
-                  v-model="v$.editedItem.group_name.$model"
-                  :rules="v$.editedItem.group_name"
-                />
-              </v-col>
-              <!-- group_name  -->
               <!-- student_name  -->
               <v-col cols="6" sm="7" md="7">
                 <base-select
@@ -144,17 +109,6 @@
                 />
               </v-col>
               <!-- student_name  -->
-              <!-- subject_name  -->
-              <v-col cols="6" sm="5" md="5">
-                <base-select
-                  label="Materia"
-                  :items="subjects"
-                  item-title="subject_name"
-                  item-value="subject_name"
-                  v-model="v$.editedItem.subject_name.$model"
-                  :rules="v$.editedItem.subject_name"
-                />
-              </v-col>
             </v-row>
             <v-row>
               <v-col align="center">
@@ -209,8 +163,6 @@ import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
 import inscriptionApi from "@/services/inscriptionApi";
 import cycleApi from "@/services/cycleApi";
 import studentApi from "@/services/studentApi";
-import groupApi from "@/services/groupApi";
-import subjectApi from "@/services/subjectApi";
 import evaluationApi from "@/services/evaluationApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
@@ -239,8 +191,6 @@ export default {
       title: "INSCRIPCIÓN",
       headers: [
         { title: "ESTUDIANTE", key: "full_name" },
-        { title: "GRUPO", key: "group_name" },
-        { title: "MATERIA", key: "subject_name" },
         { title: "ESTADO", key: "status" },
         { title: "CICLO", key: "cycle_number" },
         { title: "INSCRIPCIÓN", key: "inscription_date" },
@@ -250,8 +200,6 @@ export default {
       records: [],
       cycles: [],
       students: [],
-      groups: [],
-      subjects: [],
       status: ["Inscrito", "Aprobado", "Reprobado"],
       // evaluations: [],
       loading: false,
@@ -259,32 +207,16 @@ export default {
       options: {},
       editedItem: {
         inscription_date: "",
-        subject_average: "",
-        attendance_quantity: "",
         status: "",
         cycle_number: "",
         full_name: "",
-        group_name: "",
-        subject_name: "",
-        // grades: [],
       },
       defaultItem: {
         inscription_date: "",
-        subject_average: "",
-        attendance_quantity: "",
         status: "",
         cycle_number: "",
         full_name: "",
-        group_name: "",
-        subject_name: "",
-        // grades: [],
       },
-      // grade: {
-      //   score: "",
-      //   score_date: "",
-      //   status: "",
-      //   evaluation_name: "",
-      // },
     };
   },
   mounted() {
@@ -318,12 +250,6 @@ export default {
         inscription_date: {
           required: helpers.withMessage(langMessages.required, required),
         },
-        subject_average: {
-          // required: helpers.withMessage(langMessages.required, required),
-        },
-        attendance_quantity: {
-          // required: helpers.withMessage(langMessages.required, required),
-        },
         status: {
           required: helpers.withMessage(langMessages.required, required),
         },
@@ -333,27 +259,7 @@ export default {
         full_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
-        group_name: {
-          required: helpers.withMessage(langMessages.required, required),
-        },
-        subject_name: {
-          required: helpers.withMessage(langMessages.required, required),
-        },
       },
-      // grade: {
-      //   score: {
-      //     required: helpers.withMessage(langMessages.required, required),
-      //   },
-      //   score_date: {
-      //     required: helpers.withMessage(langMessages.required, required),
-      //   },
-      //   status: {
-      //     required: helpers.withMessage(langMessages.required, required),
-      //   },
-      //   evaluation_name: {
-      //     required: helpers.withMessage(langMessages.required, required),
-      //   },
-      // },
     };
   },
 
@@ -374,16 +280,6 @@ export default {
             itemsPerPage: -1,
           },
         }),
-        groupApi.get(null, {
-          params: {
-            itemsPerPage: -1,
-          },
-        }),
-        subjectApi.get(null, {
-          params: {
-            itemsPerPage: -1,
-          },
-        }),
         evaluationApi.get(null, {
           params: {
             itemsPerPage: -1,
@@ -397,8 +293,6 @@ export default {
       if (responses) {
         this.cycles = responses[1].data.cycles;
         this.students = responses[2].data.data;
-        this.groups = responses[3].data.groups;
-        this.subjects = responses[4].data.data;
         this.evaluations = responses[5].data.data;
       }
 

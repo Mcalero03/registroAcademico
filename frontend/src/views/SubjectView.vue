@@ -64,7 +64,7 @@
             <!-- Form -->
             <v-row class="pt-0">
               <!-- subject_name  -->
-              <v-col cols="12" sm="5" md="5">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Nombre de la materia"
                   v-model="v$.editedItem.subject_name.$model"
@@ -72,8 +72,17 @@
                 />
               </v-col>
               <!-- subject_name  -->
+              <!-- subject_code  -->
+              <v-col cols="12" sm="6" md="6">
+                <base-input
+                  label="Código de la materia"
+                  v-model="v$.editedItem.subject_code.$model"
+                  :rules="v$.editedItem.subject_code"
+                />
+              </v-col>
+              <!-- subject_code  -->
               <!-- average_approval  -->
-              <v-col cols="6" sm="4" md="4">
+              <v-col cols="6" sm="6" md="6">
                 <base-input
                   label="Promedio de aprobación"
                   v-model="v$.editedItem.average_approval.$model"
@@ -85,7 +94,7 @@
               </v-col>
               <!-- average_approval  -->
               <!-- units_value  -->
-              <v-col cols="6" sm="3" md="3">
+              <v-col cols="6" sm="6" md="6">
                 <base-input
                   label="Unidades valorativas"
                   v-model="v$.editedItem.units_value.$model"
@@ -172,6 +181,7 @@ export default {
       title: "MATERIA",
       headers: [
         { title: "MATERIA", key: "subject_name" },
+        { title: "CÓDIGO", key: "subject_code" },
         { title: "PROMEDIO", key: "average_approval" },
         { title: "U.V", key: "units_value" },
         { title: "ACCIONES", key: "actions", sortable: false },
@@ -183,11 +193,13 @@ export default {
       options: {},
       editedItem: {
         subject_name: "",
+        subject_code: "",
         average_approval: "",
         units_value: "",
       },
       defaultItem: {
         subject_name: "",
+        subject_code: "",
         average_approval: "",
         units_value: "",
       },
@@ -226,6 +238,9 @@ export default {
           required: helpers.withMessage(langMessages.required, required),
         },
         units_value: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
+        subject_code: {
           required: helpers.withMessage(langMessages.required, required),
         },
       },

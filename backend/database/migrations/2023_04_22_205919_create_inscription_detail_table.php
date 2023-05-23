@@ -8,28 +8,24 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('attendance_detail', function (Blueprint $table) {
+        Schema::create('inscription_detail', function (Blueprint $table) {
             $table->id();
-            $table->string('status', 100);
+            $table->string('status', 100)->comment('Retirado', 'Reprobado', 'Aprobado', 'En curso');
             $table->foreignId('inscription_id')->constrained('inscription');
-            $table->foreignId('attendance_id')->constrained('attendance');
-            $table->softDeletes();
+            $table->foreignId('group_id')->constrained('group');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
-        Schema::dropIfExists('attendance_detail');
+        Schema::dropIfExists('inscription_detail');
     }
 };

@@ -13,9 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('direction', function (Blueprint $table) {
+        Schema::create('sub_school', function (Blueprint $table) {
             $table->id();
-            $table->string('direction_name', 100);
+            $table->string('sub_school_name', 100);
+            $table->foreignId('school_id')->constrained('school');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('direction');
+        Schema::dropIfExists('sub_school');
     }
 };

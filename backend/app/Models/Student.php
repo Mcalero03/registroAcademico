@@ -23,7 +23,7 @@ class Student extends Model
         'name',
         'last_name',
         'age',
-        'card',
+        'student_card',
         'nie',
         'phone_number',
         'mail',
@@ -45,7 +45,7 @@ class Student extends Model
             ->where('student.name', 'like', $search)
             ->orWhere('student.last_name', 'like', $search)
             ->orWhere('student.age', 'like', $search)
-            ->orWhere('student.card', 'like', $search)
+            ->orWhere('student.student_card', 'like', $search)
             ->orWhere('student.nie', 'like', $search)
             ->orWhere('student.phone_number', 'like', $search)
             ->orWhere('student.mail', 'like', $search)
@@ -67,7 +67,7 @@ class Student extends Model
             ->where('student.name', 'like', $search)
             ->orWhere('student.last_name', 'like', $search)
             ->orWhere('student.age', 'like', $search)
-            ->orWhere('student.card', 'like', $search)
+            ->orWhere('student.student_card', 'like', $search)
             ->orWhere('student.nie', 'like', $search)
             ->orWhere('student.phone_number', 'like', $search)
             ->orWhere('student.mail', 'like', $search)

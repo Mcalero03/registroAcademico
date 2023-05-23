@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('optional_subject');
             $table->integer('cycle_quantity');
             $table->string('study_plan_year', 45);
-            $table->foreignId('college_id')->constrained('college');
+            $table->foreignId('sub_school_id')->constrained('sub_school');
             $table->foreignId('pensum_type_id')->constrained('pensum_type');
             $table->softDeletes();
             $table->timestamps();

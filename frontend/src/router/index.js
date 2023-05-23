@@ -33,9 +33,9 @@ const router = createRouter({
       meta: { requiresAuth: true }, // add meta field to specify the route requires authentication
     },
     {
-      path: "/direction", 
-      name: "direction",
-      component: () => import("../views/DirectionView.vue"),
+      path: "/school", 
+      name: "school",
+      component: () => import("../views/SchoolView.vue"),
       meta: { requiresAuth: true }, // add meta field to specify the route
     },
     {
@@ -63,9 +63,9 @@ const router = createRouter({
       meta: {requiresAuth: true}, // add meta field to specify the route
     }, 
     {
-      path: "/college", 
-      name: "college", 
-      component: () => import("../views/CollegeView.vue"), 
+      path: "/subSchool", 
+      name: "subSchool", 
+      component: () => import("../views/SubSchoolView.vue"), 
       meta: {requiresAuth: true}, // add meta field to specify the route  
     },
     {
@@ -128,12 +128,6 @@ const router = createRouter({
       component: () => import("../views/AttendanceView.vue"),
       meta: {requiresAuth: true} // add meta field to specify the route
     }, 
-    {
-      path: '/teacherSubjectDetail',
-      name:'teacherSubjectDetail',
-      component: () => import("../views/TeacherSubjectDetailView.vue"),
-      meta: {requiresAuth: true} // add meta field to specify the route
-    },
     {
       path: '/kinship', 
       name: 'kinship',

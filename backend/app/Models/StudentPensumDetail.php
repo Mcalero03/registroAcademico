@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Grade extends Model
+class StudentPensumDetail extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'grade';
+    protected $table = 'student_pensum_detail';
 
     public $incrementing = true;
 
@@ -18,11 +18,9 @@ class Grade extends Model
 
     protected $fillable = [
         'id',
-        'score',
-        'score_date',
         'status',
-        'evaluation_id',
-        'inscription_id',
+        'student_id',
+        'pensum_id',
     ];
 
     public $hidden = [

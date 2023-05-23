@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\College;
 use App\Models\Pensum;
 use App\Models\PensumType;
+use App\Models\SubSchool;
 use Encrypt;
 use Illuminate\Http\Request;
 
@@ -52,7 +52,7 @@ class PensumController extends Controller
         $pensum->optional_subject = $request->optional_subject;
         $pensum->cycle_quantity = $request->cycle_quantity;
         $pensum->study_plan_year = $request->study_plan_year;
-        $pensum->college_id = College::where('college_name', $request->college_name)->first()?->id;
+        $pensum->sub_school_id = SubSchool::where('sub_school_name', $request->sub_school_name)->first()?->id;
         $pensum->pensum_type_id = PensumType::where('pensum_type_name', $request->pensum_type_name)->first()?->id;
 
         $pensum->save();
@@ -83,7 +83,7 @@ class PensumController extends Controller
         $pensum->optional_subject = $request->optional_subject;
         $pensum->cycle_quantity = $request->cycle_quantity;
         $pensum->study_plan_year = $request->study_plan_year;
-        $pensum->college_id = College::where('college_name', $request->college_name)->first()?->id;
+        $pensum->sub_school_id = SubSchool::where('sub_school_name', $request->sub_school_name)->first()?->id;
         $pensum->pensum_type_id = PensumType::where('pensum_type_name', $request->pensum_type_name)->first()?->id;
 
         $pensum->save();

@@ -24,7 +24,7 @@ class PensumSeeder extends Seeder
                 "optional_subject" => 5,
                 "cycle_quantity" => 4,
                 "study_plan_year" => "2023",
-                "college_id" => 1,
+                "sub_school_id" => 1,
                 "pensum_type_id" => 1,
             ],
             [
@@ -35,7 +35,7 @@ class PensumSeeder extends Seeder
                 "optional_subject" => 1,
                 "cycle_quantity" => 3,
                 "study_plan_year" => "2023",
-                "college_id" => 2,
+                "sub_school_id" => 2,
                 "pensum_type_id" => 1,
             ],
             [
@@ -46,7 +46,7 @@ class PensumSeeder extends Seeder
                 "optional_subject" => 5,
                 "cycle_quantity" => 4,
                 "study_plan_year" => "2023",
-                "college_id" => 3,
+                "sub_school_id" => 3,
                 "pensum_type_id" => 1,
             ],
         ]);

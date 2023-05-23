@@ -21,11 +21,12 @@ class Teacher extends Model
         'id',
         'name',
         'last_name',
-        'card',
+        'teacher_card',
         'dui',
         'nit',
         'phone_number',
         'mail',
+        'school_id',
     ];
 
     public $hidden = [
@@ -36,14 +37,15 @@ class Teacher extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Teacher::select(DB::raw("CONCAT(teacher.name, ', ', teacher.last_name) as full_name"), 'teacher.*', 'teacher.id as id')
-
+        return Teacher::select(DB::raw("CONCAT(teacher.name, ', ', teacher.last_name) as full_name"), 'teacher.*', 'teacher.id as id', 'school.school_name')
+            ->join('school', 'teacher.school_id', '=', 'school.id')
             ->where('teacher.name', 'like', $search)
             ->orWhere('teacher.last_name', 'like', $search)
-            ->orWhere('teacher.card', 'like', $search)
+            ->orWhere('teacher.teacher_card', 'like', $search)
             ->orWhere('teacher.dui', 'like', $search)
             ->orWhere('teacher.phone_number', 'like', $search)
             ->orWhere('teacher.mail', 'like', $search)
+            ->orWhere('school.school_name', 'like', $search)
 
             ->skip($skip)
             ->take($itemsPerpage)
@@ -53,14 +55,15 @@ class Teacher extends Model
 
     public static function counterPagination($search)
     {
-        return Teacher::select('teacher.*', 'teacher.id as id')
-
+        return Teacher::select(DB::raw("CONCAT(teacher.name, ', ', teacher.last_name) as full_name"), 'teacher.*', 'teacher.id as id', 'school.school_name')
+            ->join('school', 'teacher.school_id', '=', 'school.id')
             ->where('teacher.name', 'like', $search)
             ->orWhere('teacher.last_name', 'like', $search)
-            ->orWhere('teacher.card', 'like', $search)
+            ->orWhere('teacher.teacher_card', 'like', $search)
             ->orWhere('teacher.dui', 'like', $search)
             ->orWhere('teacher.phone_number', 'like', $search)
             ->orWhere('teacher.mail', 'like', $search)
+            ->orWhere('school.school_name', 'like', $search)
 
             ->count();
     }

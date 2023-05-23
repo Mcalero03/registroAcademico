@@ -171,7 +171,13 @@
             <!-- Form -->
             <v-row>
               <v-col align="center">
-                <base-button type="primary" title="Guardar" @click="save" />
+                <base-button
+                  type="primary"
+                  title="Guardar"
+                  @click="save"
+                  v-if="editedIndex == -1"
+                />
+
                 <base-button
                   class="ms-1"
                   type="secondary"
@@ -224,6 +230,7 @@ import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
 import Loader from "@/components/Loader.vue";
+import moment from "moment";
 
 import useAlert from "../composables/useAlert";
 
@@ -248,7 +255,7 @@ export default {
         { title: "FECHA", key: "attendance_date" },
         { title: "HORA", key: "attendance_time" },
         { title: "MATERIA", key: "subject_name" },
-        { title: "GRUPO", key: "group_name" },
+        { title: "GRUPO", key: "group_code" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       total: 0,
@@ -355,7 +362,6 @@ export default {
         });
 
       this.teacherStudentGroup = data.group;
-      console.log(this.teacherStudentGroup);
     },
 
     async changeStudents() {
@@ -402,7 +408,6 @@ export default {
 
     getDate() {
       const datetime = new Date().toISOString().substring(0, 10);
-      console.log(datetime);
       return datetime;
     },
 
@@ -424,7 +429,7 @@ export default {
 
           this.records = data.data;
           // this.records.forEach((item) => {
-          //   item.attendance_date = moment().subtract(10, "days").calendar();
+          //   item.attendance_date = moment().format("L");
           // });
           this.total = data.total;
           this.loading = false;
@@ -465,14 +470,10 @@ export default {
     editItem(item) {
       this.editedIndex = this.records.indexOf(item);
       this.editedItem = Object.assign({}, item);
-      console.log(this.editedItem);
       this.dialog = true;
     },
 
     async save() {
-      // console.log(this.editedItem.attendances);
-      console.log(this.editedItem);
-
       this.v$.$validate();
       if (this.v$.$invalid) {
         alert.error("Campo obligatorio");

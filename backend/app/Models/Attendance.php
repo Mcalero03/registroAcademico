@@ -31,19 +31,20 @@ class Attendance extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Attendance::select('attendance.*', 'sub.subject_name', 'g.group_name')
+        return Attendance::select('attendance.*', 'sub.subject_name', 'g.group_code')
             ->join('attendance_detail as ad', 'attendance.id', '=', 'ad.attendance_id')
-            ->leftjoin('inscription as i', 'ad.inscription_id', '=', 'i.id')
-            ->leftjoin('student as s', 'i.student_id', '=', 's.id')
-            ->leftjoin('subject as sub', 'i.subject_id', '=', 'sub.id')
+            ->leftjoin('inscription_detail as i', 'ad.inscription_detail_id', '=', 'i.id')
+            ->leftjoin('inscription as id', 'i.inscription_id', '=', 'id.id')
+            ->leftjoin('student as s', 'id.student_id', '=', 's.id')
             ->leftjoin('group as g', 'i.group_id', '=', 'g.id')
+            ->leftjoin('subject as sub', 'g.subject_id', '=', 'sub.id')
             ->where('attendance.attendance_date', 'like', $search)
             ->orwhere('attendance.attendance_time', 'like', $search)
-            ->orWhere('attendance.group_id', 'like', $search)
+            ->orWhere('g.group_code', 'like', $search)
             ->orWhere('sub.subject_name', 'like', $search)
             ->orWhere('attendance.group_id', 'like', 'g.id')
             ->groupBy('attendance.attendance_date')
-            ->groupBy('g.group_name')
+            ->groupBy('g.group_code')
             ->groupBy('sub.subject_name')
 
 
@@ -55,21 +56,21 @@ class Attendance extends Model
 
     public static function counterPagination($search)
     {
-        return Attendance::select('attendance.*', 'sub.subject_name', 'g.group_name')
+        return Attendance::select('attendance.*', 'sub.subject_name', 'g.group_code')
             ->join('attendance_detail as ad', 'attendance.id', '=', 'ad.attendance_id')
-            ->leftjoin('inscription as i', 'ad.inscription_id', '=', 'i.id')
-            ->leftjoin('student as s', 'i.student_id', '=', 's.id')
-            ->leftjoin('subject as sub', 'i.subject_id', '=', 'sub.id')
+            ->leftjoin('inscription_detail as i', 'ad.inscription_detail_id', '=', 'i.id')
+            ->leftjoin('inscription as id', 'i.inscription_id', '=', 'id.id')
+            ->leftjoin('student as s', 'id.student_id', '=', 's.id')
             ->leftjoin('group as g', 'i.group_id', '=', 'g.id')
+            ->leftjoin('subject as sub', 'g.subject_id', '=', 'sub.id')
             ->where('attendance.attendance_date', 'like', $search)
             ->orwhere('attendance.attendance_time', 'like', $search)
-            ->orWhere('attendance.group_id', 'like', $search)
+            ->orWhere('g.group_code', 'like', $search)
             ->orWhere('sub.subject_name', 'like', $search)
             ->orWhere('attendance.group_id', 'like', 'g.id')
             ->groupBy('attendance.attendance_date')
-            ->groupBy('g.group_name')
+            ->groupBy('g.group_code')
             ->groupBy('sub.subject_name')
-
             ->count();
     }
 }

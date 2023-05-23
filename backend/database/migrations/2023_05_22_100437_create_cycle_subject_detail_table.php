@@ -8,28 +8,23 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('teacher_subject_detail', function (Blueprint $table) {
+        Schema::create('cycle_subject_detail', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('cycle_id')->constrained('cycle');
             $table->foreignId('subject_id')->constrained('subject');
-            $table->foreignId('teacher_id')->constrained('teacher');
-            $table->foreignId('group_id')->constrained('group');
-            $table->softDeletes();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
-        Schema::dropIfExists('teacher_subject_detail');
+        Schema::dropIfExists('cycle_subject_detail');
     }
 };

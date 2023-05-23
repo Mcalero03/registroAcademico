@@ -19,8 +19,10 @@ class Group extends Model
 
     protected $fillable = [
         'id',
-        'group_name',
+        'group_code',
         'students_quantity',
+        'subject_id',
+        'teacher_id',
     ];
 
     public $hidden = [
@@ -31,11 +33,10 @@ class Group extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Group::select(DB::raw('CASE WHEN schedule.group_id IS NULL THEN "No asignado" ELSE "Asignado" END as Schedule'), 'group.*', 'group.id as id')
-            ->leftjoin('schedule', 'group.id', '=', 'schedule.group_id')
-            ->whereNull('schedule.group_id')
-            ->whereNull('schedule.deleted_at')
-            ->where('group.group_name', 'like', $search)
+        return Group::select(DB::raw('CONCAT(teacher.name, ", ", teacher.last_name) as teacher_full_name'), 'group.*', 'group.id as id', 'subject.subject_name', 'subject.subject_code')
+            ->join('teacher', 'group.teacher_id', '=', 'teacher.id')
+            ->join('subject', 'group.subject_id', '=', 'subject.id')
+            ->where('group.group_code', 'like', $search)
             ->orWhere('group.students_quantity', 'like', $search)
 
             ->skip($skip)
@@ -46,11 +47,10 @@ class Group extends Model
 
     public static function counterPagination($search)
     {
-        return Group::select('group.*', 'group.id as id',)
-            ->join('schedule', 'group.id', '=', 'schedule.group_id')
-            ->whereNull('schedule.group_id')
-            ->whereNull('schedule.deleted_at')
-            ->where('group.group_name', 'like', $search)
+        return Group::select(DB::raw('CONCAT(teacher.name, ", ", teacher.last_name) as teacher_full_name'), 'group.*', 'group.id as id', 'subject.subject_name', 'subject.subject_code')
+            ->join('teacher', 'group.teacher_id', '=', 'teacher.id')
+            ->join('subject', 'group.subject_id', '=', 'subject.id')
+            ->where('group.group_code', 'like', $search)
             ->orWhere('group.students_quantity', 'like', $search)
 
             ->count();
@@ -60,5 +60,20 @@ class Group extends Model
     {
         return Group::select('group.*', 'group.id as id',)
             ->get();
+    }
+
+    public static function teacherId($name, $last_name)
+    {
+        return Teacher::select('teacher.id')
+            ->where('teacher.name', $name)
+            ->where('teacher.last_name', $last_name)
+            ->get('teacher.id');
+    }
+
+    public static function clean($string)
+    {
+        $change = str_replace('[', '', $string);
+        $change = str_replace(']', '', $change);
+        return $change;
     }
 }

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('year');
             $table->date('start_date');
             $table->date('end_date');
-            $table->string('status', 100);
+            $table->string('status', 100)->comment('Creado', 'Abierto', 'En proceso', 'Finalizado',);
             $table->softDeletes();
             $table->timestamps();
         });

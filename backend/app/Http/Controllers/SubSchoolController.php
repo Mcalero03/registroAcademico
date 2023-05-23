@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\College;
-use App\Models\Direction;
+use App\Models\SubSchool;
+use App\Models\School;
 use Illuminate\Http\Request;
 use Encrypt;
 
-class CollegeController extends Controller
+class SubSchoolController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,7 +19,7 @@ class CollegeController extends Controller
 
         // Getting all the records
         if (($request->itemsPerPage == -1)) {
-            $itemsPerPage =  College::count();
+            $itemsPerPage =  SubSchool::count();
             $skip = 0;
         }
 
@@ -28,13 +28,13 @@ class CollegeController extends Controller
 
         $search = (isset($request->search)) ? "%$request->search%" : '%%';
 
-        $college = College::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
+        $sub_school = SubSchool::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
 
-        $total = college::counterPagination($search);
+        $total = SubSchool::counterPagination($search);
 
         return response()->json([
             "message" => "Registros obtenidos correctamente.",
-            "data" => $college,
+            "data" => $sub_school,
             "total" => $total,
         ]);
     }
@@ -44,11 +44,11 @@ class CollegeController extends Controller
      */
     public function store(Request $request)
     {
-        $college = new College;
-        $college->college_name = $request->college_name;
-        $college->direction_id = Direction::where('direction_name', $request->direction_name)->first()?->id;
+        $sub_school = new SubSchool;
+        $sub_school->sub_school_name = $request->sub_school_name;
+        $sub_school->school_id = School::where('school_name', $request->school_name)->first()?->id;
 
-        $college->save();
+        $sub_school->save();
 
         return response()->json([
             "message" => "Registro creado correctamente",
@@ -70,11 +70,11 @@ class CollegeController extends Controller
     {
         $data = Encrypt::decryptArray($request->all(), 'id');
 
-        $college = College::where('id', $data['id'])->first();
-        $college->college_name = $request->college_name;
-        $college->direction_id = Direction::where('direction_name', $request->direction_name)->first()?->id;
+        $sub_school = SubSchool::where('id', $data['id'])->first();
+        $sub_school->sub_school_name = $request->sub_school_name;
+        $sub_school->school_id = School::where('school_name', $request->school_name)->first()?->id;
 
-        $college->save();
+        $sub_school->save();
 
         return response()->json([
             "message" => "Registro modificado correctamente",
@@ -88,7 +88,7 @@ class CollegeController extends Controller
     {
         $id = Encrypt::decryptValue($request->id);
 
-        College::where('id', $id)->delete();
+        SubSchool::where('id', $id)->delete();
 
         return response()->json([
             "message" => "Registro eliminado correctamente",

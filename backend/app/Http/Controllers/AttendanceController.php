@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Attendance;
 use App\Models\Attendance_Detail;
-use App\Models\TeacherSubjectDetail;
+use App\Models\Group;
 use App\Models\Inscription;
 use DB;
 use Encrypt;
@@ -34,12 +34,14 @@ class AttendanceController extends Controller
         $attendance = Attendance::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage)->unique();
 
         foreach ($attendance as $item) {
+            // $item->attendance_date = date("d/m/y");
 
             $item->attendances = Attendance_Detail::select(DB::raw("CONCAT(student.last_name, ', ',student.name) as full_name"), 'inscription.id', 'attendance_detail.status as attendance_status')
                 ->join('attendance', 'attendance_detail.attendance_id', '=', 'attendance.id')
-                ->leftjoin('inscription', 'attendance_detail.inscription_id', '=', 'inscription.id')
-                ->leftjoin('subject', 'inscription.subject_id', '=', 'subject.id')
-                ->leftjoin('group', 'inscription.group_id', '=', 'group.id')
+                ->leftjoin('inscription_detail as i', 'attendance_detail.inscription_detail_id', '=', 'i.id')
+                ->leftjoin('inscription', 'i.inscription_id', '=', 'inscription.id')
+                ->leftjoin('group', 'i.group_id', '=', 'group.id')
+                ->leftjoin('subject', 'group.subject_id', '=', 'subject.id')
                 ->leftjoin('student', 'inscription.student_id', '=', 'student.id')
                 ->where('attendance_detail.attendance_id', $item->id)
 
@@ -66,12 +68,7 @@ class AttendanceController extends Controller
     {
         $data = $request->all();
 
-
-
         if ($data['attendances'] != null) {
-
-            // $fecha = '2023-05-17';
-            // $group = '1';
             $date = $data['attendance_date'];
             $group = Encrypt::decryptValue($data['group']);
 
@@ -89,7 +86,7 @@ class AttendanceController extends Controller
                 foreach ($data['attendances'] as $value) {
                     Attendance_Detail::create([
                         'status' => $value['attendance_status'],
-                        'inscription_id' => Encrypt::decryptValue($value['inscription_id']),
+                        'inscription_detail_id' => Encrypt::decryptValue($value['inscription_id']),
                         'attendance_id' => $attendance->id,
                     ]);
                 }
@@ -101,7 +98,7 @@ class AttendanceController extends Controller
                 ]);
             } else {
                 return response()->json([
-                    "error" => "No se puede crear otro registro",
+                    "error" => "Ya se tomó la asistencia del grupo",
                 ]);
             }
         } else {
@@ -124,25 +121,6 @@ class AttendanceController extends Controller
      */
     public function update(Request $request)
     {
-        // $data = Encrypt::decryptArray($request->all(), 'id');
-
-        // Attendance::where('id', $data['id'])->update([
-        //     'attendance_date' => $data['attendance_date'],
-        //     'group_id' => $data['group_id'],
-        // ]);
-
-        // foreach ($data['attendances'] as $value) {
-        //     Attendance_Detail::create([
-        //         'status' => $value['status'],
-        //         'inscription_id' => $value['inscription_id'],
-        //         'attendance_id' => $data->id,
-        //     ]);
-        // }
-
-
-        // return response()->json([
-        //     "message" => "Registro modificado correctamente",
-        // ]);
     }
 
     /**
@@ -150,20 +128,13 @@ class AttendanceController extends Controller
      */
     public function destroy(Request $request)
     {
-        $id = Encrypt::decryptValue($request->id);
-
-        Attendance::where('id', $id)->delete();
-
-        return response()->json([
-            "message" => "Registro eliminado correctamente",
-        ]);
     }
 
     public function teacherSubject($name, $last_name)
     {
-        $subject = TeacherSubjectDetail::select('subject.subject_name')
-            ->join('subject', 'teacher_subject_detail.subject_id', '=', 'subject.id')
-            ->join('teacher', 'teacher_subject_detail.teacher_id', '=', 'teacher.id')
+        $subject = Group::select('subject.subject_name')
+            ->join('subject', 'group.subject_id', '=', 'subject.id')
+            ->join('teacher', 'group.teacher_id', '=', 'teacher.id')
             ->where('teacher.name', $name)
             ->where('teacher.last_name', $last_name)
             ->get('subject.subject_name');
@@ -176,14 +147,13 @@ class AttendanceController extends Controller
 
     public function subject($name, $last_name, $subject)
     {
-        $group = TeacherSubjectDetail::select('group.group_name as group', 'group.id')
-            ->join('subject', 'teacher_subject_detail.subject_id', '=', 'subject.id')
-            ->join('teacher', 'teacher_subject_detail.teacher_id', '=', 'teacher.id')
-            ->join('group', 'teacher_subject_detail.group_id', '=', 'group.id')
+        $group = Group::select('group.group_code as group', 'group.id')
+            ->join('subject', 'group.subject_id', '=', 'subject.id')
+            ->join('teacher', 'group.teacher_id', '=', 'teacher.id')
             ->where('teacher.name', $name)
             ->where('teacher.last_name', $last_name)
             ->where('subject.subject_name', $subject)
-            ->get('group.group_name');
+            ->get('group.group_code');
 
         $group = Encrypt::encryptObject($group, 'id');
 
@@ -196,10 +166,11 @@ class AttendanceController extends Controller
 
     public function student($group, $subject)
     {
-        $student = Inscription::select(DB::raw("CONCAT(student.last_name, ', ',student.name) as full_name"), 'inscription.id as inscription_id',)
+        $student = Inscription::select(DB::raw("CONCAT(student.last_name, ', ',student.name) as full_name"), 'i.id as inscription_id',)
             ->selectRaw("0 as attendance_status")
-            ->join('subject', 'inscription.subject_id', '=', 'subject.id')
-            ->join('group', 'inscription.group_id', '=', 'group.id')
+            ->leftjoin('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
+            ->join('group', 'i.group_id', '=', 'group.id')
+            ->join('subject', 'group.subject_id', '=', 'subject.id')
             ->join('student', 'inscription.student_id', '=', 'student.id')
             ->where('group.id', Encrypt::decryptValue($group))
             ->where('subject.subject_name', $subject)

@@ -112,7 +112,7 @@
                   v-model="v$.editedItem.cycle_quantity.$model"
                   :rules="v$.editedItem.cycle_quantity"
                   type="number"
-                  max="10" 
+                  max="10"
                   min="1"
                 />
               </v-col>
@@ -122,25 +122,25 @@
                 <base-input
                   label="Año"
                   v-model="v$.editedItem.study_plan_year.$model"
-                  :rules="v$.editedItem.study_plan_year" 
-                  type="number" 
-                  min="1900" 
-                  max="2099" 
+                  :rules="v$.editedItem.study_plan_year"
+                  type="number"
+                  min="1900"
+                  max="2099"
                 />
               </v-col>
               <!-- study_plan_year  -->
-              <!-- college_name  -->
+              <!-- sub_school_name  -->
               <v-col cols="8" sm="6" md="6">
                 <base-select
                   label="Escuela"
-                  :items="colleges"
-                  item-title="college_name"
-                  item-value="college_name"
-                  v-model="v$.editedItem.college_name.$model"
-                  :rules="v$.editedItem.college_name"
+                  :items="subSchools"
+                  item-title="sub_school_name"
+                  item-value="sub_school_name"
+                  v-model="v$.editedItem.sub_school_name.$model"
+                  :rules="v$.editedItem.sub_school_name"
                 />
               </v-col>
-              <!-- college_name  -->
+              <!-- sub_school_name  -->
               <!-- pensum_type_name  -->
               <v-col cols="12" sm="6" md="6">
                 <base-select
@@ -206,7 +206,7 @@ import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
 
 import pensumApi from "@/services/pensumApi";
-import collegeApi from "@/services/collegeApi";
+import subSchoolApi from "@/services/subSchoolApi";
 import pensumTypeApi from "@/services/pensumTypeApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
@@ -236,13 +236,13 @@ export default {
         { title: "TOTAL U.V", key: "uv_total" },
         { title: "CICLOS", key: "cycle_quantity" },
         { title: "PLAN DE ESTUDIO", key: "study_plan_year" },
-        { title: "ESCUELA", key: "college_name" },
+        { title: "ESCUELA", key: "sub_school_name" },
         { title: "TIPO DE PENSUM", key: "pensum_type_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       total: 0,
       records: [],
-      colleges: [],
+      subSchools: [],
       pensumTypes: [],
       loading: false,
       debounce: 0,
@@ -254,7 +254,7 @@ export default {
         optional_subject: "",
         cycle_quantity: "",
         study_plan_year: "",
-        college_name: "",
+        sub_school_name: "",
         pensum_type_name: "",
       },
       defaultItem: {
@@ -264,7 +264,7 @@ export default {
         optional_subject: "",
         cycle_quantity: "",
         study_plan_year: "",
-        college_name: "",
+        sub_school_name: "",
         pensum_type_name: "",
       },
     };
@@ -332,7 +332,10 @@ export default {
             ({ $params }) => langMessages.minLength($params),
             minLength(1)
           ),
-          maxLength: helpers.withMessage(({ $params }) => langMessages.maxLength($params), maxLength(2)),
+          maxLength: helpers.withMessage(
+            ({ $params }) => langMessages.maxLength($params),
+            maxLength(2)
+          ),
         },
         study_plan_year: {
           required: helpers.withMessage(langMessages.required, required),
@@ -340,9 +343,12 @@ export default {
             ({ $params }) => langMessages.minLength($params),
             minLength(4)
           ),
-          maxLength: helpers.withMessage(({ $params }) => langMessages.maxLength($params), maxLength(4)),
+          maxLength: helpers.withMessage(
+            ({ $params }) => langMessages.maxLength($params),
+            maxLength(4)
+          ),
         },
-        college_name: {
+        sub_school_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
         pensum_type_name: {
@@ -359,7 +365,7 @@ export default {
 
       let requests = [
         this.getDataFromApi(),
-        collegeApi.get(null, {
+        subSchoolApi.get(null, {
           params: {
             itemsPerPage: -1,
           },
@@ -375,7 +381,7 @@ export default {
       });
 
       if (responses) {
-        this.colleges = responses[1].data.data;
+        this.subSchools = responses[1].data.data;
         this.pensumTypes = responses[2].data.data;
       }
 

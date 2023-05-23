@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Encrypt;
+use App\Models\School;
 
 class TeacherController extends Controller
 {
@@ -47,11 +48,12 @@ class TeacherController extends Controller
         $teacher = new Teacher;
         $teacher->name = $request->name;
         $teacher->last_name = $request->last_name;
-        $teacher->card = $request->card;
+        $teacher->teacher_card = $request->teacher_card;
         $teacher->dui = $request->dui;
         $teacher->nit = $request->nit;
         $teacher->phone_number = $request->phone_number;
         $teacher->mail = $request->mail;
+        $teacher->school_id = School::where("school_name", $request->school_name)->first()?->id;
 
         $teacher->save();
 
@@ -78,11 +80,12 @@ class TeacherController extends Controller
         $teacher = Teacher::where('id', $data['id'])->first();
         $teacher->name = $request->name;
         $teacher->last_name = $request->last_name;
-        $teacher->card = $request->card;
+        $teacher->teacher_card = $request->teacher_card;
         $teacher->dui = $request->dui;
         $teacher->nit = $request->nit;
         $teacher->phone_number = $request->phone_number;
         $teacher->mail = $request->mail;
+        $teacher->school_id = School::where("school_name", $request->school_name)->first()?->id;
 
         $teacher->save();
 

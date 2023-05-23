@@ -81,40 +81,40 @@
                 />
               </v-col>
               <!-- last_name  -->
-              <!-- card  -->
-              <v-col cols="4" sm="3" md="3">
+              <!-- teacher_card  -->
+              <v-col cols="4" sm="3" md="2">
                 <base-input
                   label="Carnet"
-                  v-model="v$.editedItem.card.$model"
-                  :rules="v$.editedItem.card"
+                  v-model="v$.editedItem.teacher_card.$model"
+                  :rules="v$.editedItem.teacher_card"
                   type="number"
                 />
               </v-col>
-              <!-- card  -->
-              <!-- dui  -->
-              <v-col cols="8" sm="4" md="4">
-                <base-input
-                  label="Número único de identificación"
-                  v-model="v$.editedItem.dui.$model"
-                  :rules="v$.editedItem.dui"
-                  type="number"
-                />
-              </v-col>
-              <!-- dui  -->
+              <!-- teacher_card  -->
               <!-- nit  -->
-              <v-col cols="7" sm="5" md="5">
+              <v-col cols="7" sm="5" md="4">
                 <base-input
-                  label="Número de Identificación Tributaria"
+                  label="NIT"
                   v-model="v$.editedItem.nit.$model"
                   :rules="v$.editedItem.nit"
                   type="number"
                 />
               </v-col>
               <!-- nit  -->
-              <!-- phone_number  -->
-              <v-col cols="5" sm="4" md="4">
+              <!-- dui  -->
+              <v-col cols="8" sm="4" md="3">
                 <base-input
-                  label="Número de teléfono"
+                  label="DUI"
+                  v-model="v$.editedItem.dui.$model"
+                  :rules="v$.editedItem.dui"
+                  type="number"
+                />
+              </v-col>
+              <!-- dui  -->
+              <!-- phone_number  -->
+              <v-col cols="5" sm="3" md="3">
+                <base-input
+                  label="Teléfono"
                   v-model="v$.editedItem.phone_number.$model"
                   :rules="v$.editedItem.phone_number"
                   type="number"
@@ -122,7 +122,7 @@
               </v-col>
               <!-- phone_number  -->
               <!-- mails  -->
-              <v-col cols="12" sm="8" md="8">
+              <v-col cols="12" sm="5" md="6">
                 <base-input
                   label="Correo electrónico"
                   v-model="v$.editedItem.mail.$model"
@@ -130,6 +130,19 @@
                 />
               </v-col>
               <!-- mail  -->
+              <!-- school  -->
+              <v-col cols="12" sm="4" md="6">
+                <base-select
+                  label="Escuela"
+                  :items="school"
+                  item-title="school_name"
+                  item-value="school_name"
+                  v-model="v$.editedItem.school_name.$model"
+                  :rules="v$.editedItem.school_name"
+                >
+                </base-select>
+              </v-col>
+              <!-- school  -->
             </v-row>
             <!-- Form -->
             <v-row>
@@ -189,16 +202,17 @@ import {
 } from "@vuelidate/validators";
 
 import teacherApi from "@/services/teacherApi";
+import schoolApi from "@/services/schoolApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
-
+import BaseSelect from "../components/base-components/BaseSelect.vue";
 import useAlert from "../composables/useAlert";
 
 const { alert } = useAlert();
 const langMessages = messages["es"].validations;
 
 export default {
-  components: { BaseButton, BaseInput },
+  components: { BaseButton, BaseInput, BaseSelect },
 
   setup() {
     return { v$: useVuelidate() };
@@ -214,37 +228,43 @@ export default {
       headers: [
         { title: "NOMBRE", key: "name" },
         { title: "APELLIDO", key: "last_name" },
-        { title: "CARNET", key: "card" },
+        { title: "CARNET", key: "teacher_card" },
         { title: "DUI", key: "dui" },
-        // { title: "NIT", key: "nit" },
-        // { title: "TELÉFONO", key: "phone_number" },
         { title: "CORREO", key: "mail" },
+        { title: "ESCUELA", key: "school_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       total: 0,
       records: [],
+      school: [],
       loading: false,
       debounce: 0,
       options: {},
       editedItem: {
         name: "",
         last_name: "",
-        card: "",
+        teacher_card: "",
         dui: "",
         nit: "",
         phone_number: "",
         mail: "",
+        school_name: "",
       },
       defaultItem: {
         name: "",
         last_name: "",
-        card: "",
+        teacher_card: "",
         dui: "",
         nit: "",
         phone_number: "",
         mail: "",
+        school_name: "",
       },
     };
+  },
+
+  mounted() {
+    this.initialize();
   },
 
   computed: {
@@ -282,7 +302,7 @@ export default {
             minLength(4)
           ),
         },
-        card: {
+        teacher_card: {
           required: helpers.withMessage(langMessages.required, required),
           minLength: helpers.withMessage(
             ({ $params }) => langMessages.minLength($params),
@@ -318,6 +338,9 @@ export default {
           required: helpers.withMessage(langMessages.required, required),
           email: helpers.withMessage(langMessages.email, email),
         },
+        school_name: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
       },
     };
   },
@@ -327,12 +350,21 @@ export default {
       this.loading = true;
       this.records = [];
 
-      let requests = [this.getDataFromApi()];
+      let requests = [
+        this.getDataFromApi(),
+        schoolApi.get(null, {
+          params: {
+            itemsPerPage: -1,
+          },
+        }),
+      ];
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
       });
 
       if (responses) {
+        console.log(responses);
+        this.school = responses[1].data.data;
       }
 
       this.loading = false;

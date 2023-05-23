@@ -22,7 +22,7 @@ class CycleSeeder extends Seeder
                 "year" => 2023,
                 "start_date" => "2023-01-15",
                 "end_date" => "2023-06-15",
-                "status" => "Cerrado",
+                "status" => "Abierto",
             ],
             [
                 "id" => 2,
@@ -30,7 +30,7 @@ class CycleSeeder extends Seeder
                 "year" => 2023,
                 "start_date" => "2023-07-15",
                 "end_date" => "2023-12-15",
-                "status" => "En proceso",
+                "status" => "Creado",
             ],
         ]);
     }

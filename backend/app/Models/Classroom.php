@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Attendance_Detail extends Model
+class Classroom extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'attendance_detail';
+    protected $table = 'classroom';
 
     public $incrementing = true;
 
@@ -18,9 +18,11 @@ class Attendance_Detail extends Model
 
     protected $fillable = [
         'id',
+        'classroom_code',
+        'classroom_name',
+        'capacity',
         'status',
-        'inscription_detail_id',
-        'attendance_id',
+        'school_id',
     ];
 
     public $hidden = [

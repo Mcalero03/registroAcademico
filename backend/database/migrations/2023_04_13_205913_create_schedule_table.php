@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('week_day', 45);
             $table->time('start_time');
             $table->time('end_time');
-            $table->foreignId('group_id')->constrained('group');
             $table->softDeletes();
             $table->timestamps();
         });

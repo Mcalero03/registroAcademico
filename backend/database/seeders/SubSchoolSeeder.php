@@ -4,9 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\College;
+use App\Models\SubSchool;
 
-class CollegeSeeder extends Seeder
+class SubSchoolSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,21 +15,21 @@ class CollegeSeeder extends Seeder
      */
     public function run()
     {
-        College::insert([
+        SubSchool::insert([
             [
                 "id" => 1,
-                "college_name" => "Ballet",
-                "direction_id" => 2,
+                "sub_school_name" => "Ballet",
+                "school_id" => 2,
             ],
             [
                 "id" => 2,
-                "college_name" => "Pre Danza",
-                "direction_id" => 2,
+                "sub_school_name" => "Pre Danza",
+                "school_id" => 2,
             ],
             [
                 "id" => 3,
-                "college_name" => "Contemporánea",
-                "direction_id" => 2,
+                "sub_school_name" => "Contemporánea",
+                "school_id" => 2,
             ],
         ]);
     }
