@@ -17,8 +17,7 @@ return new class extends Migration
             $table->id();
             $table->date('attendance_date');
             $table->time('attendance_time');
-            $table->string('status', 100);
-            $table->foreignId('inscription_id')->constrained('inscription');
+            $table->integer('group_id');
             $table->softDeletes();
             $table->timestamps();
         });

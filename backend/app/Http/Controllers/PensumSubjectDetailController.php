@@ -59,43 +59,35 @@ class PensumSubjectDetailController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
+        $pensum = Pensum::where('program_name', $data['program_name'])->first()?->id;
+        $subject = Subject::where('subject_name', $data['subject_name'])->first()?->id;
 
-        $pensum_subject_detail = PensumSubjectDetail::create([
-            'pensum_id' => Pensum::where('program_name', $data['program_name'])->first()?->id,
-            'subject_id' => Subject::where('subject_name', $data['subject_name'])->first()?->id,
-        ]);
+        $dataExists = PensumSubjectDetail::where('pensum_id', $pensum)
+            ->where('subject_id', $subject)
+            ->exists();
 
-        $pensum_subject_detail->save();
+        if (!$dataExists) {
+            $pensum_subject_detail = PensumSubjectDetail::create([
+                'pensum_id' => $pensum,
+                'subject_id' => $subject,
+            ]);
 
-        foreach ($data['prerequisites'] as $value) {
-            Prerequisite::create([
-                'subject_id' => Subject::where('subject_name', $value['prerequisite'])->first()?->id,
-                'pensum_subject_detail_id' => $pensum_subject_detail->id,
+            $pensum_subject_detail->save();
+
+            foreach ($data['prerequisites'] as $value) {
+                Prerequisite::create([
+                    'subject_id' => Subject::where('subject_name', $value['prerequisite'])->first()?->id,
+                    'pensum_subject_detail_id' => $pensum_subject_detail->id,
+                ]);
+            }
+            return response()->json([
+                "message" => "Registro creado correctamente",
+            ]);
+        } else {
+            return response()->json([
+                "error" => "Ya existe un registro para la información ingresada",
             ]);
         }
-
-        return response()->json([
-            "message" => "Registro creado correctamente",
-        ]);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function pensum(Request $request)
-    {
-
-        $subject = PensumSubjectDetail::select('pensum_subject_detail.*', 'subject.subject_name', 'pensum.program_name')
-            ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
-            ->join('subject', 'pensum_subject_detail.subject_id', '=', 'subject.id')
-            ->where('pensum.program_name', 'like', $request->pensum)
-            ->where('subject.subject_name', 'not like', $request->subject)
-            ->get();
-
-        return response()->json([
-            "message" => "Registros obtenidos correctamente.",
-            "subject" => $subject,
-        ]);
     }
 
     /**
@@ -137,5 +129,54 @@ class PensumSubjectDetailController extends Controller
         return response()->json([
             "message" => "Registro eliminado correctamente",
         ]);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function pensum(Request $request)
+    {
+        $dataExists = PensumSubjectDetail::select('pensum_subject_detail.id')
+            ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+            ->join('subject', 'pensum_subject_detail.subject_id', '=', 'subject.id')
+            ->where('pensum.program_name', $request->pensum)
+            ->where('subject.subject_name', $request->subject)
+            ->exists();
+
+        if ($dataExists == true) {
+            $prerequisiteExists = PensumSubjectDetail::select('prerequisite.subject_id')
+                ->join('prerequisite', 'pensum_subject_detail.id', 'prerequisite.pensum_subject_detail_id')
+                ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+                ->join('subject', 'pensum_subject_detail.subject_id', '=', 'subject.id')
+                ->whereNull('prerequisite.deleted_at')
+                ->where('pensum.program_name', $request->pensum)
+                ->where('subject.subject_name', $request->subject)
+                ->get('prerequisite.subject_id');
+
+            $subject = PensumSubjectDetail::select('subject.subject_name')
+                ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+                ->join('subject', 'pensum_subject_detail.subject_id', '=', 'subject.id')
+                ->where('pensum.program_name', $request->pensum)
+                ->where('subject.subject_name', 'not like', $request->subject)
+                ->whereNotIn('pensum_subject_detail.subject_id', $prerequisiteExists)
+                ->get();
+
+            return response()->json([
+                "message" => "Registros obtenidos correctamente.",
+                "subject" => $subject,
+            ]);
+        } else {
+            $subject = PensumSubjectDetail::select('pensum_subject_detail.*', 'subject.subject_name', 'pensum.program_name')
+                ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+                ->join('subject', 'pensum_subject_detail.subject_id', '=', 'subject.id')
+                ->where('pensum.program_name', 'like', $request->pensum)
+                ->where('subject.subject_name', 'not like', $request->subject)
+                ->get();
+
+            return response()->json([
+                "message" => "Registros obtenidos correctamente.",
+                "subject" => $subject,
+            ]);
+        }
     }
 }

@@ -47,7 +47,6 @@ class ScheduleController extends Controller
         $schedule->week_day = $request->week_day;
         $schedule->start_time = $request->start_time;
         $schedule->end_time = $request->end_time;
-        $schedule->group_id = Group::where('group_name', $request->group_name)->first()?->id;
 
         $schedule->save();
 
@@ -75,7 +74,6 @@ class ScheduleController extends Controller
         $schedule->week_day = $request->week_day;
         $schedule->start_time = $request->start_time;
         $schedule->end_time = $request->end_time;
-        $schedule->group_id = Group::where('group_name', $request->group_name)->first()?->id;
 
         $schedule->save();
 

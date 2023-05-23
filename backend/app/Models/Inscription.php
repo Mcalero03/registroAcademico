@@ -21,13 +21,9 @@ class Inscription extends Model
     protected $fillable = [
         'id',
         'inscription_date',
-        'subject_average',
-        'attendance_quantity',
         'status',
         'cycle_id',
         'student_id',
-        'group_id',
-        'subject_id',
     ];
 
     public $hidden = [
@@ -38,19 +34,13 @@ class Inscription extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Inscription::select(DB::raw("CONCAT(student.name, ', ', student.last_name) as full_name"), 'inscription.*', 'cycle.cycle_number', 'subject.subject_name', 'group.group_name')
+        return Inscription::select(DB::raw("CONCAT(student.name, ', ', student.last_name) as full_name"), 'inscription.*', 'cycle.cycle_number',)
             ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
-            ->join('subject', 'inscription.subject_id', '=', 'subject.id')
             ->join('student', 'inscription.student_id', '=', 'student.id')
-            ->join('group', 'inscription.group_id', '=', 'group.id')
             ->where('inscription.inscription_date', 'like', $search)
-            ->orWhere('inscription.subject_average', 'like', $search)
-            ->orWhere('inscription.attendance_quantity', 'like', $search)
             ->orWhere('inscription.status', 'like', $search)
             ->orWhere('cycle.cycle_number', 'like', $search)
-            ->orWhere('inscription.student_id', 'like', $search) //order by student
-            ->orWhere('group.group_name', 'like', $search)
-            ->orWhere('subject.subject_name', 'like', $search)
+            ->orWhere('inscription.student_id', 'like', $search)
 
             ->skip($skip)
             ->take($itemsPerpage)
@@ -60,19 +50,13 @@ class Inscription extends Model
 
     public static function counterPagination($search)
     {
-        return Inscription::select(DB::raw("CONCAT(student.name, ', ', student.last_name) as full_name"), 'inscription.*', 'cycle.cycle_number', 'subject.subject_name', 'group.group_name')
+        return Inscription::select(DB::raw("CONCAT(student.name, ', ', student.last_name) as full_name"), 'inscription.*', 'cycle.cycle_number',)
             ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
-            ->join('subject', 'inscription.subject_id', '=', 'subject.id')
             ->join('student', 'inscription.student_id', '=', 'student.id')
-            ->join('group', 'inscription.group_id', '=', 'group.id')
             ->where('inscription.inscription_date', 'like', $search)
-            ->orWhere('inscription.subject_average', 'like', $search)
-            ->orWhere('inscription.attendance_quantity', 'like', $search)
             ->orWhere('inscription.status', 'like', $search)
             ->orWhere('cycle.cycle_number', 'like', $search)
-            ->orWhere('inscription.student_id', 'like', $search) //order by student
-            ->orWhere('group.group_name', 'like', $search)
-            ->orWhere('subject.subject_name', 'like', $search)
+            ->orWhere('inscription.student_id', 'like', $search)
 
             ->count();
     }

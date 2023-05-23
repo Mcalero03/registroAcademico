@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('last_name');
             $table->integer('age');
-            $table->string('card', 45);
+            $table->string('student_card', 45);
             $table->integer('nie');
             $table->integer('phone_number');
             $table->string('mail');

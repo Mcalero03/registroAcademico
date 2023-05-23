@@ -19,13 +19,9 @@ class InscriptionSeeder extends Seeder
             [
                 "id" => 1,
                 "inscription_date" => "2023-01-14",
-                "subject_average" => 1.0,
-                "attendance_quantity" => 1,
                 "status" => "Reprobado",
                 "cycle_id" => 1,
                 "student_id" => 1,
-                "group_id" => 1,
-                "subject_id" => 1,
             ],
             // [
             //     "id" => 2,

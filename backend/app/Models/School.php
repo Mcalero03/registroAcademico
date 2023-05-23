@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Direction extends Model
+class School extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'direction';
+    protected $table = 'school';
 
     public $incrementing = true;
 
@@ -18,7 +18,7 @@ class Direction extends Model
 
     protected $fillable = [
         'id',
-        'direction_name',
+        'school_name',
     ];
 
     public $hidden = [
@@ -29,21 +29,19 @@ class Direction extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Direction::select('direction.*', 'direction.id as id')
-
-            ->where('direction.direction_name', 'like', $search)
+        return School::select('school.*', 'school.id as id')
+            ->where('school.school_name', 'like', $search)
 
             ->skip($skip)
             ->take($itemsPerpage)
-            ->orderBy("direction.$sortBy", $sort)
+            ->orderBy("school.$sortBy", $sort)
             ->get();
     }
 
     public static function counterPagination($search)
     {
-        return Direction::select('direction.*', 'direction.id as id')
-
-            ->where('direction.direction_name', 'like', $search)
+        return School::select('school.*', 'school.id as id')
+            ->where('school.school_name', 'like', $search)
             ->count();
     }
 }

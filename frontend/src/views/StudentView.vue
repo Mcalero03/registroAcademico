@@ -92,17 +92,17 @@
                 />
               </v-col>
               <!-- age  -->
-              <!-- card  -->
+              <!-- student_card  -->
               <v-col cols="6" sm="3" md="3">
                 <base-input
                   label="Carnet"
-                  v-model="v$.editedItem.card.$model"
-                  :rules="v$.editedItem.card"
+                  v-model="v$.editedItem.student_card.$model"
+                  :rules="v$.editedItem.student_card"
                   type="number"
                   min="0"
                 />
               </v-col>
-              <!-- card  -->
+              <!-- student_card  -->
               <!-- nie  -->
               <v-col cols="6" sm="3" md="3">
                 <base-input
@@ -121,6 +121,7 @@
                   v-model="v$.editedItem.phone_number.$model"
                   :rules="v$.editedItem.phone_number"
                   type="number"
+                  min="1"
                 />
               </v-col>
               <!-- phone_number  -->
@@ -395,7 +396,7 @@ export default {
       headers: [
         { title: "NOMBRES", key: "name" },
         { title: "APELLIDOS", key: "last_name" },
-        { title: "CARNET", key: "card" },
+        { title: "CARNET", key: "student_card" },
         { title: "CORREO", key: "mail" },
         { title: "FECHA INGRESO", key: "admission_date" },
         { title: "ACCIONES", key: "actions", sortable: false },
@@ -411,7 +412,7 @@ export default {
         name: "",
         last_name: "",
         age: "",
-        card: "",
+        student_card: "",
         nie: "",
         phone_number: "",
         mail: "",
@@ -423,7 +424,7 @@ export default {
         name: "",
         last_name: "",
         age: "",
-        card: "",
+        student_card: "",
         nie: "",
         phone_number: "",
         mail: "",
@@ -494,7 +495,7 @@ export default {
             maxLength(2)
           ),
         },
-        card: {
+        student_card: {
           required: helpers.withMessage(langMessages.required, required),
           minLength: helpers.withMessage(
             ({ $params }) => langMessages.minLength($params),

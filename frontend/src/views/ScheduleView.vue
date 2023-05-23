@@ -93,18 +93,6 @@
                 />
               </v-col>
               <!-- end_time  -->
-              <!-- group_name  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-select
-                  label="Grupo"
-                  :items="groups"
-                  item-title="group_name"
-                  item-value="group_name"
-                  v-model="v$.editedItem.group_name.$model"
-                  :rules="v$.editedItem.group_name"
-                />
-              </v-col>
-              <!-- group_name  -->
             </v-row>
             <!-- Form -->
             <v-row>
@@ -158,7 +146,6 @@ import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, minLength, required } from "@vuelidate/validators";
 
 import scheduleApi from "@/services/scheduleApi";
-import groupApi from "@/services/groupApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
@@ -186,12 +173,10 @@ export default {
         { title: "DIA", key: "week_day" },
         { title: "HORA INICIO", key: "start_time" },
         { title: "HORA FIN", key: "end_time" },
-        { title: "GRUPO", key: "group_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       total: 0,
       records: [],
-      groups: [],
       weekdays: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"],
       loading: false,
       debounce: 0,
@@ -200,13 +185,11 @@ export default {
         week_day: "",
         start_time: "",
         end_time: "",
-        group_name: "",
       },
       defaultItem: {
         week_day: "",
         start_time: "",
         end_time: "",
-        group_name: "",
       },
     };
   },
@@ -249,9 +232,6 @@ export default {
         end_time: {
           required: helpers.withMessage(langMessages.required, required),
         },
-        group_name: {
-          required: helpers.withMessage(langMessages.required, required),
-        },
       },
     };
   },
@@ -261,20 +241,12 @@ export default {
       this.loading = true;
       this.records = [];
 
-      let requests = [
-        this.getDataFromApi(),
-        groupApi.get(null, {
-          params: {
-            itemsPerPage: -1,
-          },
-        }),
-      ];
+      let requests = [this.getDataFromApi()];
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
       });
 
       if (responses) {
-        this.groups = responses[1].data.data;
       }
 
       this.loading = false;

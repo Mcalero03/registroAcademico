@@ -1,13 +1,13 @@
 <?php
 
 use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\DirectionController;
+use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\PensumTypeController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\RelativeController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
-use App\Http\Controllers\CollegeController;
+use App\Http\Controllers\SubSchoolController;
 use App\Http\Controllers\CycleController;
 use App\Http\Controllers\PensumController;
 use App\Http\Controllers\PensumSubjectDetailController;
@@ -17,7 +17,6 @@ use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\InscriptionController;
 use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\TeacherSubjectDetailController;
 use App\Http\Controllers\KinshipController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -39,13 +38,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/status', fn () => response()->json(["message" => "Active"]));
 Route::resource('/department', DepartmentController::class);
-Route::resource('/direction', DirectionController::class);
+Route::resource('/school', SchoolController::class);
 Route::resource('/pensumType', PensumTypeController::class);
 Route::resource('/group', GroupController::class);
+Route::get('/group/bySubject/{subject}', [GroupController::class, 'bySubject']);
 Route::resource('/relative', RelativeController::class);
 Route::resource('/subject', SubjectController::class);
 Route::resource('/teacher', TeacherController::class);
-Route::resource('/college', CollegeController::class);
+Route::resource('/subSchool', SubSchoolController::class);
 Route::resource('/cycle', CycleController::class);
 Route::resource('/pensum', PensumController::class);
 Route::resource('/pensumSubjectDetail', PensumSubjectDetailController::class);
@@ -55,7 +55,6 @@ Route::resource('/schedule', ScheduleController::class);
 Route::resource('/student', StudentController::class);
 Route::resource('/inscription', InscriptionController::class);
 Route::resource('/attendance', AttendanceController::class);
-Route::resource('/teacherSubjectDetail', TeacherSubjectDetailController::class);
 Route::resource('/kinship', kinshipController::class);
 Route::get('/pensumSubjectDetail/byPensum/{pensum}/{subject}', [PensumSubjectDetailController::class, 'pensum']);
 Route::get('/attendance/byTeacher/{name}/{last_name}', [AttendanceController::class, 'teacherSubject']);

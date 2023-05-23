@@ -25,7 +25,7 @@ class Pensum extends Model
         'optional_subject',
         'cycle_quantity',
         'study_plan_year',
-        'college_id',
+        'sub_school_id',
         'pensum_type_id	',
     ];
 
@@ -35,9 +35,9 @@ class Pensum extends Model
         'deleted_at',
     ];
 
-    public function college()
+    public function subschool()
     {
-        return $this->belongsTo(College::class, 'college_id');
+        return $this->belongsTo(SubSchool::class, 'sub_school_id');
     }
 
     public function pensum_type()
@@ -55,7 +55,7 @@ class Pensum extends Model
             'optional_subject' => $this->optional_subject,
             'cycle_quantity' => $this->cycle_quantity,
             'study_plan_year' => $this->study_plan_year,
-            'college_name' => $this->college->college_name,
+            'sub_school_name' => $this->subschool->sub_school_name,
             'pensum_type_name' => $this->pensum_type->pensum_type_name,
         ];
     }
@@ -68,7 +68,7 @@ class Pensum extends Model
             ->orWhere('pensum.optional_subject', 'like', $search)
             ->orWhere('pensum.cycle_quantity', 'like', $search)
             ->orWhere('pensum.study_plan_year', 'like', $search)
-            ->orWhere('pensum.college_id', 'like', $search)
+            ->orWhere('pensum.sub_school_id', 'like', $search)
             ->orWhere('pensum.pensum_type_id', 'like', $search)
             ->skip($skip)
             ->take($itemsPerpage)
@@ -87,7 +87,7 @@ class Pensum extends Model
             ->orWhere('pensum.optional_subject', 'like', $search)
             ->orWhere('pensum.cycle_quantity', 'like', $search)
             ->orWhere('pensum.study_plan_year', 'like', $search)
-            ->orWhere('pensum.college_id', 'like', $search)
+            ->orWhere('pensum.sub_school_id', 'like', $search)
             ->orWhere('pensum.pensum_type_id', 'like', $search)
 
             ->count();

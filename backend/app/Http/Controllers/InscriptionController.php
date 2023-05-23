@@ -66,8 +66,6 @@ class InscriptionController extends Controller
 
         $inscription = Inscription::create([
             'inscription_date' => $data['inscription_date'],
-            'subject_average' => $data['subject_average'],
-            'attendance_quantity' => $data['attendance_quantity'],
             'status' => $data['status'],
             'cycle_id' => Cycle::where('cycle_number', $data['cycle_number'])->first()?->id,
             'student_id' => $student_id,
@@ -112,8 +110,6 @@ class InscriptionController extends Controller
 
         Inscription::where('id', $data['id'])->update([
             'inscription_date' => $data['inscription_date'],
-            'subject_average' => $data['subject_average'],
-            'attendance_quantity' => $data['attendance_quantity'],
             'status' => $data['status'],
             'cycle_id' => Cycle::where('cycle_number', $data['cycle_number'])->first()?->id,
             'student_id' => $student_id,

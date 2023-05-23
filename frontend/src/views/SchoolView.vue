@@ -2,16 +2,10 @@
   <div data-app>
     <v-card class="p-3 mt-3">
       <v-container>
-        <h2>
-          {{ title }}
-        </h2>
+        <h2>{{ title }}</h2>
         <div class="options-table">
-          <base-button
-            type="primary"
-            title="Agregar"
-            @click="addRecord()"
-          ></base-button>
-          <v-col cols="12" sm="4" lg="4" xl="4" class="pl-0 pb-0 pr-0">
+          <base-button type="primary" title="Agregar" @click="addRecord()" />
+          <v-col cols="12" sm="12" md="4" lg="4" xl="4" class="pl-0 pb-0 pr-0">
             <v-text-field
               class="mt-3"
               variant="outlined"
@@ -28,7 +22,7 @@
         :items-length="total"
         :items="records"
         :loading="loading"
-        items-title="id"
+        item-title="id"
         item-value="id"
         @update:options="getDataFromApi"
       >
@@ -63,42 +57,15 @@
           <v-container>
             <!-- Form -->
             <v-row class="pt-0">
-              <!-- teacher_name  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-select
-                  label="Profesor"
-                  :items="teachers"
-                  item-title="full_name"
-                  item-value="full_name"
-                  v-model="v$.editedItem.full_name.$model"
-                  :rules="v$.editedItem.full_name"
+              <!-- school_name  -->
+              <v-col cols="12" sm="12" md="12">
+                <base-input
+                  label="Dirección"
+                  v-model="v$.editedItem.school_name.$model"
+                  :rules="v$.editedItem.school_name"
                 />
               </v-col>
-              <!-- teacher_name  -->
-              <!-- subject_name  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-select
-                  label="Materia"
-                  :items="subjects"
-                  item-title="subject_name"
-                  item-value="subject_name"
-                  v-model="v$.editedItem.subject_name.$model"
-                  :rules="v$.editedItem.subject_name"
-                />
-              </v-col>
-              <!-- subject_name  -->
-              <!-- group_name  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-select
-                  label="Grupo"
-                  :items="groups"
-                  item-title="group_name"
-                  item-value="group_name"
-                  v-model="v$.editedItem.group_name.$model"
-                  :rules="v$.editedItem.group_name"
-                />
-              </v-col>
-              <!-- group_name  -->
+              <!-- school_name  -->
             </v-row>
             <!-- Form -->
             <v-row>
@@ -144,19 +111,14 @@
   </div>
 </template> 
 
-
-
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
-import { helpers, required } from "@vuelidate/validators";
+import { helpers, minLength, required, email } from "@vuelidate/validators";
 
-import teacherSubjectDetailApi from "@/services/teacherSubjectDetailApi";
-import subjectApi from "@/services/subjectApi";
-import teacherApi from "@/services/teacherApi";
-import groupApi from "@/services/groupApi";
+import schoolApi from "@/services/schoolApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
-import BaseSelect from "../components/base-components/BaseSelect.vue";
+import BaseInput from "../components/base-components/BaseInput.vue";
 
 import useAlert from "../composables/useAlert";
 
@@ -164,7 +126,7 @@ const { alert } = useAlert();
 const langMessages = messages["es"].validations;
 
 export default {
-  components: { BaseButton, BaseSelect },
+  components: { BaseButton, BaseInput },
 
   setup() {
     return { v$: useVuelidate() };
@@ -176,36 +138,25 @@ export default {
       dialog: false,
       dialogDelete: false,
       editedIndex: -1,
-      title: "DETALLE PROFESOR MATERIA",
       headers: [
-        { title: "MATERIA", key: "subject_name" },
-        { title: "PROFESOR", key: "full_name" },
-        { title: "GRUPO", key: "group_name" },
+        { title: "DIRECCIÓN", key: "school_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
+      title: "DIRECCIONES",
       total: 0,
       records: [],
-      subjects: [],
-      teachers: [],
-      groups: [],
       loading: false,
       debounce: 0,
       options: {},
       editedItem: {
-        subject_name: "",
-        full_name: "",
-        group_name: "",
+        school_name: "",
       },
       defaultItem: {
-        subject_name: "",
-        full_name: "",
-        group_name: "",
+        school_name: "",
       },
     };
   },
-  mounted() {
-    this.initialize();
-  },
+
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "Nuevo registro" : "Editar registro";
@@ -219,6 +170,9 @@ export default {
     dialog(val) {
       val || this.close();
     },
+    dialogBlock(val) {
+      val || this.closeBlock();
+    },
     dialogDelete(val) {
       val || this.closeDelete();
     },
@@ -227,94 +181,38 @@ export default {
   validations() {
     return {
       editedItem: {
-        subject_name: {
+        school_name: {
           required: helpers.withMessage(langMessages.required, required),
-        },
-        full_name: {
-          required: helpers.withMessage(langMessages.required, required),
-        },
-        group_name: {
-          required: helpers.withMessage(langMessages.required, required),
+          minLength: helpers.withMessage(
+            ({ $params }) => langMessages.minLength($params),
+            minLength(4)
+          ),
         },
       },
     };
   },
 
+  created() {
+    this.initialize();
+  },
+
+  beforeMount() {
+    this.getDataFromApi({ page: 1, itemsPerPage: 10, sortBy: [], search: "" });
+  },
   methods: {
     async initialize() {
       this.loading = true;
       this.records = [];
 
-      let requests = [
-        this.getDataFromApi(),
-        subjectApi.get(null, {
-          params: {
-            itemsPerPage: -1,
-          },
-        }),
-        teacherApi.get(null, {
-          params: {
-            itemsPerPage: -1,
-          },
-        }),
-        groupApi.get(null, {
-          params: {
-            itemsPerPage: -1,
-          },
-        }),
-      ];
+      let requests = [this.getDataFromApi()];
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
       });
 
       if (responses) {
-        this.subjects = responses[1].data.data;
-        this.teachers = responses[2].data.data;
-        this.groups = responses[3].data.data;
       }
 
       this.loading = false;
-    },
-
-    getDataFromApi(options) {
-      this.loading = false;
-      this.records = [];
-
-      clearTimeout(this.debounce);
-      this.debounce = setTimeout(async () => {
-        try {
-          const { data } = await teacherSubjectDetailApi.get(null, {
-            params: { ...options, search: this.search },
-          });
-
-          this.records = data.data;
-          this.total = data.total;
-          this.loading = false;
-        } catch (error) {
-          alert.error("No fue posible obtener los registros.");
-        }
-      });
-    },
-
-    created() {
-      this.initialize();
-    },
-
-    beforeMount() {
-      this.getDataFromApi({
-        page: 1,
-        itemsPerPage: 10,
-        sortBy: [],
-        search: "",
-      });
-    },
-
-    close() {
-      this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
     },
 
     addRecord() {
@@ -328,6 +226,13 @@ export default {
       this.editedIndex = this.records.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
+    },
+
+    deleteItem(item) {
+      this.editedIndex = this.records.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+
+      this.dialogDelete = true;
     },
 
     async save() {
@@ -345,10 +250,7 @@ export default {
         );
 
         try {
-          const { data } = await teacherSubjectDetailApi.put(
-            `/${edited.id}`,
-            edited
-          );
+          const { data } = await schoolApi.put(`/${edited.id}`, edited);
           alert.success(data.message);
         } catch (error) {
           alert.error("No fue posible actualizar el registro.");
@@ -361,10 +263,8 @@ export default {
 
       // Creating record
       try {
-        const { data } = await teacherSubjectDetailApi.post(
-          null,
-          this.editedItem
-        );
+        const { data } = await schoolApi.post(null, this.editedItem);
+        console.log(data);
         alert.success(data.message);
       } catch (error) {
         alert.error("No fue posible crear el registro.");
@@ -375,21 +275,11 @@ export default {
       return;
     },
 
-    deleteItem(item) {
-      this.editedIndex = this.records.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-
-      this.dialogDelete = true;
-    },
-
     async deleteItemConfirm() {
       try {
-        const { data } = await teacherSubjectDetailApi.delete(
-          `/${this.editedItem.id}`,
-          {
-            params: { id: this.editedItem.id },
-          }
-        );
+        const { data } = await schoolApi.delete(`/${this.editedItem.id}`, {
+          params: { id: this.editedItem.id },
+        });
 
         alert.success(data.message);
       } catch (error) {
@@ -399,11 +289,40 @@ export default {
       this.closeDelete();
     },
 
+    close() {
+      this.dialog = false;
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      });
+    },
+
     closeDelete() {
       this.dialogDelete = false;
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
+      });
+    },
+
+    getDataFromApi(options) {
+      this.loading = false;
+      this.records = [];
+
+      clearTimeout(this.debounce);
+      this.debounce = setTimeout(async () => {
+        try {
+          const { data } = await schoolApi.get(null, {
+            params: { ...options, search: this.search },
+          });
+
+          this.records = data.data;
+          this.total = data.total;
+          this.loading = false;
+        } catch (error) {
+          alert.error("No fue posible obtener los registros.");
+          console.log(error);
+        }
       });
     },
   },

@@ -19,9 +19,8 @@ class AttendanceSeeder extends Seeder
             [
                 "id" => 1,
                 "attendance_date" => "2023-01-16",
-                "attendance_time" => "07:30:00",
-                "status" => "Asistencia",
-                "inscription_id" => 1,
+                "attendance_time" => "07:31:00",
+                "group_id" => 1,
             ],
             // [
             //     "id" => 2,

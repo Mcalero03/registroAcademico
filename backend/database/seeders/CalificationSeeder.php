@@ -4,9 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Grade;
+use App\Models\Calification;
 
-class GradeSeeder extends Seeder
+class CalificationSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,14 +15,12 @@ class GradeSeeder extends Seeder
      */
     public function run()
     {
-        Grade::insert([
+        Calification::insert([
             [
                 "id" => 1,
                 "score" => 10,
-                "score_date" => "2023-01-16",
-                "status" => "Aprobado",
                 "evaluation_id" => 1,
-                "inscription_id" => 1,
+                "inscription_detail_id" => 1,
             ],
             // [
             //     "id" => 2,
@@ -30,7 +28,7 @@ class GradeSeeder extends Seeder
             //     "score_date" => "2023-01-16",
             //     "status" => "Aprobado",
             //     "evaluation_id" => 1,
-            //     "inscription_id" => 2,
+            //     "inscription_detail_id" => 2,
             // ],
             // [
             //     "id" => 3,
@@ -38,7 +36,7 @@ class GradeSeeder extends Seeder
             //     "score_date" => "2023-01-18",
             //     "status" => "Aprobado",
             //     "evaluation_id" => 2,
-            //     "inscription_id" => 3,
+            //     "inscription_detail_id" => 3,
             // ],
             // [
             //     "id" => 4,
@@ -46,7 +44,7 @@ class GradeSeeder extends Seeder
             //     "score_date" => "2023-01-18",
             //     "status" => "Aprobado",
             //     "evaluation_id" => 2,
-            //     "inscription_id" => 4,
+            //     "inscription_detail_id" => 4,
             // ],
             // [
             //     "id" => 5,
@@ -54,7 +52,7 @@ class GradeSeeder extends Seeder
             //     "score_date" => "2023-01-16",
             //     "status" => "Aprobado",
             //     "evaluation_id" => 3,
-            //     "inscription_id" => 5,
+            //     "inscription_detail_id" => 5,
             // ],
             // [
             //     "id" => 6,
@@ -62,7 +60,7 @@ class GradeSeeder extends Seeder
             //     "score_date" => "2023-01-16",
             //     "status" => "Aprobado",
             //     "evaluation_id" => 3,
-            //     "inscription_id" => 6,
+            //     "inscription_detail_id" => 6,
             // ],
             // [
             //     "id" => 7,
@@ -70,7 +68,7 @@ class GradeSeeder extends Seeder
             //     "score_date" => "2023-07-16",
             //     "status" => "Aprobado",
             //     "evaluation_id" => 4,
-            //     "inscription_id" => 7,
+            //     "inscription_detail_id" => 7,
             // ],
             // [
             //     "id" => 8,
@@ -78,7 +76,7 @@ class GradeSeeder extends Seeder
             //     "score_date" => "2023-07-16",
             //     "status" => "Aprobado",
             //     "evaluation_id" => 4,
-            //     "inscription_id" => 8,
+            //     "inscription_detail_id" => 8,
             // ],
             // [
             //     "id" => 9,
@@ -86,7 +84,7 @@ class GradeSeeder extends Seeder
             //     "score_date" => "2023-07-19",
             //     "status" => "Aprobado",
             //     "evaluation_id" => 5,
-            //     "inscription_id" => 9,
+            //     "inscription_detail_id" => 9,
             // ],
             // [
             //     "id" => 10,
@@ -94,7 +92,7 @@ class GradeSeeder extends Seeder
             //     "score_date" => "2023-07-19",
             //     "status" => "Aprobado",
             //     "evaluation_id" => 5,
-            //     "inscription_id" => 10,
+            //     "inscription_detail_id" => 10,
             // ],
             // [
             //     "id" => 11,
@@ -102,7 +100,7 @@ class GradeSeeder extends Seeder
             //     "score_date" => "2023-07-16",
             //     "status" => "Aprobado",
             //     "evaluation_id" => 6,
-            //     "inscription_id" => 11,
+            //     "inscription_detail_id" => 11,
             // ],
             // [
             //     "id" => 12,
@@ -110,7 +108,7 @@ class GradeSeeder extends Seeder
             //     "score_date" => "2023-07-16",
             //     "status" => "Aprobado",
             //     "evaluation_id" => 6,
-            //     "inscription_id" => 12,
+            //     "inscription_detail_id" => 12,
             // ],
         ]);
     }

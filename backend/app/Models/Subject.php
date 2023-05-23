@@ -18,6 +18,7 @@ class Subject extends Model
 
     protected $fillable = [
         'id',
+        'subject_code',
         'subject_name',
         'average_approval',
         'units_value',
@@ -33,6 +34,7 @@ class Subject extends Model
         return Subject::select('subject.*', 'subject.id as id')
 
             ->where('subject.subject_name', 'like', $search)
+            ->orwhere('subject.subject_code', 'like', $search)
             ->orWhere('subject.average_approval', 'like', $search)
             ->orWhere('subject.units_value', 'like', $search)
 
@@ -47,6 +49,7 @@ class Subject extends Model
         return Subject::select('subject.*', 'subject.id as id')
 
             ->where('subject.subject_name', 'like', $search)
+            ->orwhere('subject.subject_code', 'like', $search)
             ->orWhere('subject.average_approval', 'like', $search)
             ->orWhere('subject.units_value', 'like', $search)
 

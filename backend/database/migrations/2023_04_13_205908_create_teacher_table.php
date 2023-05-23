@@ -17,11 +17,12 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('last_name');
-            $table->string('card', 45);
+            $table->string('teacher_card', 45);
             $table->integer('dui');
-            $table->integer('nit');
+            $table->bigInteger('nit');
             $table->integer('phone_number');
             $table->string('mail');
+            $table->foreignId('school_id')->constrained('school');
             $table->softDeletes();
             $table->timestamps();
         });

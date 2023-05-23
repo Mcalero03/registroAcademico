@@ -17,14 +17,50 @@
         </RouterLink> -->
         <v-menu>
           <template v-slot:activator="{ props }">
-            <v-btn v-bind="props" class="d-flex flex-column align-center mb-4"
-              ><v-icon icon="mdi-cogs" size="15"></v-icon>
-              CRUD
+            <v-btn v-bind="props" class="align-center mb-4"
+              ><v-icon icon="mdi-security" size="15" color="#313945"></v-icon>
             </v-btn>
           </template>
           <v-list>
             <v-list-item
-              v-for="(item, index) in items"
+              v-for="(item, index) in admin"
+              :key="index"
+              :value="index"
+              :prepend-icon="item.icon"
+              :to="item.url"
+            >
+              <v-list-item-title size="15">{{ item.title }} </v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+        <v-menu>
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" class="align-center mb-4"
+              ><v-icon icon="mdi-school" size="15" color="#313945"></v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item
+              v-for="(item, index) in academic"
+              :key="index"
+              :value="index"
+              :prepend-icon="item.icon"
+              :to="item.url"
+            >
+              <v-list-item-title size="15">{{ item.title }} </v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+
+        <v-menu>
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" class="align-center mb-4"
+              ><v-icon icon="mdi-cogs" size="15" color="#313945"></v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item
+              v-for="(item, index) in settings"
               :key="index"
               :value="index"
               :prepend-icon="item.icon"
@@ -68,15 +104,15 @@ const { isLoggedIn, logout } = useAuth();
 <script>
 export default {
   data: () => ({
-    items: [
+    admin: [
       {
-        title: "Direccion",
-        url: "/direction",
+        title: "Escuela",
+        url: "/school",
         icon: "mdi-town-hall",
       },
       {
-        title: "Escuela",
-        url: "/college",
+        title: "Sub-Escuela",
+        url: "/subSchool",
         icon: "mdi-account-school",
       },
       {
@@ -94,11 +130,7 @@ export default {
         url: "/subject",
         icon: "mdi-bookshelf",
       },
-      {
-        title: "Grupo",
-        url: "/group",
-        icon: "mdi-account-group",
-      },
+
       {
         title: "Ciclo",
         url: "/cycle",
@@ -114,16 +146,22 @@ export default {
         url: "/pensumSubjectDetail",
         icon: "mdi-details",
       },
-
-      {
-        title: "Detalle Profesor Materia",
-        url: "/teacherSubjectDetail",
-        icon: "mdi-details",
-      },
+      // {
+      //   title: "Detalle Profesor Materia",
+      //   url: "/teacherSubjectDetail",
+      //   icon: "mdi-details",
+      // },
+    ],
+    academic: [
       {
         title: "Estudiante",
         url: "/student",
         icon: "mdi-account",
+      },
+      {
+        title: "Grupo",
+        url: "/group",
+        icon: "mdi-account-group",
       },
       {
         title: "Inscripción",
@@ -139,12 +177,9 @@ export default {
         title: "Asistencia",
         url: "/attendance",
         icon: "mdi-checkbox-multiple-outline",
-      }, 
-      {
-        title: "Parentesco",
-        url: "/kinship",
-        icon: "mdi-family-tree",
       },
+    ],
+    settings: [
       {
         title: "Departamento",
         url: "/department",
@@ -155,12 +190,12 @@ export default {
         url: "/municipality",
         icon: "mdi-home-city-outline",
       },
-
+      {
+        title: "Parentesco",
+        url: "/kinship",
+        icon: "mdi-family-tree",
+      },
     ],
-    // settings: [
-    //   ["Escuela", "mdi-account-school", "/college"],
-    //   ["Cycle", "mdi-list-status"],
-    // ], 
     // title: "Horario",
     //     url: "/schedule",
     //     icon: "mdi-calendar-clock",

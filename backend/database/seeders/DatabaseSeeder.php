@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\StudentPensumDetail;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -22,9 +24,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             DepartmentSeeder::class,
             MunicipalitiesSeeder::class,
-            DirectionSeeder::class,
-            CollegeSeeder::class,
+            SchoolSeeder::class,
             Pensum_TypeSeeder::class,
+            ClassroomSeeder::class,
+            SubSchoolSeeder::class,
             PensumSeeder::class,
             SubjectSeeder::class,
             Pensum_Subject_DetailSeeder::class,
@@ -32,15 +35,19 @@ class DatabaseSeeder extends Seeder
             TeacherSeeder::class,
             EvaluationSeeder::class,
             CycleSeeder::class,
+            CycleSubjectDetailSeeder::class,
             GroupSeeder::class,
             ScheduleSeeder::class,
             KinshipSeeder::class,
             StudentSeeder::class,
             RelativeSeeder::class,
             InscriptionSeeder::class,
+            InscriptionDetailSeeder::class,
             AttendanceSeeder::class,
-            GradeSeeder::class,
-            Teacher_Subject_DetailSeeder::class,
+            Attendance_DetailSeeder::class,
+            CalificationSeeder::class,
+            ScheduleClassroomGroupDetailSeeder::class,
+            StudentPensumDetailSeeder::class,
         ]);
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Group;
-use App\Models\Schedule;
+use App\Models\Subject;
 use Encrypt;
 
 class GroupController extends Controller
@@ -29,22 +29,17 @@ class GroupController extends Controller
         $search = (isset($request->search)) ? "%$request->search%" : '%%';
 
         $group = Group::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage)->unique();
-        
-        foreach ($group as $item) {
-            $item->schedules = Schedule::select('schedule.*')
-            ->where('group_id', $item->id)
-            ->get();
+        $groups = Group::Groups();
 
-            $item->schedules = Encrypt::encryptObject($item->schedules, "id");
-        }
-        
         $group = Encrypt::encryptObject($group, "id");
+        $groups = Encrypt::encryptObject($groups, "id");
 
         $total = Group::counterPagination($search);
 
         return response()->json([
             "message" => "Registros obtenidos correctamente.",
             "data" => $group,
+            "groups" => $groups,
             "total" => $total,
         ]);
     }
@@ -55,26 +50,35 @@ class GroupController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
+        $info = explode(', ', $data['teacher_full_name']);
+        $id = Group::teacherId($info[0], $info[1])->pluck('id');
+        $teacher_id = Group::clean($id);
 
-        $group = Group::create([
-            'group_name' =>$data['group_name'],
-            'students_quantity' => $data['students_quantity'],
-        ]);
+        $subject_id = Subject::where('subject_name', $data['subject_name'])->first()?->id;
 
-        $group->save(); 
+        // $dataExists = Group::where('teacher_id', $teacher_id)
+        //     ->where('subject_id', $subject_id)
+        //     ->exists();
 
-        foreach ($data['schedules'] as $item) {
-            Schedule::create([
-                'week_day' => $item['week_day'],
-                'start_time'=> $item['start_time'],
-                'end_time'=> $item['end_time'],
-                'group_id'=> $group->id,
+        // if (!$dataExists) {
+            $group = Group::create([
+                'group_code' => $data['group_code'],
+                'students_quantity' => $data['students_quantity'],
+                'teacher_id' => $teacher_id,
+                'subject_id' => $subject_id,
             ]);
-        }
 
-        return response()->json([
-            "message" => "Registro creado correctamente.",
-        ]);
+            $group->save();
+
+            return response()->json([
+                "message" => "Registro creado correctamente.",
+            ]);
+        // } else {
+
+        //     return response()->json([
+        //         "message" => "Ya existe un registro igual para este grupo.",
+        //     ]);
+        // }
     }
 
     /**
@@ -91,22 +95,16 @@ class GroupController extends Controller
     public function update(Request $request)
     {
         $data = Encrypt::decryptArray($request->all(), 'id');
+        $info = explode(', ', $data['teacher_full_name']);
+        $id = Group::teacherId($info[0], $info[1])->pluck('id');
+        $teacher_id = Group::clean($id);
 
         Group::where('id', $data['id'])->update([
-            'group_name' =>$data['group_name'],
+            'group_code' => $data['group_code'],
             'students_quantity' => $data['students_quantity'],
+            'teacher_id' => $teacher_id,
+            'subject_id' => Subject::where('subject_name', $data['subject_name'])->first()?->id,
         ]);
-
-        Schedule::where('group_id', $data['id'])->delete();
-
-        foreach ($data['schedules'] as $item) {
-            Schedule::create([
-                'week_day' => $item['week_day'],
-                'start_time'=> $item['start_time'],
-                'end_time'=> $item['end_time'],
-                'group_id'=> $data['id'],
-            ]);
-        }
 
         return response()->json([
             "message" => "Registro modificado correctamente.",
@@ -121,10 +119,21 @@ class GroupController extends Controller
         $id = Encrypt::decryptValue($request->id);
 
         Group::where('id', $id)->delete();
-        Schedule::where('group_id', $id)->delete();
 
         return response()->json([
             "message" => "Registro eliminado correctamente.",
+        ]);
+    }
+
+    public function bySubject($subject)
+    {
+        $subjectcode = Subject::select('subject_code')
+            ->where('subject_name', 'like', $subject)
+            ->get();
+
+        return response()->json([
+            "message" => "Registros obtenidos correctamente.",
+            "subject" => $subjectcode,
         ]);
     }
 }

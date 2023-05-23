@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Direction;
+use App\Models\School;
 use Illuminate\Http\Request;
 use Encrypt;
 
-class DirectionController extends Controller
+class SchoolController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,7 +18,7 @@ class DirectionController extends Controller
 
         // Getting all the records
         if (($request->itemsPerPage == -1)) {
-            $itemsPerPage =  Direction::count();
+            $itemsPerPage =  School::count();
             $skip = 0;
         }
 
@@ -27,16 +27,16 @@ class DirectionController extends Controller
 
         $search = (isset($request->search)) ? "%$request->search%" : '%%';
 
-        $direction = Direction::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
-        $direction = Encrypt::encryptObject($direction, "id");
+        $school = School::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
+        $school = Encrypt::encryptObject($school, "id");
 
-        $total = Direction::counterPagination($search);
+        $total = School::counterPagination($search);
 
-        // dd($direction);
+        // dd($school);
 
         return response()->json([
             "message" => "Registros obtenidos correctamente.",
-            "data" => $direction,
+            "data" => $school,
             "total" => $total,
         ]);
     }
@@ -46,10 +46,10 @@ class DirectionController extends Controller
      */
     public function store(Request $request)
     {
-        $direction = new Direction;
-        $direction->direction_name = $request->direction_name;
+        $school = new School;
+        $school->school_name = $request->school_name;
 
-        $direction->save();
+        $school->save();
 
         return response()->json([
             "message" => "Registro creado correctamente.",
@@ -71,10 +71,10 @@ class DirectionController extends Controller
     {
         $data = Encrypt::decryptArray($request->all(), 'id');
 
-        $direction = Direction::where('id', $data['id'])->first();
-        $direction->direction_name = $request->direction_name;
+        $school = School::where('id', $data['id'])->first();
+        $school->school_name = $request->school_name;
 
-        $direction->save();
+        $school->save();
 
         return response()->json([
             "message" => "Registro modificado correctamente.",
@@ -88,7 +88,7 @@ class DirectionController extends Controller
     {
         $id = Encrypt::decryptValue($request->id);
 
-        Direction::where('id', $id)->delete();
+        School::where('id', $id)->delete();
 
         return response()->json([
             "message" => "Registro eliminado correctamente.",

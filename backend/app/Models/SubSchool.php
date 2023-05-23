@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Encrypt;
 
-class College extends Model
+class SubSchool extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'college';
+    protected $table = 'sub_school';
 
     public $incrementing = true;
 
@@ -19,8 +19,8 @@ class College extends Model
 
     protected $fillable = [
         'id',
-        'college_name',
-        'direction_id',
+        'sub_school_name',
+        'school_id',
     ];
 
     public $hidden = [
@@ -29,37 +29,37 @@ class College extends Model
         'deleted_at',
     ];
 
-    public function direction()
+    public function school()
     {
-        return $this->belongsTo(Direction::class, 'direction_id');
+        return $this->belongsTo(School::class, 'school_id');
     }
 
     public function format()
     {
         return [
             "id" => Encrypt::encryptValue($this->id),
-            'college_name' => $this->college_name,
-            'direction_name' => $this->direction->direction_name,
+            'sub_school_name' => $this->sub_school_name,
+            'school_name' => $this->school->school_name,
         ];
     }
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return College::where('college.college_name', 'like', $search)
-            ->orWhere('college.direction_id', 'like', $search)
+        return SubSchool::where('sub_school.sub_school_name', 'like', $search)
+            ->orWhere('sub_school.school_id', 'like', $search)
             ->skip($skip)
             ->take($itemsPerpage)
-            ->orderBy("college.$sortBy", $sort)
+            ->orderBy("sub_school.$sortBy", $sort)
             ->get()
-            ->map(fn ($college) => $college->format());
+            ->map(fn ($sub_school) => $sub_school->format());
     }
 
     public static function counterPagination($search)
     {
-        return College::select('college.*', 'college.id as id')
+        return SubSchool::select('sub_school.*', 'sub_school.id as id')
 
-            ->where('college.college_name', 'like', $search)
-            ->orWhere('college.direction_id', 'like', $search)
+            ->where('sub_school.sub_school_name', 'like', $search)
+            ->orWhere('sub_school.school_id', 'like', $search)
 
             ->count();
     }

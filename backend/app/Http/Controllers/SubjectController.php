@@ -45,6 +45,7 @@ class SubjectController extends Controller
     public function store(Request $request)
     {
         $subject = new Subject;
+        $subject->subject_code = $request->subject_code;
         $subject->subject_name = $request->subject_name;
         $subject->average_approval = $request->average_approval;
         $subject->units_value = $request->units_value;
@@ -72,6 +73,7 @@ class SubjectController extends Controller
         $data = Encrypt::decryptArray($request->all(), 'id');
 
         $subject = Subject::where('id', $data['id'])->first();
+        $subject->subject_code = $request->subject_code;
         $subject->subject_name = $request->subject_name;
         $subject->average_approval = $request->average_approval;
         $subject->units_value = $request->units_value;

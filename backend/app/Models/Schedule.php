@@ -22,7 +22,6 @@ class Schedule extends Model
         'week_day',
         'start_time',
         'end_time',
-        'group_id',
     ];
 
     public $hidden = [
@@ -42,8 +41,7 @@ class Schedule extends Model
             'id' => Encrypt::encryptValue($this->id),
             'week_day' => $this->week_day,
             'start_time' => $this->start_time,
-            'end_time' => $this->end_time,
-            'group_name' => $this->group->group_name,
+            'end_time' => $this->end_time
         ];
     }
 
@@ -54,7 +52,6 @@ class Schedule extends Model
             ->where('schedule.week_day', 'like', $search)
             ->orWhere('schedule.start_time', 'like', $search)
             ->orWhere('schedule.end_time', 'like', $search)
-            ->orWhere('schedule.group_id', 'like', $search)
 
             ->skip($skip)
             ->take($itemsPerpage)
@@ -70,7 +67,6 @@ class Schedule extends Model
             ->where('schedule.week_day', 'like', $search)
             ->orWhere('schedule.start_time', 'like', $search)
             ->orWhere('schedule.end_time', 'like', $search)
-            ->orWhere('schedule.group_id', 'like', $search)
 
             ->count();
     }

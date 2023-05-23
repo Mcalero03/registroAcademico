@@ -4,9 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Direction;
+use App\Models\School;
 
-class DirectionSeeder extends Seeder
+class SchoolSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,14 +15,14 @@ class DirectionSeeder extends Seeder
      */
     public function run()
     {
-        Direction::insert([
+        School::insert([
             [
                 "id" => 1,
-                "direction_name" => "Coro"
+                "school_name" => "Coro"
             ],
             [
                 "id" => 2,
-                "direction_name" => "Danza"
+                "school_name" => "Danza"
             ],
 
         ]);

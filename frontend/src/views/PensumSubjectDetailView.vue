@@ -66,7 +66,7 @@
             <v-row class="pt-0">
               <!-- subject_name  -->
               <v-col cols="12" sm="6" md="6">
-              <v-label>Materia</v-label>
+                <v-label>Materia</v-label>
                 <select
                   v-model="v$.editedItem.subject_name.$model"
                   class="form-select"
@@ -88,7 +88,6 @@
                   v-model="v$.editedItem.program_name.$model"
                   @change="change"
                   class="form-select"
-                  v-if="v$.editedItem.subject_name.$model"
                 >
                   <option
                     v-for="(option, index) in pensums"
@@ -141,7 +140,7 @@
                       </tr>
                       <tr v-if="editedItem.prerequisites.length == 0">
                         <td colspan="5" class="text-center pt-3">
-                          <p>No se ha ingresado ningún prerequisito</p>
+                          <p>No se ha asignado ningún prerequisito</p>
                         </td>
                       </tr>
                     </tbody>
@@ -154,7 +153,24 @@
                   persistent
                 >
                   <v-card height="100%">
-                    <v-container>
+                    <!-- Container when there are no prerequisites available  -->
+                    <v-container v-if="pensumSubject == 0">
+                      <h2 class="black-secondary text-center mt-4 mb-4">
+                        No hay materias para asignar como prerrequisito!
+                      </h2>
+                      <v-row>
+                        <v-col align="center"
+                          ><base-button
+                            class="ms-1"
+                            type="secondary"
+                            title="Cancelar"
+                            @click="closePrerequisiteDialog()"
+                        /></v-col> </v-row
+                    ></v-container>
+                    <!-- Container when there are no prerequisites available  -->
+
+                    <!-- Container when there are prerequisites available  -->
+                    <v-container v-if="pensumSubject != 0">
                       <h2 class="black-secondary text-center mt-4 mb-4">
                         Agregar prerequisito
                       </h2>
@@ -189,6 +205,7 @@
                         </v-col>
                       </v-row>
                     </v-container>
+                    <!-- Container when there are prerequisites available  -->
                   </v-card>
                 </v-dialog>
                 <!-- Modal -->
@@ -341,9 +358,7 @@ export default {
         },
       },
       prerequisite: {
-        prerequisite: {
-          // required: helpers.withMessage(langMessages.required, required),
-        },
+        prerequisite: {},
       },
     };
   },
@@ -358,11 +373,7 @@ export default {
             this.v$.editedItem.subject_name.$model
         )
         .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
+          alert.error(true, "No fue posible obtener la información.", "fail");
         });
 
       this.pensumSubject = data.subject;
@@ -473,10 +484,6 @@ export default {
 
     close() {
       this.dialog = false;
-      this.editedItem.prerequisites.splice(
-          0,
-          this.editedItem.prerequisites.length
-        );
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
@@ -494,6 +501,7 @@ export default {
       this.editedIndex = this.records.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
+      this.change();
     },
 
     async save() {
@@ -535,7 +543,11 @@ export default {
           null,
           this.editedItem
         );
-        alert.success(data.message);
+        if (data.message) {
+          alert.success(data.message);
+        } else {
+          alert.error(data.error);
+        }
       } catch (error) {
         alert.error("No fue posible crear el registro.");
       }
