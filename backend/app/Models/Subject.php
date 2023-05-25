@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DB;
 
 class Subject extends Model
 {
@@ -22,6 +23,7 @@ class Subject extends Model
         'subject_name',
         'average_approval',
         'units_value',
+        'status'
     ];
 
     public $hidden = [
@@ -31,12 +33,14 @@ class Subject extends Model
     ];
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Subject::select('subject.*', 'subject.id as id')
-
+        return Subject::select(DB::raw('CASE WHEN subject.status=0 THEN "Sin prerrequisito" ELSE "Con prerrequisito" END as prerequisite'), 'subject.*', 'subject.id as id', 'pensum.program_name', 'pensum_subject_detail.id as pensum_subject_detail_id')
+            ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+            ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
             ->where('subject.subject_name', 'like', $search)
             ->orwhere('subject.subject_code', 'like', $search)
             ->orWhere('subject.average_approval', 'like', $search)
             ->orWhere('subject.units_value', 'like', $search)
+            ->orWhere('subject.status', 'like', $search)
 
             ->skip($skip)
             ->take($itemsPerpage)
@@ -46,12 +50,14 @@ class Subject extends Model
 
     public static function counterPagination($search)
     {
-        return Subject::select('subject.*', 'subject.id as id')
-
+        return Subject::select(DB::raw('CASE WHEN subject.status=0 THEN "Sin prerrequisito" ELSE "Con prerrequisito" END as prerequisite'), 'subject.*', 'subject.id as id', 'pensum_subject_detail.program_name')
+            ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+            ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
             ->where('subject.subject_name', 'like', $search)
             ->orwhere('subject.subject_code', 'like', $search)
             ->orWhere('subject.average_approval', 'like', $search)
             ->orWhere('subject.units_value', 'like', $search)
+            ->orWhere('subject.status', 'like', $search)
 
             ->count();
     }

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('subject_name', 100);
             $table->float('average_approval', 10, 0);
             $table->integer('units_value');
+            $table->string('status', 1)->comment("0 = Sin prerrequisito", "1 = Con prerrequisito");
             $table->softDeletes();
             $table->timestamps();
         });
