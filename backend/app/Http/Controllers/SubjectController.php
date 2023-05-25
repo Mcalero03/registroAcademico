@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PensumSubjectDetail;
 use App\Models\Subject;
+use App\Models\Prerequisite;
+use App\Models\Pensum;
 use Illuminate\Http\Request;
 use Encrypt;
 
@@ -28,6 +31,17 @@ class SubjectController extends Controller
         $search = (isset($request->search)) ? "%$request->search%" : '%%';
 
         $subject = Subject::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
+
+        foreach ($subject as $item) {
+            $item->prerequisites = Prerequisite::select('prerequisite.*', 'subject.subject_name as prerequisite')
+                ->join('pensum_subject_detail', 'prerequisite.pensum_subject_detail_id', 'pensum_subject_detail.id')
+                ->join('subject', 'prerequisite.subject_id', '=', 'subject.id')
+                ->where('pensum_subject_detail_id', $item->pensum_subject_detail_id)
+                ->get();
+
+            $item->prerequisites = Encrypt::encryptObject($item->prerequisites, 'id');
+        }
+
         $subject = Encrypt::encryptObject($subject, "id");
 
         $total = Subject::counterPagination($search);
@@ -44,17 +58,60 @@ class SubjectController extends Controller
      */
     public function store(Request $request)
     {
-        $subject = new Subject;
-        $subject->subject_code = $request->subject_code;
-        $subject->subject_name = $request->subject_name;
-        $subject->average_approval = $request->average_approval;
-        $subject->units_value = $request->units_value;
+        $data = $request->all();
+        if ($data['prerequisite'] == "Con prerrequisito") {
+            $data['prerequisite'] = "1";
+        } else {
+            $data['prerequisite'] = "0";
+        }
 
-        $subject->save();
 
-        return response()->json([
-            "message" => "Registro creado correctamente",
-        ]);
+        $dataExists = Subject::where('subject_name', $data['subject_name'])
+            ->exists();
+
+        if (!$dataExists) {
+            $subject = Subject::create([
+                'subject_code' => $data['subject_code'],
+                'subject_name' => $data['subject_name'],
+                'average_approval' => $data['average_approval'],
+                'units_value' => $data['units_value'],
+                'status' => $data['prerequisite'],
+            ]);
+
+            $subject->save();
+
+            $pensum = Pensum::where('program_name', $data['program_name'])->first()?->id;
+            $subject = Subject::where('subject_name', $data['subject_name'])->first()?->id;
+
+            $dataExists = PensumSubjectDetail::where('pensum_id', $pensum)
+                ->where('subject_id', $subject)
+                ->exists();
+
+            if (!$dataExists) {
+
+                $pensum_subject_detail = PensumSubjectDetail::create([
+                    'pensum_id' => $pensum,
+                    'subject_id' => $subject,
+                ]);
+
+                $pensum_subject_detail->save();
+
+                return response()->json([
+                    "message" => "Registro creado correctamente",
+                ]);
+            } else {
+                return response()->json([
+                    "error" => "Ya existe un registro para la información ingresada",
+                ]);
+            }
+            return response()->json([
+                "message" => "Registro creado correctamente",
+            ]);
+        } else {
+            return response()->json([
+                "error" => "Ya existe una materia con el mismo nombre",
+            ]);
+        }
     }
 
     /**
@@ -72,13 +129,36 @@ class SubjectController extends Controller
     {
         $data = Encrypt::decryptArray($request->all(), 'id');
 
-        $subject = Subject::where('id', $data['id'])->first();
-        $subject->subject_code = $request->subject_code;
-        $subject->subject_name = $request->subject_name;
-        $subject->average_approval = $request->average_approval;
-        $subject->units_value = $request->units_value;
+        if ($data['prerequisite'] == "Con prerrequisito") {
+            $data['prerequisite'] = "1";
+        } else {
+            $data['prerequisite'] = "0";
+        }
 
-        $subject->save();
+        Subject::where('id', $data['id'])->update([
+            'subject_code' => $data['subject_code'],
+            'subject_name' => $data['subject_name'],
+            'average_approval' => $data['average_approval'],
+            'units_value' => $data['units_value'],
+            'status' => $data['prerequisite'],
+        ]);
+
+        $pensum = Pensum::where('program_name', $data['program_name'])->first()?->id;
+        $subject = Subject::where('subject_name', $data['subject_name'])->first()?->id;
+
+        $pensum_subject_detail = PensumSubjectDetail::where('pensum_id', $pensum)
+            ->where('subject_id', $subject)
+            ->first()?->id;
+
+        Prerequisite::where('pensum_subject_detail_id', $pensum_subject_detail)->delete();
+
+        foreach ($data['prerequisites'] as $value) {
+            Prerequisite::create([
+                'subject_id' => Subject::where('subject_name', $value['prerequisite'])->first()?->id,
+                'pensum_subject_detail_id' => $pensum_subject_detail,
+            ]);
+        }
+
 
         return response()->json([
             "message" => "Registro modificado correctamente",

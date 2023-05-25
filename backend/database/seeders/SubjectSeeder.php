@@ -22,6 +22,7 @@ class SubjectSeeder extends Seeder
                 "subject_name" => "Composición musical",
                 "average_approval" => 7.0,
                 "units_value" => 2,
+                "status" => "0"
             ],
             [
                 "id" => 2,
@@ -29,6 +30,7 @@ class SubjectSeeder extends Seeder
                 "subject_name" => "Sensoriomotora",
                 "average_approval" => 8.0,
                 "units_value" => 2,
+                "status" => "0"
             ],
             [
                 "id" => 3,
@@ -36,6 +38,7 @@ class SubjectSeeder extends Seeder
                 "subject_name" => "Artes escénicas",
                 "average_approval" => 7.0,
                 "units_value" => 2,
+                "status" => "0"
             ],
             [
                 "id" => 4,
@@ -43,6 +46,7 @@ class SubjectSeeder extends Seeder
                 "subject_name" => "Dramaturgia",
                 "average_approval" => 7.0,
                 "units_value" => 2,
+                "status" => "1"
             ],
             [
                 "id" => 5,
@@ -50,6 +54,7 @@ class SubjectSeeder extends Seeder
                 "subject_name" => "Técnicas de danza",
                 "average_approval" => 8.0,
                 "units_value" => 2,
+                "status" => "1"
             ],
             [
                 "id" => 6,
@@ -57,6 +62,7 @@ class SubjectSeeder extends Seeder
                 "subject_name" => "Composición coreográfica",
                 "average_approval" => 7.0,
                 "units_value" => 2,
+                "status" => "1"
             ],
         ]);
     }

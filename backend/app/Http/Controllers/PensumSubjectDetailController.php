@@ -153,11 +153,21 @@ class PensumSubjectDetailController extends Controller
                 ->where('subject.subject_name', $request->subject)
                 ->get('prerequisite.subject_id');
 
+            $subjectAsPrerequisite = PensumSubjectDetail::select('pensum_subject_detail.subject_id')
+                ->join('prerequisite', 'pensum_subject_detail.id', 'prerequisite.pensum_subject_detail_id')
+                ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+                ->join('subject', 'pensum_subject_detail.subject_id', '=', 'subject.id')
+                ->whereNull('prerequisite.deleted_at')
+                ->where('pensum.program_name', $request->pensum)
+                ->where('prerequisite.subject_id', Subject::where('subject_name', $request->subject)->first()?->id)
+                ->get('pensum_subject_detail.subject_id');
+
             $subject = PensumSubjectDetail::select('subject.subject_name')
                 ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
                 ->join('subject', 'pensum_subject_detail.subject_id', '=', 'subject.id')
                 ->where('pensum.program_name', $request->pensum)
                 ->where('subject.subject_name', 'not like', $request->subject)
+                ->whereNotIn('pensum_subject_detail.subject_id', $subjectAsPrerequisite)
                 ->whereNotIn('pensum_subject_detail.subject_id', $prerequisiteExists)
                 ->get();
 

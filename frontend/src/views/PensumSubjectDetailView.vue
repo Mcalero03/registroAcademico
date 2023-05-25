@@ -377,6 +377,7 @@ export default {
         });
 
       this.pensumSubject = data.subject;
+      console.log(this.pensumSubject);
     },
 
     async initialize() {
