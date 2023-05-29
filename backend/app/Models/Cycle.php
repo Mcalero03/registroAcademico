@@ -33,9 +33,7 @@ class Cycle extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Cycle::select('cycle.*', 'cycle.id as id')
-
-            ->where('cycle.cycle_number', 'like', $search)
+        return Cycle::select('cycle.*', 'cycle.id as id',)
             ->orWhere('cycle.year', 'like', $search)
             ->orWhere('cycle.start_date', 'like', $search)
             ->orWhere('cycle.end_date', 'like', $search)
@@ -49,13 +47,12 @@ class Cycle extends Model
 
     public static function counterPagination($search)
     {
-        return Cycle::select('cycle.*', 'cycle.id as id')
-
-            ->where('cycle.cycle_number', 'like', $search)
+        return Cycle::select('cycle.*', 'cycle.id as id',)
             ->orWhere('cycle.year', 'like', $search)
             ->orWhere('cycle.start_date', 'like', $search)
             ->orWhere('cycle.end_date', 'like', $search)
             ->orWhere('cycle.status', 'like', $search)
+
 
             ->count();
     }

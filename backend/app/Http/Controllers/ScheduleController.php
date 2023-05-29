@@ -43,16 +43,28 @@ class ScheduleController extends Controller
      */
     public function store(Request $request)
     {
-        $schedule = new Schedule;
-        $schedule->week_day = $request->week_day;
-        $schedule->start_time = $request->start_time;
-        $schedule->end_time = $request->end_time;
 
-        $schedule->save();
+        $dataExists = Schedule::where('week_day', $request->week_day)
+            ->where('start_time', $request->start_time)
+            ->where('end_time', $request->end_time)
+            ->exists();
 
-        return response()->json([
-            "message" => "Registro creado correctamente",
-        ]);
+        if (!$dataExists) {
+            $schedule = new Schedule;
+            $schedule->week_day = $request->week_day;
+            $schedule->start_time = $request->start_time;
+            $schedule->end_time = $request->end_time;
+
+            $schedule->save();
+
+            return response()->json([
+                "message" => "Registro creado correctamente",
+            ]);
+        } else {
+            return response()->json([
+                "error" => "Ya existe un horario con esos datos",
+            ]);
+        }
     }
 
     /**

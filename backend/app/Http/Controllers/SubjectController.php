@@ -31,6 +31,7 @@ class SubjectController extends Controller
         $search = (isset($request->search)) ? "%$request->search%" : '%%';
 
         $subject = Subject::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
+        $cycleSubject = Subject::cycleSubject();
 
         foreach ($subject as $item) {
             $item->prerequisites = Prerequisite::select('prerequisite.*', 'subject.subject_name as prerequisite')
@@ -49,6 +50,7 @@ class SubjectController extends Controller
         return response()->json([
             "message" => "Registros obtenidos correctamente.",
             "data" => $subject,
+            "cycleSubject" => $cycleSubject,
             "total" => $total,
         ]);
     }

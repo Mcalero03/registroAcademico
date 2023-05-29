@@ -195,10 +195,12 @@ export default {
         url: "/kinship",
         icon: "mdi-family-tree",
       },
+      {
+        title: "Horario",
+        url: "/schedule",
+        icon: "mdi-calendar-clock",
+      },
     ],
-    // title: "Horario",
-    //     url: "/schedule",
-    //     icon: "mdi-calendar-clock",
   }),
 };
 </script> 

@@ -53,6 +53,7 @@ Route::resource('/evaluation', EvaluationController::class);
 Route::resource('/municipality', MunicipalityController::class);
 Route::resource('/schedule', ScheduleController::class);
 Route::resource('/student', StudentController::class);
+Route::get('/student/byCareer/{id}', [StudentController::class, 'career']);
 Route::resource('/inscription', InscriptionController::class);
 Route::resource('/attendance', AttendanceController::class);
 Route::resource('/kinship', kinshipController::class);

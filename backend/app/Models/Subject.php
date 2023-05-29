@@ -61,4 +61,10 @@ class Subject extends Model
 
             ->count();
     }
+
+    public static function cycleSubject()
+    {
+        return Subject::select(DB::raw('subject.id = 0 as subject_status'), 'subject.*')
+            ->get();
+    }
 }
