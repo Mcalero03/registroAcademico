@@ -80,8 +80,8 @@
                   label="Año lectivo"
                   v-model="v$.editedItem.year.$model"
                   :rules="v$.editedItem.year"
-                  type="number" 
-                  min="1900" 
+                  type="number"
+                  min="1900"
                   max="2099"
                 />
               </v-col>
@@ -119,6 +119,56 @@
               </v-col>
               <!-- status  -->
             </v-row>
+            <!-- Subject table -->
+            <v-row>
+              <v-col align="center" cols="12" md="12" sm="12" class="pt-4">
+                <div class="table-responsive-md">
+                  <v-table>
+                    <thead>
+                      <tr>
+                        <th>MATERIA</th>
+                        <th>AGREGAR</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(subject, index) in editedItem.subjects"
+                        v-bind:index="index"
+                        :key="index"
+                      >
+                        <td v-text="subject.subject_name"></td>
+                        <td>
+                          <v-checkbox
+                            v-model="subject.subject_status"
+                            true-value="1"
+                            false-value="0"
+                            class="ml-6"
+                            color="info"
+                            disabled
+                            v-if="editedIndex != -1"
+                          />
+                          <v-checkbox
+                            v-model="subject.subject_status"
+                            true-value="1"
+                            false-value="0"
+                            class="ml-6"
+                            color="info"
+                            v-else-if="editedIndex == -1"
+                          />
+                        </td>
+                      </tr>
+                      <tr v-if="editedItem.subjects.length == 0">
+                        <td colspan="5" class="text-center pt-3">
+                          <loader v-if="loading" />
+                          <p>No se han encontrado materias para este ciclo</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </v-table>
+                </div>
+              </v-col>
+            </v-row>
+            <!-- Subject table -->
             <!-- Form -->
             <v-row>
               <v-col align="center">
@@ -171,9 +221,11 @@ import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
 
 import cycleApi from "@/services/cycleApi";
+import subjectApi from "@/services/subjectApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
+import Loader from "@/components/Loader.vue";
 
 import useAlert from "../composables/useAlert";
 
@@ -181,7 +233,7 @@ const { alert } = useAlert();
 const langMessages = messages["es"].validations;
 
 export default {
-  components: { BaseButton, BaseInput, BaseSelect },
+  components: { BaseButton, BaseInput, BaseSelect, Loader },
 
   setup() {
     return { v$: useVuelidate() };
@@ -206,7 +258,7 @@ export default {
       records: [],
       loading: false,
       debounce: 0,
-      status: ["Creado", "En proceso", "Finalizado"],
+      status: ["Abierto", "En proceso", "Finalizado"],
       options: {},
       editedItem: {
         cycle_number: "",
@@ -214,6 +266,7 @@ export default {
         start_date: "",
         end_date: "",
         status: "",
+        subjects: [],
       },
       defaultItem: {
         cycle_number: "",
@@ -221,10 +274,14 @@ export default {
         start_date: "",
         end_date: "",
         status: "",
+        subjects: [],
       },
     };
   },
 
+  mounted() {
+    this.initialize();
+  },
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "Nuevo registro" : "Editar registro";
@@ -284,12 +341,21 @@ export default {
       this.loading = true;
       this.records = [];
 
-      let requests = [this.getDataFromApi()];
+      let requests = [
+        this.getDataFromApi(),
+        subjectApi.get(null, {
+          params: {
+            itemsPerPage: -1,
+          },
+        }),
+      ];
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
       });
 
       if (responses) {
+        this.editedItem.subjects = responses[1].data.cycleSubject;
+        console.log(this.editedItem.subjects);
       }
 
       this.loading = false;

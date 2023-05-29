@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cycle;
+use App\Models\CycleSubjectDetail;
 use Encrypt;
 use Illuminate\Http\Request;
 
@@ -28,6 +29,15 @@ class CycleController extends Controller
         $search = (isset($request->search)) ? "%$request->search%" : '%%';
 
         $cycle = Cycle::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
+
+        foreach ($cycle as $item) {
+            $item->subjects = CycleSubjectDetail::select('cycle_subject_detail.*', 'subject.subject_name')
+                ->join('subject', 'cycle_subject_detail.subject_id', '=', 'subject.id')
+                ->where('cycle_id', $item->id)
+                ->get();
+            $item->subjects = Encrypt::encryptObject($item->subjects, "id");
+        }
+
         $cycle = Encrypt::encryptObject($cycle, "id");
 
         $cycles = Cycle::cycle();

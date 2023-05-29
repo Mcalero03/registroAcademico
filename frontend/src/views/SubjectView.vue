@@ -400,9 +400,6 @@ export default {
         program_name: "",
         prerequisites: [],
       },
-      // pensumSubjectDetail: {
-      //   program_name: "",
-      // },
       prerequisite: {
         prerequisite: "",
       },

@@ -149,6 +149,7 @@ import scheduleApi from "@/services/scheduleApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
+import moment from "moment";
 
 import useAlert from "../composables/useAlert";
 
@@ -335,7 +336,11 @@ export default {
       // Creating record
       try {
         const { data } = await scheduleApi.post(null, this.editedItem);
-        alert.success(data.message);
+        if (data.message) {
+          alert.success(data.message);
+        } else {
+          alert.error(data.error);
+        }
       } catch (error) {
         alert.error("No fue posible crear el registro.");
       }
