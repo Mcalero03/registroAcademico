@@ -47,6 +47,8 @@ Route::resource('/subject', SubjectController::class);
 Route::resource('/teacher', TeacherController::class);
 Route::resource('/subSchool', SubSchoolController::class);
 Route::resource('/cycle', CycleController::class);
+Route::get('/cycle/bySchool/{school}', [CycleController::class, 'bySchool']);
+Route::get('/cycle/byPensum/{pensum}', [CycleController::class, 'byPensum']);
 Route::resource('/pensum', PensumController::class);
 Route::resource('/pensumSubjectDetail', PensumSubjectDetailController::class);
 Route::resource('/evaluation', EvaluationController::class);

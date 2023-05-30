@@ -6,6 +6,8 @@ use App\Models\Cycle;
 use App\Models\CycleSubjectDetail;
 use Encrypt;
 use Illuminate\Http\Request;
+use App\Models\Pensum;
+use App\Models\Subject;
 
 class CycleController extends Controller
 {
@@ -56,18 +58,41 @@ class CycleController extends Controller
      */
     public function store(Request $request)
     {
-        $cycle = new Cycle;
-        $cycle->cycle_number = $request->cycle_number;
-        $cycle->year = $request->year;
-        $cycle->start_date = $request->start_date;
-        $cycle->end_date = $request->end_date;
-        $cycle->status = $request->status;
+        $data = $request->all();
 
-        $cycle->save();
+        $activeStatus = Cycle::where('status', "Activo")
+            ->exists();
+        if (!$activeStatus) {
+            $cycle = Cycle::create([
+                'cycle_number' => $data['cycle_number'],
+                'year' => $data['year'],
+                'start_date' => $data['start_date'],
+                'end_date' => $data['end_date'],
+                'status' => $data['status'],
+            ]);
 
-        return response()->json([
-            "message" => "Registro creado correctamente",
-        ]);
+            $cycle->save();
+
+            $subjects = $data['subjects'];
+            $subjectsCount = count($subjects);
+
+            for ($i = 0; $i < $subjectsCount; $i++) {
+                $item = $subjects[$i];
+
+                CycleSubjectDetail::create([
+                    'cycle_id' => $cycle->id,
+                    'subject_id' => Subject::where('subject_name', $item)->first()?->id,
+                ]);
+            }
+
+            return response()->json([
+                "message" => "Registro creado correctamente",
+            ]);
+        } else {
+            return response()->json([
+                "error" => "Solo puede haber un ciclo activo",
+            ]); #
+        }
     }
 
     /**
@@ -85,18 +110,39 @@ class CycleController extends Controller
     {
         $data = Encrypt::decryptArray($request->all(), 'id');
 
-        $cycle = Cycle::where('id', $data['id'])->first();
-        $cycle->cycle_number = $request->cycle_number;
-        $cycle->year = $request->year;
-        $cycle->start_date = $request->start_date;
-        $cycle->end_date = $request->end_date;
-        $cycle->status = $request->status;
+        Cycle::where('id', $data['id'])->update([
+            'cycle_number' => $data['cycle_number'],
+            'year' => $data['year'],
+            'start_date' => $data['start_date'],
+            'end_date' => $data['end_date'],
+            'status' => $data['status'],
+        ]);
 
-        $cycle->save();
+        CycleSubjectDetail::where('cycle_id', $data['id'])->delete();
 
+        // $subjects = $data['subjects'];
+        // $subjectsCount = count($subjects);
+
+        // for ($i = 0; $i < $subjectsCount; $i++) {
+        //     $item = $subjects[$i];
+
+        //     CycleSubjectDetail::create([
+        //         'cycle_id' => $data['id'],
+        //         'subject_id' => Subject::where('subject_name', $item)->first()?->id,
+        //     ]);
+
+        //     if ($data['subjects'] != $item) {
+        foreach ($data['subjects'] as $item) {
+            CycleSubjectDetail::create([
+                'cycle_id' => $data['id'],
+                'subject_id' => Subject::where('subject_name', $item['subject_name'])->first()?->id,
+            ]);
+        }
         return response()->json([
             "Message" => "Registro modificado correctamente.",
         ]);
+        //     }
+        // }
     }
 
     /**
@@ -107,9 +153,38 @@ class CycleController extends Controller
         $id = Encrypt::decryptValue($request->id);
 
         Cycle::where('id', $id)->delete();
+        CycleSubjectDetail::where('id', $id)->delete();
 
         return response()->json([
             "message" => "Registro eliminado correctamente",
+        ]);
+    }
+
+    public function bySchool(Request $request)
+    {
+        $pensum = Pensum::select('pensum.program_name')
+            ->join('sub_school', 'pensum.sub_school_id', '=', 'sub_school.id')
+            ->join('school', 'sub_school.school_id', '=', 'school.id')
+            ->where('school.school_name', $request->school)
+            ->get();
+
+        return response()->json([
+            "message" => "Registro encontrado correctamente",
+            "pensum" => $pensum
+        ]);
+    }
+
+    public function byPensum(Request $request)
+    {
+        $subject = Subject::select('subject.subject_name')
+            ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+            ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+            ->where('pensum.program_name', $request->pensum)
+            ->get();
+
+        return response()->json([
+            "message" => "Registro encontrado correctamente",
+            "subject" => $subject
         ]);
     }
 }

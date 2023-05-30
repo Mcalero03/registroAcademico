@@ -118,16 +118,72 @@
                 />
               </v-col>
               <!-- status  -->
+              <!-- school  -->
+              <v-col cols="12" sm="6" md="6" v-if="editedIndex == -1">
+                <v-label>Escuela</v-label>
+                <select
+                  class="form-select"
+                  @change="changePensum"
+                  v-model="v$.editedItem.school.$model"
+                >
+                  <option
+                    v-for="(option, index) in schools"
+                    :key="index"
+                    :value="option.school_name"
+                  >
+                    {{ option.school_name }}
+                  </option>
+                </select>
+              </v-col>
+              <!-- school  -->
+              <!-- pensum  -->
+              <v-col cols="12" sm="6" md="6" v-if="editedIndex == -1">
+                <v-label>Pensum</v-label>
+                <select
+                  @change="changeSubject"
+                  class="form-select"
+                  v-model="v$.editedItem.pensum.$model"
+                >
+                  <option
+                    v-for="(option, index) in pensums"
+                    :key="index"
+                    :value="option.program_name"
+                  >
+                    {{ option.program_name }}
+                  </option>
+                </select>
+              </v-col>
+              <!-- pensum  -->
             </v-row>
             <!-- Subject table -->
             <v-row>
-              <v-col align="center" cols="12" md="12" sm="12" class="pt-4">
+              <v-col align="center" cols="6" md="6" sm="6"
+                ><v-data-table
+                  v-if="editedIndex == -1"
+                  v-model="this.editedItem.subjects"
+                  :headers="headersSubject"
+                  :items="subjects"
+                  items-title="subject_name"
+                  item-value="subject_name"
+                  show-select
+                  density="compact"
+                  class="elevation-1"
+                  items-per-page="5"
+                ></v-data-table
+              ></v-col>
+              <v-col
+                align="center"
+                cols="12"
+                md="12"
+                sm="12"
+                v-if="editedIndex != -1"
+              >
                 <div class="table-responsive-md">
-                  <v-table>
+                  <v-table hover density="compact" height="auto">
                     <thead>
                       <tr>
-                        <th>MATERIA</th>
-                        <th>AGREGAR</th>
+                        <th>MATERIAS SELECCIONADAS</th>
+                        <th>ACCIÓN</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -137,30 +193,51 @@
                         :key="index"
                       >
                         <td v-text="subject.subject_name"></td>
-                        <td>
-                          <v-checkbox
-                            v-model="subject.subject_status"
-                            true-value="1"
-                            false-value="0"
-                            class="ml-6"
-                            color="info"
-                            disabled
-                            v-if="editedIndex != -1"
-                          />
-                          <v-checkbox
-                            v-model="subject.subject_status"
-                            true-value="1"
-                            false-value="0"
-                            class="ml-6"
-                            color="info"
-                            v-else-if="editedIndex == -1"
+                        <td class="text-center">
+                          <v-icon
+                            size="20"
+                            class="mr-2"
+                            @click="deleteSubjetct(index)"
+                            icon="mdi-delete"
                           />
                         </td>
                       </tr>
                       <tr v-if="editedItem.subjects.length == 0">
                         <td colspan="5" class="text-center pt-3">
                           <loader v-if="loading" />
-                          <p>No se han encontrado materias para este ciclo</p>
+                          <p>No se han seleccionado materias para este ciclo</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </v-table>
+                </div>
+              </v-col>
+              <v-col
+                align="center"
+                cols="6"
+                md="6"
+                sm="6"
+                v-if="editedIndex == -1"
+              >
+                <div class="table-responsive-md">
+                  <v-table hover density="compact" height="300px">
+                    <thead>
+                      <tr>
+                        <th>MATERIAS SELECCIONADAS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(subject, index) in selected"
+                        v-bind:index="index"
+                        :key="index"
+                      >
+                        <td v-text="subject.subject_name"></td>
+                      </tr>
+                      <tr v-if="selected.length == 0">
+                        <td colspan="5" class="text-center pt-3">
+                          <loader v-if="loading" />
+                          <p>No se han seleccionado materias para este ciclo</p>
                         </td>
                       </tr>
                     </tbody>
@@ -221,6 +298,7 @@ import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
 
 import cycleApi from "@/services/cycleApi";
+import schoolApi from "@/services/schoolApi";
 import subjectApi from "@/services/subjectApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
@@ -254,11 +332,16 @@ export default {
         { title: "ESTADO", key: "status" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
+      headersSubject: [{ title: "SELECCIONE MATERIAS", key: "subject_name" }],
       total: 0,
       records: [],
+      schools: [],
+      pensums: [],
+      selected: [],
+      subjects: [],
       loading: false,
       debounce: 0,
-      status: ["Abierto", "En proceso", "Finalizado"],
+      status: ["Activo", "Inactivo", "Finalizado"],
       options: {},
       editedItem: {
         cycle_number: "",
@@ -266,6 +349,8 @@ export default {
         start_date: "",
         end_date: "",
         status: "",
+        school: "",
+        pensum: "",
         subjects: [],
       },
       defaultItem: {
@@ -274,6 +359,8 @@ export default {
         start_date: "",
         end_date: "",
         status: "",
+        school: "",
+        pensum: "",
         subjects: [],
       },
     };
@@ -297,6 +384,16 @@ export default {
     },
     dialogDelete(val) {
       val || this.closeDelete();
+    },
+
+    "editedItem.subjects"(newSubjects) {
+      const selectedSubjects = newSubjects.map((subject) => {
+        return { ["subject_name"]: subject };
+      });
+
+      this.selected = selectedSubjects;
+      console.log(newSubjects);
+      console.log(this.selected); // Aquí puedes ver los datos seleccionados como un arreglo asociativo
     },
   },
 
@@ -332,11 +429,52 @@ export default {
             minLength(4)
           ),
         },
+        school: {
+          // required: helpers.withMessage(langMessages.required, required),
+        },
+        pensum: {
+          // required: helpers.withMessage(langMessages.required, required),
+        },
       },
     };
   },
 
   methods: {
+    //METHODS TO CHANGE
+    async changePensum() {
+      const { data } = await cycleApi
+        .get("/bySchool/" + this.v$.editedItem.school.$model)
+        .catch((error) => {
+          alert.error(
+            true,
+            "No fue posible obtener la información de los espacios.",
+            "fail"
+          );
+        });
+
+      this.pensums = data.pensum;
+      console.log(this.pensums);
+    },
+    async changeSubject() {
+      const { data } = await cycleApi
+        .get("/byPensum/" + this.v$.editedItem.pensum.$model)
+        .catch((error) => {
+          alert.error(
+            true,
+            "No fue posible obtener la información de los espacios.",
+            "fail"
+          );
+        });
+
+      this.subjects = data.subject;
+      console.log(this.subjects);
+    },
+
+    async deleteSubjetct(index) {
+      this.editedItem.subjects.splice(index, 1);
+      console.log(this.editedItem.subjects);
+    },
+
     async initialize() {
       this.loading = true;
       this.records = [];
@@ -348,14 +486,18 @@ export default {
             itemsPerPage: -1,
           },
         }),
+        schoolApi.get(null, {
+          params: {
+            itemsPerPage: -1,
+          },
+        }),
       ];
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
       });
 
       if (responses) {
-        this.editedItem.subjects = responses[1].data.cycleSubject;
-        console.log(this.editedItem.subjects);
+        this.schools = responses[2].data.data;
       }
 
       this.loading = false;
@@ -398,6 +540,7 @@ export default {
       this.dialog = false;
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
+        this.subjects = [];
         this.editedIndex = -1;
       });
     },
@@ -444,7 +587,11 @@ export default {
       // Creating record
       try {
         const { data } = await cycleApi.post(null, this.editedItem);
-        alert.success(data.message);
+        if (data.message) {
+          alert.success(data.message);
+        } else {
+          alert.error(data.error);
+        }
       } catch (error) {
         alert.error("No fue posible crear el registro.");
       }
