@@ -2,10 +2,16 @@
   <div data-app>
     <v-card class="p-3 mt-3">
       <v-container>
-        <h2>{{ title }}</h2>
+        <h2>
+          {{ title }}
+        </h2>
         <div class="options-table">
-          <base-button type="primary" title="Agregar" @click="addRecord()" />
-          <v-col cols="12" sm="12" md="4" lg="4" xl="4" class="pl-0 pb-0 pr-0">
+          <base-button
+            type="primary"
+            title="Agregar"
+            @click="addRecord()"
+          ></base-button>
+          <v-col cols="12" sm="4" lg="4" xl="4" class="pl-0 pb-0 pr-0">
             <v-text-field
               class="mt-3"
               variant="outlined"
@@ -22,7 +28,7 @@
         :items-length="total"
         :items="records"
         :loading="loading"
-        item-title="id"
+        items-title="id"
         item-value="id"
         @update:options="getDataFromApi"
       >
@@ -57,10 +63,55 @@
           <v-container>
             <!-- Form -->
             <v-row class="pt-0">
-              <!-- school_name  -->
-              <v-col cols="12" sm="12" md="12">
+              <!-- classroom_code  -->
+              <v-col cols="6" sm="3" md="3">
                 <base-input
+                  label="Código"
+                  v-model="v$.editedItem.classroom_code.$model"
+                  :rules="v$.editedItem.classroom_code"
+                />
+              </v-col>
+              <!-- classroom_code  -->
+              <!-- classroom_name  -->
+              <v-col cols="6" sm="5" md="5">
+                <base-input
+                  label="Nombre del aula"
+                  v-model="v$.editedItem.classroom_name.$model"
+                  :rules="v$.editedItem.classroom_name"
+                />
+              </v-col>
+              <!-- classroom_name  -->
+              <!-- capacity  -->
+              <v-col cols="6" sm="4" md="4">
+                <base-input
+                  label="Capacidad"
+                  type="number"
+                  v-model="v$.editedItem.capacity.$model"
+                  :rules="v$.editedItem.capacity"
+                  min="1"
+                  max="100"
+                />
+              </v-col>
+              <!-- capacity  -->
+              <!-- status  -->
+              <v-col cols="6" sm="6" md="6">
+                <base-select
+                  label="Estado"
+                  :items="status"
+                  item-title="status"
+                  item-value="status"
+                  v-model="v$.editedItem.status.$model"
+                  :rules="v$.editedItem.status"
+                />
+              </v-col>
+              <!-- status  -->
+              <!-- school_name  -->
+              <v-col cols="12" sm="6" md="6">
+                <base-select
                   label="Escuela"
+                  :items="schools"
+                  item-title="school_name"
+                  item-value="school_name"
                   v-model="v$.editedItem.school_name.$model"
                   :rules="v$.editedItem.school_name"
                 />
@@ -111,14 +162,18 @@
   </div>
 </template> 
 
+
+
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
-import { helpers, minLength, required, email } from "@vuelidate/validators";
+import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
 
+import classroomApi from "@/services/classroomApi";
 import schoolApi from "@/services/schoolApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
+import BaseSelect from "../components/base-components/BaseSelect.vue";
 
 import useAlert from "../composables/useAlert";
 
@@ -126,7 +181,7 @@ const { alert } = useAlert();
 const langMessages = messages["es"].validations;
 
 export default {
-  components: { BaseButton, BaseInput },
+  components: { BaseButton, BaseInput, BaseSelect },
 
   setup() {
     return { v$: useVuelidate() };
@@ -138,23 +193,41 @@ export default {
       dialog: false,
       dialogDelete: false,
       editedIndex: -1,
+      title: "AULAS",
       headers: [
+        { title: "NOMBRE", key: "classroom_name" },
+        { title: "CÓDIGO", key: "classroom_code" },
+        { title: "CAPACIDAD", key: "capacity" },
+        { title: "ESTADO", key: "status" },
         { title: "ESCUELA", key: "school_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
-      title: "ESCUELAS",
       total: 0,
+      status: ["Habilitado", "Inhabilitado"],
       records: [],
+      schools: [],
       loading: false,
       debounce: 0,
       options: {},
       editedItem: {
+        classroom_code: "",
+        classroom_name: "",
+        capacity: "",
+        status: "",
         school_name: "",
       },
       defaultItem: {
+        classroom_code: "",
+        classroom_name: "",
+        capacity: "",
+        status: "",
         school_name: "",
       },
     };
+  },
+
+  mounted() {
+    this.initialize();
   },
 
   computed: {
@@ -170,9 +243,6 @@ export default {
     dialog(val) {
       val || this.close();
     },
-    dialogBlock(val) {
-      val || this.closeBlock();
-    },
     dialogDelete(val) {
       val || this.closeDelete();
     },
@@ -181,38 +251,104 @@ export default {
   validations() {
     return {
       editedItem: {
-        school_name: {
+        classroom_code: {
           required: helpers.withMessage(langMessages.required, required),
           minLength: helpers.withMessage(
             ({ $params }) => langMessages.minLength($params),
             minLength(4)
           ),
         },
+        classroom_name: {
+          required: helpers.withMessage(langMessages.required, required),
+          minLength: helpers.withMessage(
+            ({ $params }) => langMessages.minLength($params),
+            minLength(4)
+          ),
+        },
+        capacity: {
+          required: helpers.withMessage(langMessages.required, required),
+          minLength: helpers.withMessage(
+            ({ $params }) => langMessages.minLength($params),
+            minLength(1)
+          ),
+          maxLength: helpers.withMessage(
+            ({ $params }) => langMessages.maxLength($params),
+            maxLength(2)
+          ),
+        },
+        status: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
+        school_name: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
       },
     };
   },
 
-  created() {
-    this.initialize();
-  },
-
-  beforeMount() {
-    this.getDataFromApi({ page: 1, itemsPerPage: 10, sortBy: [], search: "" });
-  },
   methods: {
     async initialize() {
       this.loading = true;
       this.records = [];
 
-      let requests = [this.getDataFromApi()];
+      let requests = [
+        this.getDataFromApi(),
+        schoolApi.get(null, {
+          params: {
+            itemsPerPage: -1,
+          },
+        }),
+      ];
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
       });
 
       if (responses) {
+        this.schools = responses[1].data.data;
       }
 
       this.loading = false;
+    },
+
+    getDataFromApi(options) {
+      this.loading = false;
+      this.records = [];
+
+      clearTimeout(this.debounce);
+      this.debounce = setTimeout(async () => {
+        try {
+          const { data } = await classroomApi.get(null, {
+            params: { ...options, search: this.search },
+          });
+
+          this.records = data.data;
+          this.total = data.total;
+          this.loading = false;
+        } catch (error) {
+          alert.error("No fue posible obtener los registros.");
+        }
+      });
+    },
+
+    created() {
+      this.initialize();
+    },
+
+    beforeMount() {
+      this.getDataFromApi({
+        page: 1,
+        itemsPerPage: 10,
+        sortBy: [],
+        search: "",
+      });
+    },
+
+    close() {
+      this.dialog = false;
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      });
     },
 
     addRecord() {
@@ -226,13 +362,6 @@ export default {
       this.editedIndex = this.records.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
-    },
-
-    deleteItem(item) {
-      this.editedIndex = this.records.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-
-      this.dialogDelete = true;
     },
 
     async save() {
@@ -250,7 +379,7 @@ export default {
         );
 
         try {
-          const { data } = await schoolApi.put(`/${edited.id}`, edited);
+          const { data } = await classroomApi.put(`/${edited.id}`, edited);
           alert.success(data.message);
         } catch (error) {
           alert.error("No fue posible actualizar el registro.");
@@ -263,9 +392,12 @@ export default {
 
       // Creating record
       try {
-        const { data } = await schoolApi.post(null, this.editedItem);
-        console.log(data);
-        alert.success(data.message);
+        const { data } = await classroomApi.post(null, this.editedItem);
+        if (data.message) {
+          alert.success(data.message);
+        } else {
+          alert.error(data.error);
+        }
       } catch (error) {
         alert.error("No fue posible crear el registro.");
       }
@@ -275,9 +407,16 @@ export default {
       return;
     },
 
+    deleteItem(item) {
+      this.editedIndex = this.records.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+
+      this.dialogDelete = true;
+    },
+
     async deleteItemConfirm() {
       try {
-        const { data } = await schoolApi.delete(`/${this.editedItem.id}`, {
+        const { data } = await classroomApi.delete(`/${this.editedItem.id}`, {
           params: { id: this.editedItem.id },
         });
 
@@ -289,40 +428,11 @@ export default {
       this.closeDelete();
     },
 
-    close() {
-      this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
     closeDelete() {
       this.dialogDelete = false;
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
-      });
-    },
-
-    getDataFromApi(options) {
-      this.loading = false;
-      this.records = [];
-
-      clearTimeout(this.debounce);
-      this.debounce = setTimeout(async () => {
-        try {
-          const { data } = await schoolApi.get(null, {
-            params: { ...options, search: this.search },
-          });
-
-          this.records = data.data;
-          this.total = data.total;
-          this.loading = false;
-        } catch (error) {
-          alert.error("No fue posible obtener los registros.");
-          console.log(error);
-        }
       });
     },
   },

@@ -142,10 +142,16 @@ export default {
         icon: "mdi-view-list",
       },
       {
-        title: "Detalle Prerequisitos",
-        url: "/pensumSubjectDetail",
-        icon: "mdi-details",
+        title: "Aulas",
+        url: "/classroom",
+        icon: "mdi-desk",
       },
+      // {
+      //   title: "Detalle Prerequisitos",
+      //   url: "/pensumSubjectDetail",
+      //   icon: "mdi-details",
+      // },
+
       // {
       //   title: "Detalle Profesor Materia",
       //   url: "/teacherSubjectDetail",

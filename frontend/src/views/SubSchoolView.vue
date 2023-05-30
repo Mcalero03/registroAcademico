@@ -66,7 +66,7 @@
               <!-- sub_school_name  -->
               <v-col cols="12" sm="6" md="6">
                 <base-input
-                  label="Nombre de la escuela"
+                  label="Sub-Escuela"
                   v-model="v$.editedItem.sub_school_name.$model"
                   :rules="v$.editedItem.sub_school_name"
                 />
@@ -75,7 +75,7 @@
               <!-- school_name  -->
               <v-col cols="12" sm="6" md="6">
                 <base-select
-                  label="Dirección"
+                  label="Escuela"
                   :items="schools"
                   item-title="school_name"
                   item-value="school_name"

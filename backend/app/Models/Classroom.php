@@ -30,4 +30,31 @@ class Classroom extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
+    {
+        return Classroom::select('classroom.*', 'school.school_name')
+            ->join('school', 'classroom.school_id', '=', 'school.id')
+            ->where('classroom.classroom_code', 'like', $search)
+            ->orwhere('classroom.classroom_name', 'like', $search)
+            ->orwhere('classroom.capacity', 'like', $search)
+            ->orwhere('classroom.status', 'like', $search)
+
+            ->skip($skip)
+            ->take($itemsPerpage)
+            ->orderBy("classroom.$sortBy", $sort)
+            ->get();
+    }
+
+    public static function counterPagination($search)
+    {
+        return Classroom::select('classroom.*', 'school.school_name')
+            ->join('school', 'classroom.school_id', '=', 'school.id')
+            ->where('classroom.classroom_code', 'like', $search)
+            ->orwhere('classroom.classroom_name', 'like', $search)
+            ->orwhere('classroom.capacity', 'like', $search)
+            ->orwhere('classroom.status', 'like', $search)
+
+            ->count();
+    }
 }
