@@ -18,6 +18,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\InscriptionController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\KinshipController;
+use App\Http\Controllers\ClassroomController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -63,3 +64,4 @@ Route::get('/pensumSubjectDetail/byPensum/{pensum}/{subject}', [PensumSubjectDet
 Route::get('/attendance/byTeacher/{name}/{last_name}', [AttendanceController::class, 'teacherSubject']);
 Route::get('/attendance/bySubject/{name}/{last_name}/{subject}', [AttendanceController::class, 'subject']);
 Route::get('/attendance/byGroup/{group}/{subject}', [AttendanceController::class, 'student']);
+Route::resource('/classroom', ClassroomController::class);
