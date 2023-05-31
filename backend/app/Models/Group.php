@@ -33,8 +33,9 @@ class Group extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Group::select(DB::raw('CONCAT(teacher.name, ", ", teacher.last_name) as teacher_full_name'), 'group.*', 'group.id as id', 'subject.subject_name', 'subject.subject_code')
+        return Group::select(DB::raw('CONCAT(teacher.name, ", ", teacher.last_name) as teacher_full_name'), 'group.*', 'group.id as id', 'subject.subject_name', 'subject.subject_code', 'school.school_name')
             ->join('teacher', 'group.teacher_id', '=', 'teacher.id')
+            ->join('school', 'teacher.school_id', '=', 'school.id')
             ->join('subject', 'group.subject_id', '=', 'subject.id')
             ->where('group.group_code', 'like', $search)
             ->orWhere('group.students_quantity', 'like', $search)
@@ -47,8 +48,9 @@ class Group extends Model
 
     public static function counterPagination($search)
     {
-        return Group::select(DB::raw('CONCAT(teacher.name, ", ", teacher.last_name) as teacher_full_name'), 'group.*', 'group.id as id', 'subject.subject_name', 'subject.subject_code')
+        return Group::select(DB::raw('CONCAT(teacher.name, ", ", teacher.last_name) as teacher_full_name'), 'group.*', 'group.id as id', 'subject.subject_name', 'subject.subject_code', 'school.school_name')
             ->join('teacher', 'group.teacher_id', '=', 'teacher.id')
+            ->join('school', 'teacher.school_id', '=', 'school.id')
             ->join('subject', 'group.subject_id', '=', 'subject.id')
             ->where('group.group_code', 'like', $search)
             ->orWhere('group.students_quantity', 'like', $search)

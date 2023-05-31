@@ -63,8 +63,64 @@
           <v-container>
             <!-- Form -->
             <v-row class="pt-0">
+              <!-- schools  -->
+              <v-col cols="12" sm="4" md="5">
+                <v-label>Escuela</v-label>
+                <select
+                  v-model="v$.editedItem.school_name.$model"
+                  @change="changeSubject"
+                  class="form-select"
+                >
+                  <option
+                    v-for="(option, index) in schools"
+                    :key="index"
+                    :value="option.school_name"
+                  >
+                    {{ option.school_name }}
+                  </option>
+                </select>
+              </v-col>
+              <!-- schools  -->
+              <!-- group_code  -->
+              <v-col cols="12" sm="4" md="3" class="mt-2">
+                <base-input
+                  label="Código de grupo"
+                  v-model="v$.editedItem.group_code.$model"
+                  :rules="v$.editedItem.group_code"
+                />
+              </v-col>
+              <!-- group_code  -->
+              <!-- student_quantity  -->
+              <v-col cols="12" sm="4" md="4" class="mt-2">
+                <base-input
+                  label="Cantidad de estudiantes"
+                  v-model="v$.editedItem.students_quantity.$model"
+                  :rules="v$.editedItem.students_quantity"
+                  type="number"
+                  min="1"
+                  max="100"
+                />
+              </v-col>
+              <!-- student_quantity  -->
+              <!-- teacher  -->
+              <v-col cols="12" sm="4" md="4">
+                <v-label>Profesor</v-label>
+                <select
+                  v-model="v$.editedItem.teacher_full_name.$model"
+                  class="form-select"
+                >
+                  <option
+                    v-for="(option, index) in teachers"
+                    :key="index"
+                    :value="option.full_name"
+                  >
+                    {{ option.full_name }}
+                  </option>
+                </select>
+              </v-col>
+              <!-- teacher  -->
               <!-- subject_name  -->
-              <v-col cols="12" sm="6" md="6">
+              <v-col cols="12" sm="4" md="4">
                 <v-label>Materia</v-label>
                 <select
                   v-model="v$.editedItem.subject_name.$model"
@@ -82,7 +138,7 @@
               </v-col>
               <!-- subject_name  -->
               <!-- subject_code  -->
-              <v-col cols="12" sm="6" md="6">
+              <v-col cols="12" sm="4" md="4">
                 <v-label>Código de materia</v-label>
                 <select
                   v-model="v$.editedItem.subject_code.$model"
@@ -99,45 +155,177 @@
                 </select>
               </v-col>
               <!-- subject_code  -->
-              <!-- teacher  -->
-              <v-col cols="12" sm="6" md="6">
-                <v-label>Profesor</v-label>
-                <select
-                  v-model="v$.editedItem.teacher_full_name.$model"
-                  class="form-select"
-                >
-                  <option
-                    v-for="(option, index) in teachers"
-                    :key="index"
-                    :value="option.full_name"
-                  >
-                    {{ option.full_name }}
-                  </option>
-                </select>
-              </v-col>
-              <!-- teacher  -->
-              <!-- group_code  -->
-              <v-col cols="12" sm="6" md="3" class="mt-2">
-                <base-input
-                  label="Código de grupo"
-                  v-model="v$.editedItem.group_code.$model"
-                  :rules="v$.editedItem.group_code"
+              <!-- career -->
+              <v-col cols="auto" class="pt-5 pb-5 mt-2">
+                <base-button
+                  type="secondary"
+                  title="Agregar horario"
+                  @click="addSchedule()"
                 />
               </v-col>
-              <!-- group_code  -->
-              <!-- student_quantity  -->
-              <v-col cols="12" sm="6" md="3" class="mt-2">
-                <base-input
-                  label="Cantidad de estudiantes"
-                  v-model="v$.editedItem.students_quantity.$model"
-                  :rules="v$.editedItem.students_quantity"
-                  type="number"
-                  min="1"
-                  max="100"
-                />
-              </v-col>
-              <!-- student_quantity  -->
+              <!-- career -->
             </v-row>
+            <!-- Schedule Table -->
+            <v-row>
+              <v-col align="center" cols="12" md="12" sm="12" class="pt-4">
+                <h4>HORARIOS ASIGNADOS</h4>
+                <div class="table-responsive-md">
+                  <v-table>
+                    <thead>
+                      <tr>
+                        <th>DÍA</th>
+                        <th>HORA INICIO</th>
+                        <th>HORA FIN</th>
+                        <th>AULA</th>
+                        <th class="text-center">ACCIÓN</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(schedule, index) in editedItem.selectedSchedule"
+                        v-bind:index="index"
+                        :key="index"
+                      >
+                        <td v-text="schedule.week_day"></td>
+                        <td v-text="schedule.start_time"></td>
+                        <td v-text="schedule.end_time"></td>
+                        <td v-text="schedule.classroom_name"></td>
+                        <td class="text-center">
+                          <v-icon
+                            size="20"
+                            class="mr-2"
+                            @click="deleteSchedule(index)"
+                            icon="mdi-delete"
+                          />
+                        </td>
+                      </tr>
+                      <tr v-if="editedItem.selectedSchedule.length == 0">
+                        <td colspan="5" class="text-center pt-3">
+                          <p>No hay horarios asignados</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </v-table>
+                </div>
+              </v-col>
+
+              <!-- Modal -->
+              <v-dialog v-model="dialogSchedule" max-width="700px" persistent>
+                <v-card height="100%">
+                  <v-container>
+                    <h2 class="black-secondary text-center mt-4 mb-4">
+                      Agregar horario
+                    </h2>
+                    <v-row>
+                      <!-- classroom_name  -->
+                      <v-col cols="12" sm="4" md="4">
+                        <v-label>Aulas</v-label>
+                        <select
+                          v-model="v$.schedule.classroom_name.$model"
+                          @change="changeSchedules()"
+                          class="form-select"
+                        >
+                          <option
+                            v-for="(option, index) in classrooms"
+                            :key="index"
+                            :value="option.classroom_name"
+                          >
+                            {{ option.classroom_name }}
+                          </option>
+                        </select>
+                      </v-col>
+                      <!-- classroom_name  -->
+                    </v-row>
+                    <v-row>
+                      <!-- week_day  -->
+                      <v-col cols="12" sm="4" md="4">
+                        <v-label>Día</v-label>
+                        <select
+                          v-model="v$.schedule.week_day.$model"
+                          @change="changestarttime()"
+                          class="form-select"
+                        >
+                          <option
+                            v-for="(option, index) in weekdays"
+                            :key="index"
+                            :value="option"
+                          >
+                            {{ option }}
+                          </option>
+                        </select>
+                      </v-col>
+                      <!-- week_day  -->
+                      <!-- start_time  -->
+                      <v-col cols="12" sm="4" md="4">
+                        <v-label>Hora Inicio</v-label>
+                        <select
+                          v-model="v$.schedule.start_time.$model"
+                          class="form-select"
+                          @change="changeendtime()"
+                        >
+                          <option
+                            v-for="(option, index) in start_time"
+                            :key="index"
+                            :value="option.start_time"
+                          >
+                            {{ option.start_time }}
+                          </option>
+                        </select>
+                      </v-col>
+                      <!-- start_time  -->
+                      <!-- end_time  -->
+                      <v-col cols="12" sm="4" md="4">
+                        <v-label>Hora Fin</v-label>
+                        <select
+                          v-model="v$.schedule.end_time.$model"
+                          class="form-select"
+                        >
+                          <option
+                            v-for="(option, index) in end_time"
+                            :key="index"
+                            :value="option.end_time"
+                          >
+                            {{ option.end_time }}
+                          </option>
+                        </select>
+                      </v-col>
+                      <!-- end_time  -->
+                      <v-col align="center" cols="12" md="12" sm="12">
+                        <h4 class="pb-2">HORARIOS DISPONIBLES</h4>
+                        <v-data-table
+                          v-model="v$.schedule.selectedSchedule.$model"
+                          :headers="headerSchedule"
+                          :items="schedules"
+                          item-title="schedules"
+                          item-value="schedules"
+                          density="compact"
+                          class="elevation-1"
+                          items-per-page="5"
+                        ></v-data-table
+                      ></v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col align="center">
+                        <base-button
+                          type="primary"
+                          title="Agregar"
+                          @click="addNewSchedule()"
+                        />
+                        <base-button
+                          class="ms-1"
+                          type="secondary"
+                          title="Cancelar"
+                          @click="closeScheduleDialog()"
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                </v-card>
+              </v-dialog>
+              <!-- Modal -->
+            </v-row>
+            <!-- Schedule Table -->
+
             <!-- Form -->
             <v-row>
               <v-col align="center">
@@ -190,8 +378,10 @@ import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
 
 import groupApi from "@/services/groupApi";
-import teacherApi from "@/services/teacherApi";
+import schoolApi from "@/services/schoolApi";
 import subjectApi from "@/services/subjectApi";
+import teacherApi from "@/services/teacherApi";
+import classroomApi from "@/services/classroomApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
@@ -224,11 +414,24 @@ export default {
         { title: "CÓDIGO", key: "subject_code" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
+      headerSchedule: [
+        { title: "DÍA", key: "week_day" },
+        { title: "HORA INICIO", key: "start_time" },
+        { title: "HORA FIN", key: "end_time" },
+      ],
+      headerClassroom: [{ title: "AULA", key: "classroom_name" }],
+
       total: 0,
+      weekdays: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"],
       records: [],
       subjects: [],
-      codes: [],
+      schools: [],
+      start_time: [],
+      end_time: [],
       teachers: [],
+      codes: [],
+      schedules: [],
+      classrooms: [],
       loading: false,
       debounce: 0,
       options: {},
@@ -238,6 +441,9 @@ export default {
         teacher_full_name: "",
         subject_name: "",
         subject_code: "",
+        school_name: "",
+        schedule: [],
+        selectedSchedule: [],
       },
       defaultItem: {
         group_code: "",
@@ -245,6 +451,16 @@ export default {
         teacher_full_name: "",
         subject_name: "",
         subject_code: "",
+        school_name: "",
+        schedule: [],
+        selectedSchedule: [],
+      },
+      schedule: {
+        classroom_name: "",
+        week_day: "",
+        start_time: "",
+        end_time: "",
+        selectedSchedule: [],
       },
     };
   },
@@ -304,11 +520,38 @@ export default {
         subject_code: {
           required: helpers.withMessage(langMessages.required, required),
         },
+        school_name: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
+        schedule: {},
+        selectedSchedule: {},
+      },
+      schedule: {
+        classroom_name: {},
+        week_day: {},
+        start_time: {},
+        end_time: {},
+        selectedSchedule: {},
       },
     };
   },
 
   methods: {
+    //METHODS TO CHANGE
+    async changeSubject() {
+      const { data } = await subjectApi
+        .get("/subjectByCycle/" + this.v$.editedItem.school_name.$model)
+        .catch((error) => {
+          alert.error(
+            true,
+            "No fue posible obtener la información de los espacios.",
+            "fail"
+          );
+        });
+
+      this.subjects = data.subject;
+    },
+
     async change() {
       const { data } = await groupApi
         .get("/bySubject/" + this.v$.editedItem.subject_name.$model)
@@ -323,6 +566,68 @@ export default {
       this.codes = data.subject;
     },
 
+    async changeSchedules() {
+      const { data } = await groupApi
+        .get(
+          "/byTeacher/" +
+            this.v$.editedItem.teacher_full_name.$model +
+            "/" +
+            this.v$.schedule.classroom_name.$model
+        )
+        .catch((error) => {
+          alert.error(
+            true,
+            "No fue posible obtener la información de los espacios.",
+            "fail"
+          );
+        });
+
+      this.schedules = data.schedule;
+    },
+
+    async changestarttime() {
+      const { data } = await groupApi
+        .get(
+          "/byDay/" +
+            this.v$.schedule.week_day.$model +
+            "/" +
+            this.v$.editedItem.teacher_full_name.$model
+        )
+        .catch((error) => {
+          alert.error(
+            true,
+            "No fue posible obtener la información de los espacios.",
+            "fail"
+          );
+        });
+
+      this.start_time = data.start_time;
+      console.log(this.start_time);
+    },
+
+    async changeendtime() {
+      const { data } = await groupApi
+        .get(
+          "/byStartTime/" +
+            this.v$.schedule.start_time.$model +
+            "/" +
+            this.v$.schedule.week_day.$model
+        )
+        .catch((error) => {
+          alert.error(
+            true,
+            "No fue posible obtener la información de los espacios.",
+            "fail"
+          );
+        });
+
+      this.end_time = data.end_time;
+    },
+
+    async deleteSchedule(index) {
+      this.editedItem.selectedSchedule.splice(index, 1);
+    },
+
     async initialize() {
       this.loading = true;
       this.records = [];
@@ -330,7 +635,8 @@ export default {
       let requests = [
         this.getDataFromApi(),
         teacherApi.get(null, { params: { itemsPerPage: -1 } }),
-        subjectApi.get(null, { params: { itemsPerPage: -1 } }),
+        schoolApi.get(null, { params: { itemsPerPage: -1 } }),
+        classroomApi.get(null, { params: { itemsPerPage: -1 } }),
       ];
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
@@ -338,7 +644,8 @@ export default {
 
       if (responses) {
         this.teachers = responses[1].data.data;
-        this.subjects = responses[2].data.data;
+        this.schools = responses[2].data.data;
+        this.classrooms = responses[3].data.available;
       }
 
       this.loading = false;
@@ -382,7 +689,47 @@ export default {
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
+        this.selectedSchedule = [];
       });
+    },
+
+    //RELATIVE
+
+    addSchedule() {
+      this.dialogSchedule = true;
+      this.v$.schedule.classroom_name.$model = "";
+      this.v$.schedule.week_day.$model = "";
+      this.v$.schedule.start_time.$model = "";
+      this.v$.schedule.end_time.$model = "";
+      this.v$.schedule.selectedSchedule.$model = [];
+      this.v$.schedule.$reset();
+    },
+
+    async addNewSchedule() {
+      this.v$.schedule.$validate();
+      if (this.v$.schedule.$invalid) {
+        alert.error("Campo obligatorio");
+        return;
+      }
+
+      // Creating record
+      try {
+        this.editedItem.selectedSchedule.push({ ...this.schedule });
+        console.log(this.editedItem.selectedSchedule);
+      } catch (error) {
+        alert.error("No fue posible crear el registro.");
+      }
+
+      this.closeScheduleDialog();
+      this.initialize();
+      this.loading = false;
+      return;
+    },
+
+    closeScheduleDialog() {
+      this.v$.schedule.$reset();
+      this.dialogSchedule = false;
+      // this.editedRelative = -1;
     },
 
     addRecord() {
@@ -396,6 +743,9 @@ export default {
       this.editedIndex = this.records.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
+
+      this.changeSubject();
+      this.change();
     },
 
     async save() {
@@ -427,7 +777,11 @@ export default {
       // Creating record
       try {
         const { data } = await groupApi.post(null, this.editedItem);
-        alert.success(data.message);
+        if (data.message) {
+          alert.success(data.message);
+        } else {
+          alert.error(data.error);
+        }
       } catch (error) {
         alert.error("No fue posible crear el registro.");
       }

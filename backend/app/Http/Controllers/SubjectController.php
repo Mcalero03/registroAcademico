@@ -31,7 +31,7 @@ class SubjectController extends Controller
         $search = (isset($request->search)) ? "%$request->search%" : '%%';
 
         $subject = Subject::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
-        $cycleSubject = Subject::cycleSubject();
+        $subjectbycycle = Subject::cycleSubject();
 
         foreach ($subject as $item) {
             $item->prerequisites = Prerequisite::select('prerequisite.*', 'subject.subject_name as prerequisite')
@@ -50,7 +50,7 @@ class SubjectController extends Controller
         return response()->json([
             "message" => "Registros obtenidos correctamente.",
             "data" => $subject,
-            "cycleSubject" => $cycleSubject,
+            "subjectbycycle" => $subjectbycycle,
             "total" => $total,
         ]);
     }
@@ -178,6 +178,27 @@ class SubjectController extends Controller
 
         return response()->json([
             "message" => "Registro eliminado correctamente",
+        ]);
+    }
+
+    public function subjectByCycle(Request $request)
+    {
+        $subject = Subject::select('subject.subject_name')
+            ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+            ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+            ->join('sub_school', 'pensum.sub_school_id', '=', 'sub_school.id')
+            ->join('school', 'sub_school.school_id', '=', 'school.id')
+            ->join('cycle_subject_detail', 'subject.id', '=', 'cycle_subject_detail.subject_id')
+            ->join('cycle', 'cycle_subject_detail.cycle_id', '=', 'cycle.id')
+            ->where('cycle.status', "Activo")
+            ->where('cycle_subject_detail.deleted_at', null)
+            ->where('school.school_name', $request->school)
+            ->get('subject.subject_name');
+
+
+        return response()->json([
+            "message" => "Registro encontrado correctamente",
+            "subject" => $subject
         ]);
     }
 }

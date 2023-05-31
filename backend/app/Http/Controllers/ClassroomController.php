@@ -29,6 +29,7 @@ class ClassroomController extends Controller
         $search = (isset($request->search)) ? "%$request->search%" : '%%';
 
         $classroom = Classroom::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
+        $classrooomAvaliable = Classroom::classroomAvailable();
 
         $classroom = Encrypt::encryptObject($classroom, "id");
 
@@ -37,6 +38,7 @@ class ClassroomController extends Controller
         return response()->json([
             "message" => "Registros obtenidos correctamente.",
             "data" => $classroom,
+            "available" => $classrooomAvaliable,
             "total" => $total,
         ]);
     }
