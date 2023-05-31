@@ -57,4 +57,16 @@ class Classroom extends Model
 
             ->count();
     }
+
+    public static function classroomAvailable()
+    {
+        return  Classroom::select('classroom.*')
+            // ->whereNotExists(function ($query) {
+            //     $query->select(DB::raw(1))
+            //         ->from('schedule_classroom_group_detail as scgd')
+            //         ->whereRaw('scgd.classroom_id = classroom.id');
+            // })
+            ->where('status', 'Habilitado') // Filtrar salones sin asignación en schedule_classroom_group_detail
+            ->get();
+    }
 }

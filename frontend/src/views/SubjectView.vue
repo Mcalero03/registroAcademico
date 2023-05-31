@@ -501,9 +501,6 @@ export default {
         });
 
       this.pensumSubject = data.subject;
-      console.log(this.pensumSubject);
-      console.log(this.v$.editedItem.program_name.$model);
-      console.log(this.v$.editedItem.subject_name.$model);
     },
 
     async initialize() {

@@ -4,7 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Group;
+use App\Models\ScheduleClassroomGroupDetail;
 use App\Models\Subject;
+use App\Models\Schedule;
+use App\Models\Teacher;
+use App\Models\School;
+use App\Models\Cycle;
+use App\Models\Classroom;
+use DB;
 use Encrypt;
 
 class GroupController extends Controller
@@ -31,7 +38,19 @@ class GroupController extends Controller
         $group = Group::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage)->unique();
         $groups = Group::Groups();
 
+        foreach ($group as $item) {
+            $item->selectedSchedule = ScheduleClassroomGroupDetail::select('schedule_classroom_group_detail.id', 'schedule.week_day', 'schedule.start_time', 'schedule.end_time', 'classroom.classroom_name')
+                ->join('group', 'schedule_classroom_group_detail.group_id', '=', 'group.id')
+                ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
+                ->join('classroom', 'schedule_classroom_group_detail.classroom_id', 'classroom.id')
+                ->where('group.id', $item->id)
+                ->get();
+
+            $item->selectedSchedule = Encrypt::encryptObject($item->selectedSchedule, "id");
+        }
+
         $group = Encrypt::encryptObject($group, "id");
+
         $groups = Encrypt::encryptObject($groups, "id");
 
         $total = Group::counterPagination($search);
@@ -61,18 +80,61 @@ class GroupController extends Controller
         //     ->exists();
 
         // if (!$dataExists) {
-            $group = Group::create([
-                'group_code' => $data['group_code'],
-                'students_quantity' => $data['students_quantity'],
-                'teacher_id' => $teacher_id,
-                'subject_id' => $subject_id,
-            ]);
+        $group = Group::create([
+            'group_code' => $data['group_code'],
+            'students_quantity' => $data['students_quantity'],
+            'teacher_id' => $teacher_id,
+            'subject_id' => $subject_id,
+        ]);
 
-            $group->save();
+        $group->save();
+
+        // $group_id = Group::select('id')
+        //     ->where('group_code', $data['group_code'])
+        //     ->where('teacher_id', $teacher_id)
+        //     ->exists();  
+
+
+
+        foreach ($data['selectedSchedule'] as $value) {
+            $schedule_id = Schedule::where('week_day', $value['week_day'])
+                ->where('start_time', $value['start_time'])
+                ->where('end_time', $value['end_time'])
+                ->first()?->id;
+
+            $classroom_id = Classroom::where('classroom_name', $value['classroom_name'])->first()?->id;
+
+            $exists = ScheduleClassroomGroupDetail::select('id')
+                ->where('schedule_id', $schedule_id)
+                ->where('classroom_id', $classroom_id)
+                ->exists();
+
+            if (!$exists) {
+                ScheduleClassroomGroupDetail::create([
+                    'schedule_id' => Schedule::where('week_day', $value['week_day'])
+                        ->where('start_time', $value['start_time'])
+                        ->where('end_time', $value['end_time'])
+                        ->first()?->id,
+                    'classroom_id' => Classroom::where('classroom_name', $value['classroom_name'])->first()?->id,
+                    'group_id' => Group::select('id')
+                        ->where('group_code', $data['group_code'])
+                        ->where('teacher_id', $teacher_id)->first()?->id,
+                    'cycle_id' => Cycle::select('id')
+                        ->where('status', 'Activo')
+                        ->first()?->id,
+                ]);
+
+                return response()->json([
+                    "message" => "Registro creado correctamente.",
+                ]);
+            }
 
             return response()->json([
-                "message" => "Registro creado correctamente.",
+                "error" => "No se puede asignar el horario",
             ]);
+        }
+
+
         // } else {
 
         //     return response()->json([
@@ -106,6 +168,24 @@ class GroupController extends Controller
             'subject_id' => Subject::where('subject_name', $data['subject_name'])->first()?->id,
         ]);
 
+        ScheduleClassroomGroupDetail::where('group_id', $data['id'])->delete();
+
+        foreach ($data['selectedSchedule'] as $value) {
+            ScheduleClassroomGroupDetail::create([
+                'schedule_id' => Schedule::where('week_day', $value['week_day'])
+                    ->where('start_time', $value['start_time'])
+                    ->where('end_time', $value['end_time'])
+                    ->first()?->id,
+                'classroom_id' => Classroom::where('classroom_name', $value['classroom_name'])->first()?->id,
+                'group_id' => Group::select('id')
+                    ->where('group_code', $data['group_code'])
+                    ->where('teacher_id', $teacher_id)->first()?->id,
+                'cycle_id' => Cycle::select('id')
+                    ->where('status', 'Activo')
+                    ->first()?->id,
+            ]);
+        }
+
         return response()->json([
             "message" => "Registro modificado correctamente.",
         ]);
@@ -119,9 +199,24 @@ class GroupController extends Controller
         $id = Encrypt::decryptValue($request->id);
 
         Group::where('id', $id)->delete();
+        ScheduleClassroomGroupDetail::where('group_id', $id)->delete();
 
         return response()->json([
             "message" => "Registro eliminado correctamente.",
+        ]);
+    }
+    public function bySchool($school)
+    {
+        $school_id = School::where('school_name', $school)->first()?->id;
+
+        $teacher = Teacher::select(DB::raw("CONCAT(teacher.name, ', ', teacher.last_name) as full_name"))
+            ->join('school', 'teacher.school_id', '=', 'school.id')
+            ->where('school.id', 'like', $school_id)
+            ->get();
+
+        return response()->json([
+            "message" => "Registros obtenidos correctamente.",
+            "teacher" => $teacher,
         ]);
     }
 
@@ -134,6 +229,65 @@ class GroupController extends Controller
         return response()->json([
             "message" => "Registros obtenidos correctamente.",
             "subject" => $subjectcode,
+        ]);
+    }
+
+    public function byTeacher($teacher, $classroom)
+    {
+        $info = explode(', ', $teacher);
+        $id = Group::teacherId($info[0], $info[1])->pluck('id');
+        $teacher_id = Group::clean($id);
+
+        $schedule = Group::select('schedule.id')
+            ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
+            ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
+            ->where('group.teacher_id', $teacher_id)
+            ->get();
+
+        $scheduleAvailable = Schedule::select('schedule.*')
+            ->whereNotIn('schedule.id', $schedule)
+            ->get();
+
+        return response()->json([
+            "message" => "Registros obtenidos correctamente.",
+            "schedule" => $scheduleAvailable,
+            "classroom" => $classroom,
+        ]);
+    }
+
+
+    public function byDay($day, $teacher)
+    {
+        $info = explode(', ', $teacher);
+        $id = Group::teacherId($info[0], $info[1])->pluck('id');
+        $teacher_id = Group::clean($id);
+
+        $schedule = Group::select('schedule.id')
+            ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
+            ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
+            ->where('group.teacher_id', $teacher_id)
+            ->get();
+
+        $start_time = Schedule::select('schedule.start_time')
+            ->where('schedule.week_day', $day)
+            ->whereNotIn('schedule.id', $schedule)
+            ->get();
+
+        return response()->json([
+            "message" => "Registros obtenidos correctamente.",
+            "start_time" => $start_time,
+        ]);
+    }
+    public function byStartTime($start_time, $week_day)
+    {
+        $end_time = Schedule::select('schedule.end_time')
+            ->where('schedule.week_day', $week_day)
+            ->where('schedule.start_time', $start_time)
+            ->get();
+
+        return response()->json([
+            "message" => "Registros obtenidos correctamente.",
+            "end_time" => $end_time,
         ]);
     }
 }

@@ -392,8 +392,8 @@ export default {
       });
 
       this.selected = selectedSubjects;
-      console.log(newSubjects);
-      console.log(this.selected); // Aquí puedes ver los datos seleccionados como un arreglo asociativo
+      // console.log(newSubjects);
+      // console.log(this.selected); // Aquí puedes ver los datos seleccionados como un arreglo asociativo
     },
   },
 
