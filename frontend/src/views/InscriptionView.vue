@@ -62,53 +62,325 @@
         <v-card-text class="pt-0">
           <v-container>
             <!-- Form -->
-            <v-row class="pt-0">
-              <!-- inscription_date  -->
-              <v-col cols="6" sm="4" md="4">
-                <base-input
-                  label="Fecha de inscripción"
-                  v-model="v$.editedItem.inscription_date.$model"
-                  :rules="v$.editedItem.inscription_date"
-                  type="date"
-                />
-              </v-col>
-              <!-- inscription_date  -->
-              <!-- status  -->
-              <v-col cols="6" sm="4" md="4">
+            <v-row>
+              <!-- cycle  -->
+              <v-col cols="5" sm="5" md="3" v-if="editedIndex == -1">
+                <v-label>Ciclo</v-label>
                 <base-select
-                  label="Estado"
-                  :items="status"
-                  item-title="status"
-                  item-value="status"
-                  v-model="v$.editedItem.status.$model"
-                  :rules="v$.editedItem.status"
-                />
-              </v-col>
-              <!-- status  -->
-              <!-- cycle_number  -->
-              <v-col cols="6" sm="4" md="4">
-                <base-select
-                  label="Número de ciclo"
                   :items="cycles"
-                  item-title="cycle_number"
-                  item-value="cycle_number"
-                  v-model="v$.editedItem.cycle_number.$model"
-                  :rules="v$.editedItem.cycle_number"
+                  item-title="cycle"
+                  item-value="cycle"
+                  v-model="v$.editedItem.cycle.$model"
+                  :rules="v$.editedItem.cycle"
                 />
               </v-col>
-              <!-- cycle_number  -->
-              <!-- student_name  -->
-              <v-col cols="6" sm="7" md="7">
+              <!-- cycle  -->
+              <v-col
+                cols="5"
+                sm="5"
+                md="3"
+                class="p-0 m-0 pr-4 pb-4"
+                v-if="editedIndex != -1"
+              >
+                <v-label>Ciclo</v-label>
                 <base-select
-                  label="Estudiante"
+                  :items="cycles"
+                  v-model="v$.editedItem.cycle.$model"
+                  :rules="v$.editedItem.cycle"
+                  readonly
+                  v-if="editedIndex != -1"
+                />
+              </v-col>
+              <!-- cycle  -->
+              <v-col
+                cols="5"
+                sm="5"
+                md="3"
+                v-if="editedIndex == -1"
+                class="pt-4"
+              >
+                <v-label>Buscar por carnet</v-label>
+                <v-text-field
+                  class="mt-3"
+                  variant="outlined"
+                  type="text"
+                  v-model="searchStudent"
+                >
+                </v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col
+                cols="12"
+                sm="6"
+                md="6"
+                v-if="editedIndex == -1"
+                class="p-0 m-0 pr-4"
+              >
+                <v-table>
+                  <thead>
+                    <tr>
+                      <th>Estudiante</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="(schedule, index) in students"
+                      v-bind:index="index"
+                      :key="index"
+                    >
+                      <td v-text="schedule.full_name"></td>
+                    </tr>
+                  </tbody>
+                </v-table>
+              </v-col>
+              <!-- student_name  -->
+              <!-- student_name  -->
+              <v-col
+                cols="12"
+                sm="6"
+                md="6"
+                class="p-0 m-0 pr-4"
+                v-if="editedIndex != -1"
+              >
+                <v-label>Estudiante</v-label>
+                <base-select
                   :items="students"
-                  item-title="full_name"
-                  item-value="full_name"
                   v-model="v$.editedItem.full_name.$model"
                   :rules="v$.editedItem.full_name"
+                  readonly
+                  v-if="editedIndex != -1"
                 />
               </v-col>
               <!-- student_name  -->
+              <!-- program_name  -->
+              <v-col cols="12" sm="6" md="6" v-if="editedIndex == -1">
+                <v-label>Carrera</v-label>
+                <base-select
+                  :items="pensums"
+                  item-title="program_name"
+                  item-value="program_name"
+                  v-model="v$.editedItem.program_name.$model"
+                  :rules="v$.editedItem.program_name"
+                  @click="showCareers"
+                />
+              </v-col>
+              <!-- program_name  -->
+              <!-- program_name  -->
+              <v-col
+                cols="12"
+                sm="6"
+                md="6"
+                class="p-0 m-0 pr-4"
+                v-if="editedIndex != -1"
+              >
+                <v-label>Carrera</v-label>
+                <base-select
+                  :items="pensums"
+                  v-model="v$.editedItem.program_name.$model"
+                  :rules="v$.editedItem.program_name"
+                  readonly
+                  v-if="editedIndex != -1"
+                />
+              </v-col>
+              <!-- program_name  -->
+            </v-row>
+            <v-row justify="center"
+              ><!-- subject -->
+              <v-col cols="auto" class="mt-2" v-if="editedIndex == -1">
+                <base-button
+                  type="secondary"
+                  title="Agregar materia"
+                  @click="addSubject()"
+                />
+              </v-col>
+              <!-- subject -->
+            </v-row>
+            <!-- Inscription Table -->
+            <v-row>
+              <v-col
+                align="center"
+                cols="12"
+                md="12"
+                sm="12"
+                class="pt-4"
+                v-if="editedIndex == -1"
+              >
+                <div class="table-responsive-md">
+                  <v-table>
+                    <thead>
+                      <tr>
+                        <th>GRUPO</th>
+                        <th class="text-center">ACCIÓN</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(inscription, index) in editedItem.inscriptions"
+                        v-bind:index="index"
+                        :key="index"
+                      >
+                        <td v-text="inscription.group_code"></td>
+                        <td class="text-center">
+                          <v-icon
+                            size="20"
+                            class="mr-2"
+                            @click="deleteGroup(index)"
+                            icon="mdi-delete"
+                          />
+                        </td>
+                      </tr>
+                      <tr v-if="editedItem.inscriptions.length == 0">
+                        <td colspan="5" class="text-center pt-3">
+                          <p>No se ha inscrito ningún grupo</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </v-table>
+                </div>
+              </v-col>
+              <v-col
+                align="center"
+                cols="12"
+                md="12"
+                sm="12"
+                class="pt-4"
+                v-if="editedIndex != -1"
+              >
+                <div class="table-responsive-md">
+                  <v-table>
+                    <thead>
+                      <tr>
+                        <th>GRUPO</th>
+                        <th>MATERIA</th>
+                        <th>ESTADO</th>
+                        <th class="text-center">ACCIÓN</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(inscription, index) in editedItem.inscriptions"
+                        v-bind:index="index"
+                        :key="index"
+                      >
+                        <td v-text="inscription.group_code"></td>
+                        <td v-text="inscription.subject_name"></td>
+                        <td v-text="inscription.status"></td>
+                        <td class="text-center">
+                          <v-icon
+                            size="20"
+                            class="mr-2"
+                            @click="viewSchedules(index)"
+                            icon="mdi-clock "
+                          />
+                          <v-icon
+                            size="20"
+                            class="mr-2"
+                            @click="editItemStatus(index)"
+                            icon="mdi-pencil"
+                          />
+                        </td>
+                      </tr>
+                      <tr v-if="editedItem.inscriptions.length == 0">
+                        <td colspan="5" class="text-center pt-3">
+                          <p>No se ha inscrito ningún grupo</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </v-table>
+                </div>
+              </v-col>
+              <!-- Modal -->
+              <v-dialog v-model="dialogSubject" max-width="700px" persistent>
+                <v-card height="100%" v-if="this.groups == 'Registrado'">
+                  <v-container>
+                    <h2 class="black-secondary text-center mt-4 mb-4">
+                      Ya inscribió materias para este ciclo
+                    </h2>
+                    <v-row>
+                      <v-col align="center">
+                        <base-button
+                          class="ms-1"
+                          type="secondary"
+                          title="Cancelar"
+                          @click="closeSubjectDialog()"
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                </v-card>
+
+                <v-card height="100%" v-if="this.groups != 'Registrado'">
+                  <v-container>
+                    <h2 class="black-secondary text-center mt-4 mb-4">
+                      Agregar materia
+                    </h2>
+                    <v-row>
+                      <!-- group_code  -->
+                      <v-col cols="12" sm="4" md="4">
+                        <v-label>Seleccione un grupo</v-label>
+                        <base-select
+                          :items="selectGroups"
+                          item-title="group_code"
+                          item-value="group_code"
+                          v-model="v$.group.group_code.$model"
+                          :rules="v$.group.group_code"
+                        />
+                      </v-col>
+                      <!-- group_code  -->
+                    </v-row>
+                    <v-row>
+                      <v-col
+                        align="center"
+                        cols="12"
+                        md="12"
+                        sm="12"
+                        v-if="inscriptions != null"
+                      >
+                        <h4 class="pb-2" align="left">MATERIAS CURSADAS</h4>
+                        <v-data-table
+                          :headers="headerSubjectsTaken"
+                          :items="inscriptions"
+                          item-title="subject_name"
+                          item-value="subject_name"
+                          density="compact"
+                          class="elevation-1"
+                          items-per-page="5"
+                        ></v-data-table
+                      ></v-col>
+                      <v-col align="center" cols="12" md="12" sm="12">
+                        <h4 class="pb-2" align="left">GRUPOS DISPONIBLES</h4>
+                        <v-data-table
+                          :headers="headerGroups"
+                          :items="groups"
+                          item-title="group_code"
+                          item-value="group_code"
+                          density="compact"
+                          class="elevation-1"
+                          items-per-page="5"
+                        ></v-data-table
+                      ></v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col align="center">
+                        <base-button
+                          type="primary"
+                          title="Agregar"
+                          @click="addNewSubject()"
+                        />
+                        <base-button
+                          class="ms-1"
+                          type="secondary"
+                          title="Cancelar"
+                          @click="closeSubjectDialog()"
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                </v-card>
+              </v-dialog>
+              <!-- Modal -->
+              <!-- Inscription Table -->
             </v-row>
             <v-row>
               <v-col align="center">
@@ -125,6 +397,112 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
+    <!-- Modal -->
+    <v-dialog v-model="dialogSchedules" max-width="600px" persistent>
+      <v-card height="100%">
+        <v-container>
+          <h2 class="black-secondary text-center mt-4 mb-4">Horarios</h2>
+          <v-row
+            ><v-col align="center" cols="12" md="12" sm="12" class="pt-4">
+              <div class="table-responsive-md">
+                <v-table>
+                  <thead>
+                    <tr>
+                      <th>DÍA</th>
+                      <th>HORA INICIO</th>
+                      <th>HORA FIN</th>
+                      <th>AULA</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="(schedule, index) in editedItem.schedules"
+                      v-bind:index="index"
+                      :key="index"
+                    >
+                      <td v-text="schedule.week_day"></td>
+                      <td v-text="schedule.start_time"></td>
+                      <td v-text="schedule.end_time"></td>
+                      <td v-text="schedule.classroom_name"></td>
+                    </tr>
+                    <tr v-if="editedItem.schedules.length == 0">
+                      <td colspan="5" class="text-center pt-3">
+                        <p>No hay horario definido</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </v-table>
+              </div>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col align="center">
+              <base-button
+                class="ms-1"
+                type="secondary"
+                title="Cancelar"
+                @click="closeScheduleDialog()"
+              />
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card>
+    </v-dialog>
+    <!-- Modal -->
+
+    <!-- Modal -->
+    <v-dialog v-model="dialogEditStatus" max-width="600px" persistent>
+      <v-card height="100%">
+        <v-container>
+          <h2 class="black-secondary text-center mt-4 mb-4">Editar estado</h2>
+          <v-row>
+            <!-- group_code  -->
+            <v-col cols="12" sm="6" md="6">
+              <base-input
+                label="Grupo"
+                v-model="v$.editStatus.group_code.$model"
+                :rules="v$.editStatus.group_code"
+                readonly
+              />
+            </v-col>
+            <!-- group_code  -->
+            <!-- subject_name  -->
+            <v-col cols="12" sm="6" md="6">
+              <base-input
+                label="Materia"
+                v-model="v$.editStatus.subject_name.$model"
+                :rules="v$.editStatus.subject_name"
+                readonly
+              />
+            </v-col>
+            <!-- subject_name  -->
+            <!-- status  -->
+            <v-col cols="12" sm="6" md="6">
+              <v-label>Estado</v-label>
+              <base-select
+                :items="status"
+                item-title="status"
+                item-value="status"
+                v-model="v$.editStatus.status.$model"
+                :rules="v$.editStatus.status"
+              />
+            </v-col>
+            <!-- status  -->
+          </v-row>
+          <v-row>
+            <v-col align="center">
+              <base-button
+                type="primary"
+                title="Actualizar"
+                @click="addEditItemStatus()"
+              />
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card>
+    </v-dialog>
+    <!-- Modal -->
 
     <v-dialog v-model="dialogDelete" max-width="400px">
       <v-card class="h-100">
@@ -162,8 +540,6 @@ import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
 
 import inscriptionApi from "@/services/inscriptionApi";
 import cycleApi from "@/services/cycleApi";
-import studentApi from "@/services/studentApi";
-import evaluationApi from "@/services/evaluationApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
@@ -183,39 +559,73 @@ export default {
   data() {
     return {
       search: "",
+      searchStudent: "",
       dialog: false,
       dialogDelete: false,
-      dialogGrade: false,
+      dialogSchedules: false,
+      dialogSubject: false,
+      dialogEditStatus: false,
       editedIndex: -1,
-      editedGrade: -1,
+      editedGroup: -1,
       title: "INSCRIPCIÓN",
       headers: [
         { title: "ESTUDIANTE", key: "full_name" },
+        { title: "CICLO", key: "cycle" },
         { title: "ESTADO", key: "status" },
-        { title: "CICLO", key: "cycle_number" },
+        { title: "CARRERA", key: "program_name" },
         { title: "INSCRIPCIÓN", key: "inscription_date" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
+      headerSubjectsTaken: [
+        { title: "Materia", key: "subject_name" },
+        { title: "Estado", key: "status" },
+      ],
+      headerGroups: [
+        { title: "Materia", key: "subject_name" },
+        { title: "Grupo", key: "group_code" },
+        { title: "Día", key: "week_day" },
+        { title: "Hora Inicio", key: "start_time" },
+        { title: "Hora Fin", key: "end_time" },
+      ],
+
       total: 0,
       records: [],
       cycles: [],
+      status: ["Inscrito", "Retirado", "Reprobado", "Aprobado"],
       students: [],
-      status: ["Inscrito", "Aprobado", "Reprobado"],
-      // evaluations: [],
+      inscriptions: [],
+      pensums: [],
+      selectGroups: [],
+      groups: [],
+      subjects: [],
       loading: false,
       debounce: 0,
       options: {},
       editedItem: {
-        inscription_date: "",
-        status: "",
-        cycle_number: "",
+        inscription_date: this.getDate(),
+        cycle: "",
         full_name: "",
+        inscriptions: [],
+        schedules: [],
+        program_name: "",
+        status: "",
       },
       defaultItem: {
-        inscription_date: "",
-        status: "",
-        cycle_number: "",
+        inscription_date: this.getDate(),
+        cycle: "",
         full_name: "",
+        inscriptions: [],
+        schedules: [],
+        program_name: "",
+        status: "",
+      },
+      group: {
+        group_code: "",
+      },
+      editStatus: {
+        group_code: "",
+        subject_name: "",
+        status: "",
       },
     };
   },
@@ -233,37 +643,97 @@ export default {
     search(val) {
       this.getDataFromApi();
     },
+    searchStudent(val) {
+      this.searchStudentCard();
+    },
     dialog(val) {
       val || this.close();
     },
     dialogDelete(val) {
       val || this.closeDelete();
     },
-    dialogGrade(val) {
-      val || this.closeGradeDialog();
-    },
   },
 
   validations() {
     return {
       editedItem: {
-        inscription_date: {
-          required: helpers.withMessage(langMessages.required, required),
-        },
-        status: {
-          required: helpers.withMessage(langMessages.required, required),
-        },
-        cycle_number: {
+        cycle: {
           required: helpers.withMessage(langMessages.required, required),
         },
         full_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
+        schedules: {},
+        inscriptions: {},
+        pensums: {},
+        program_name: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
+        status: {},
+      },
+      group: {
+        group_code: {},
+      },
+      editStatus: {
+        group_code: {},
+        subject_name: {},
+        status: {},
       },
     };
   },
 
   methods: {
+    async showSchedules() {
+      const { data } = await inscriptionApi
+        .get("/showSchedules/" + this.editedItem.id)
+        .catch((error) => {
+          alert.error(true, "No fue posible obtener la información.", "fail");
+        });
+      this.editedItem.schedules = data.schedules;
+    },
+
+    async showCareers() {
+      const { data } = await inscriptionApi
+        .get("/showCareers/" + this.editedItem.full_name)
+        .catch((error) => {
+          alert.error(true, "No fue posible obtener la información.", "fail");
+        });
+      this.pensums = data.careers;
+    },
+
+    async searchStudentCard() {
+      try {
+        const { data } = await inscriptionApi.get(null, {
+          params: {
+            searchStudent: this.searchStudent,
+          },
+        });
+
+        this.students = data.student;
+        this.editedItem.full_name = this.students[0].full_name;
+      } catch (error) {
+        alert.error("No fue posible obtener el estudiante.");
+      }
+    },
+
+    async availableSubjects() {
+      const { data } = await inscriptionApi
+        .get(
+          "/availableSubjects/" +
+            this.editedItem.full_name +
+            "/" +
+            this.editedItem.program_name +
+            "/" +
+            this.editedItem.cycle
+        )
+        .catch((error) => {
+          alert.error(true, "No fue posible obtener la información.", "fail");
+        });
+      this.inscriptions = data.inscriptions;
+      this.groups = data.groups;
+      this.selectGroups = data.selectGroup;
+    },
+
     async initialize() {
       this.loading = true;
       this.records = [];
@@ -275,16 +745,6 @@ export default {
             itemsPerPage: -1,
           },
         }),
-        studentApi.get(null, {
-          params: {
-            itemsPerPage: -1,
-          },
-        }),
-        evaluationApi.get(null, {
-          params: {
-            itemsPerPage: -1,
-          },
-        }),
       ];
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
@@ -292,8 +752,6 @@ export default {
 
       if (responses) {
         this.cycles = responses[1].data.cycles;
-        this.students = responses[2].data.data;
-        this.evaluations = responses[5].data.data;
       }
 
       this.loading = false;
@@ -307,7 +765,10 @@ export default {
       this.debounce = setTimeout(async () => {
         try {
           const { data } = await inscriptionApi.get(null, {
-            params: { ...options, search: this.search },
+            params: {
+              ...options,
+              search: this.search,
+            },
           });
 
           this.records = data.data;
@@ -332,45 +793,90 @@ export default {
       });
     },
 
-    addGrade() {
-      this.dialogGrade = true;
-      this.editedGrade = -1;
-      this.v$.grade.score.$model = "";
-      this.v$.grade.score_date.$model = "";
-      this.v$.grade.status.$model = "";
-      this.v$.grade.evaluation_name.$model = "";
-      this.v$.grade.$reset();
+    getDate() {
+      const datetime = new Date().toISOString().substring(0, 10);
+      return datetime;
     },
 
-    async addNewGrade() {
-      this.v$.grade.$validate();
-      if (this.v$.grade.$invalid) {
+    viewSchedules() {
+      this.v$.editedItem.schedules.$model = [];
+      this.showSchedules();
+      this.dialogSchedules = true;
+    },
+
+    closeScheduleDialog() {
+      this.v$.editedItem.schedules.$reset();
+      this.dialogSchedules = false;
+    },
+
+    //EDIT STATUS OF GROUPS INSCRIPTION
+    editItemStatus(index) {
+      this.editedGroup = this.editedItem.inscriptions[index];
+      this.editedItem.inscriptions.splice(index, 1);
+      this.editStatus = Object.assign({}, this.editedGroup);
+      this.dialogEditStatus = true;
+    },
+
+    async addEditItemStatus() {
+      this.v$.editStatus.$validate();
+      if (this.v$.editStatus.$invalid) {
         alert.error("Campo obligatorio");
         return;
       }
 
       // Creating record
       try {
-        this.editedItem.grades.push({ ...this.grade });
-        console.log(this.grade);
+        this.editedItem.inscriptions.push({ ...this.editStatus });
       } catch (error) {
         alert.error("No fue posible crear el registro.");
       }
 
-      this.closeGradeDialog();
+      this.closeEditStatus();
       this.initialize();
       this.loading = false;
       return;
     },
 
-    closeGradeDialog() {
-      this.v$.grade.$reset();
-      this.dialogGrade = false;
-      this.editedGrade = -1;
+    closeEditStatus() {
+      this.v$.editStatus.$reset();
+      this.dialogEditStatus = false;
     },
 
-    async deleteGrade(index) {
-      this.editedItem.grades.splice(index, 1);
+    //ADD NEW GROUP INSCRIPTION
+    addSubject() {
+      this.dialogSubject = true;
+      this.availableSubjects();
+      this.v$.group.group_code.$model = "";
+      this.v$.group.$reset();
+    },
+
+    closeSubjectDialog() {
+      this.v$.group.$reset();
+      this.dialogSubject = false;
+    },
+
+    async addNewSubject() {
+      this.v$.group.$validate();
+      if (this.v$.group.$invalid) {
+        alert.error("Campo obligatorio");
+        return;
+      }
+
+      // Creating record
+      try {
+        this.editedItem.inscriptions.push({ ...this.group });
+      } catch (error) {
+        alert.error("No fue posible crear el registro.");
+      }
+
+      this.closeSubjectDialog();
+      this.initialize();
+      this.loading = false;
+      return;
+    },
+
+    async deleteGroup(index) {
+      this.editedItem.inscriptions.splice(index, 1);
     },
 
     close() {
@@ -379,6 +885,9 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
+      this.searchStudent = "";
+      this.students = [];
+      this.editedItem.inscriptions = [];
     },
 
     addRecord() {
@@ -386,6 +895,9 @@ export default {
       this.editedIndex = -1;
       this.editedItem = Object.assign({}, this.defaultItem);
       this.v$.$reset();
+      this.searchStudent = "";
+      this.students = [];
+      this.editedItem.inscriptions = [];
     },
 
     editItem(item) {

@@ -340,7 +340,7 @@
                 <v-dialog v-model="dialogCareer" max-width="600px" persistent>
                   <v-card height="100%">
                     <!-- Container when there are no careers available  -->
-                    <v-container v-if="pensums == 0">
+                    <v-container v-if="pensums == 0 && editedIndex != -1">
                       <h2 class="black-secondary text-center mt-4 mb-4">
                         No hay carreras para inscribir!
                       </h2>
@@ -795,6 +795,7 @@ export default {
       // Creating record
       try {
         this.editedItem.relatives.push({ ...this.relative });
+        console.log(this.editedItem.relatives);
       } catch (error) {
         alert.error("No fue posible crear el registro.");
       }

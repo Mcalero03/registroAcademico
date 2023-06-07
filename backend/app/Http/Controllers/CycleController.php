@@ -60,9 +60,37 @@ class CycleController extends Controller
     {
         $data = $request->all();
 
-        $activeStatus = Cycle::where('status', "Activo")
+        $activeStatus = Cycle::where('status', 'Activo')
+            ->whereNull('cycle.deleted_at')
             ->exists();
-        if (!$activeStatus) {
+
+        if ($data['status'] != 'Activo') {
+            $cycle = Cycle::create([
+                'cycle_number' => $data['cycle_number'],
+                'year' => $data['year'],
+                'start_date' => $data['start_date'],
+                'end_date' => $data['end_date'],
+                'status' => $data['status'],
+            ]);
+
+            $cycle->save();
+
+            $subjects = $data['subjects'];
+            $subjectsCount = count($subjects);
+
+            for ($i = 0; $i < $subjectsCount; $i++) {
+                $item = $subjects[$i];
+
+                CycleSubjectDetail::create([
+                    'cycle_id' => $cycle->id,
+                    'subject_id' => Subject::where('subject_name', $item)->first()?->id,
+                ]);
+            }
+
+            return response()->json([
+                "message" => "Registro creado correctamente",
+            ]);
+        } elseif ($activeStatus == false) {
             $cycle = Cycle::create([
                 'cycle_number' => $data['cycle_number'],
                 'year' => $data['year'],
@@ -120,18 +148,6 @@ class CycleController extends Controller
 
         CycleSubjectDetail::where('cycle_id', $data['id'])->delete();
 
-        // $subjects = $data['subjects'];
-        // $subjectsCount = count($subjects);
-
-        // for ($i = 0; $i < $subjectsCount; $i++) {
-        //     $item = $subjects[$i];
-
-        //     CycleSubjectDetail::create([
-        //         'cycle_id' => $data['id'],
-        //         'subject_id' => Subject::where('subject_name', $item)->first()?->id,
-        //     ]);
-
-        //     if ($data['subjects'] != $item) {
         foreach ($data['subjects'] as $item) {
             CycleSubjectDetail::create([
                 'cycle_id' => $data['id'],
@@ -139,10 +155,8 @@ class CycleController extends Controller
             ]);
         }
         return response()->json([
-            "Message" => "Registro modificado correctamente.",
+            "message" => "Registro modificado correctamente.",
         ]);
-        //     }
-        // }
     }
 
     /**

@@ -75,11 +75,6 @@ class GroupController extends Controller
 
         $subject_id = Subject::where('subject_name', $data['subject_name'])->first()?->id;
 
-        // $dataExists = Group::where('teacher_id', $teacher_id)
-        //     ->where('subject_id', $subject_id)
-        //     ->exists();
-
-        // if (!$dataExists) {
         $group = Group::create([
             'group_code' => $data['group_code'],
             'students_quantity' => $data['students_quantity'],
@@ -88,59 +83,9 @@ class GroupController extends Controller
         ]);
 
         $group->save();
-
-        // $group_id = Group::select('id')
-        //     ->where('group_code', $data['group_code'])
-        //     ->where('teacher_id', $teacher_id)
-        //     ->exists();  
-
-
-
-        foreach ($data['selectedSchedule'] as $value) {
-            $schedule_id = Schedule::where('week_day', $value['week_day'])
-                ->where('start_time', $value['start_time'])
-                ->where('end_time', $value['end_time'])
-                ->first()?->id;
-
-            $classroom_id = Classroom::where('classroom_name', $value['classroom_name'])->first()?->id;
-
-            $exists = ScheduleClassroomGroupDetail::select('id')
-                ->where('schedule_id', $schedule_id)
-                ->where('classroom_id', $classroom_id)
-                ->exists();
-
-            if (!$exists) {
-                ScheduleClassroomGroupDetail::create([
-                    'schedule_id' => Schedule::where('week_day', $value['week_day'])
-                        ->where('start_time', $value['start_time'])
-                        ->where('end_time', $value['end_time'])
-                        ->first()?->id,
-                    'classroom_id' => Classroom::where('classroom_name', $value['classroom_name'])->first()?->id,
-                    'group_id' => Group::select('id')
-                        ->where('group_code', $data['group_code'])
-                        ->where('teacher_id', $teacher_id)->first()?->id,
-                    'cycle_id' => Cycle::select('id')
-                        ->where('status', 'Activo')
-                        ->first()?->id,
-                ]);
-
-                return response()->json([
-                    "message" => "Registro creado correctamente.",
-                ]);
-            }
-
-            return response()->json([
-                "error" => "No se puede asignar el horario",
-            ]);
-        }
-
-
-        // } else {
-
-        //     return response()->json([
-        //         "message" => "Ya existe un registro igual para este grupo.",
-        //     ]);
-        // }
+        return response()->json([
+            "message" => "Registro creado correctamente.",
+        ]);
     }
 
     /**
@@ -170,6 +115,7 @@ class GroupController extends Controller
 
         ScheduleClassroomGroupDetail::where('group_id', $data['id'])->delete();
 
+
         foreach ($data['selectedSchedule'] as $value) {
             ScheduleClassroomGroupDetail::create([
                 'schedule_id' => Schedule::where('week_day', $value['week_day'])
@@ -185,7 +131,6 @@ class GroupController extends Controller
                     ->first()?->id,
             ]);
         }
-
         return response()->json([
             "message" => "Registro modificado correctamente.",
         ]);

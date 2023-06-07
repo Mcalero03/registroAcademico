@@ -37,7 +37,7 @@
             size="20"
             class="mr-2"
             @click="editItem(item.raw)"
-            icon="mdi-pencil"
+            icon="mdi-clock-edit-outline"
           />
           <v-icon
             size="20"
@@ -64,7 +64,7 @@
             <!-- Form -->
             <v-row class="pt-0">
               <!-- schools  -->
-              <v-col cols="12" sm="4" md="5">
+              <v-col cols="12" sm="4" md="4">
                 <v-label>Escuela</v-label>
                 <select
                   v-model="v$.editedItem.school_name.$model"
@@ -81,44 +81,6 @@
                 </select>
               </v-col>
               <!-- schools  -->
-              <!-- group_code  -->
-              <v-col cols="12" sm="4" md="3" class="mt-2">
-                <base-input
-                  label="Código de grupo"
-                  v-model="v$.editedItem.group_code.$model"
-                  :rules="v$.editedItem.group_code"
-                />
-              </v-col>
-              <!-- group_code  -->
-              <!-- student_quantity  -->
-              <v-col cols="12" sm="4" md="4" class="mt-2">
-                <base-input
-                  label="Cantidad de estudiantes"
-                  v-model="v$.editedItem.students_quantity.$model"
-                  :rules="v$.editedItem.students_quantity"
-                  type="number"
-                  min="1"
-                  max="100"
-                />
-              </v-col>
-              <!-- student_quantity  -->
-              <!-- teacher  -->
-              <v-col cols="12" sm="4" md="4">
-                <v-label>Profesor</v-label>
-                <select
-                  v-model="v$.editedItem.teacher_full_name.$model"
-                  class="form-select"
-                >
-                  <option
-                    v-for="(option, index) in teachers"
-                    :key="index"
-                    :value="option.full_name"
-                  >
-                    {{ option.full_name }}
-                  </option>
-                </select>
-              </v-col>
-              <!-- teacher  -->
               <!-- subject_name  -->
               <v-col cols="12" sm="4" md="4">
                 <v-label>Materia</v-label>
@@ -155,8 +117,50 @@
                 </select>
               </v-col>
               <!-- subject_code  -->
+              <!-- teacher  -->
+              <v-col cols="12" sm="4" md="4">
+                <v-label>Profesor</v-label>
+                <select
+                  v-model="v$.editedItem.teacher_full_name.$model"
+                  class="form-select"
+                >
+                  <option
+                    v-for="(option, index) in teachers"
+                    :key="index"
+                    :value="option.full_name"
+                  >
+                    {{ option.full_name }}
+                  </option>
+                </select>
+              </v-col>
+              <!-- teacher  -->
+              <!-- group_code  -->
+              <v-col cols="12" sm="4" md="4" class="mt-2">
+                <base-input
+                  label="Código de grupo"
+                  v-model="v$.editedItem.group_code.$model"
+                  :rules="v$.editedItem.group_code"
+                />
+              </v-col>
+              <!-- group_code  -->
+              <!-- student_quantity  -->
+              <v-col cols="12" sm="4" md="4" class="mt-2">
+                <base-input
+                  label="Cantidad de estudiantes"
+                  v-model="v$.editedItem.students_quantity.$model"
+                  :rules="v$.editedItem.students_quantity"
+                  type="number"
+                  min="1"
+                  max="100"
+                />
+              </v-col>
+              <!-- student_quantity  -->
               <!-- career -->
-              <v-col cols="auto" class="pt-5 pb-5 mt-2">
+              <v-col
+                cols="auto"
+                class="pt-5 pb-5 mt-2"
+                v-if="editedIndex != -1"
+              >
                 <base-button
                   type="secondary"
                   title="Agregar horario"
@@ -167,7 +171,14 @@
             </v-row>
             <!-- Schedule Table -->
             <v-row>
-              <v-col align="center" cols="12" md="12" sm="12" class="pt-4">
+              <v-col
+                align="center"
+                cols="12"
+                md="12"
+                sm="12"
+                class="pt-4"
+                v-if="editedIndex != -1"
+              >
                 <h4>HORARIOS ASIGNADOS</h4>
                 <div class="table-responsive-md">
                   <v-table>

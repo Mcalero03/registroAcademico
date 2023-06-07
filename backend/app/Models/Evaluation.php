@@ -30,36 +30,31 @@ class Evaluation extends Model
         'deleted_at',
     ];
 
-    public function subject()
-    {
-        return $this->belongsTo(Subject::class, 'subject_id');
-    }
-
-    public function format()
-    {
-        return [
-            'id' => Encrypt::encryptValue($this->id),
-            'evaluation_name' => $this->evaluation_name,
-            'ponder' => $this->ponder,
-            'subject_name' => $this->subject->subject_name,
-        ];
-    }
-
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
         return Evaluation::where('evaluation.evaluation_name', 'like', $search)
+            ->join('subject', 'evaluation.subject_id', '=', 'subject.id')
+            ->join('group', 'subject.id', '=', 'group.subject_id')
+            ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
+            ->join('teacher', 'group.teacher_id', '=', 'teacher.id')
             ->orWhere('evaluation.ponder', 'like', $search)
             ->orWhere('evaluation.subject_id', 'like', $search)
+
             ->skip($skip)
             ->take($itemsPerpage)
             ->orderBy("evaluation.$sortBy", $sort)
-            ->get()
-            ->map(fn ($evaluation) => $evaluation->format());
+            ->get();
     }
 
     public static function counterPagination($search)
     {
-        return Evaluation::select('evaluation.*', 'evaluation.id as id')
+        return Evaluation::where('evaluation.evaluation_name', 'like', $search)
+            ->join('subject', 'evaluation.subject_id', '=', 'subject.id')
+            ->join('group', 'subject.id', '=', 'group.subject_id')
+            ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
+            ->join('teacher', 'group.teacher_id', '=', 'teacher.id')
+            ->orWhere('evaluation.ponder', 'like', $search)
+            ->orWhere('evaluation.subject_id', 'like', $search)
 
             ->where('evaluation.evaluation_name', 'like', $search)
             ->orWhere('evaluation.ponder', 'like', $search)

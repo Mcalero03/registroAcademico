@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DB;
 
 class Cycle extends Model
 {
@@ -59,9 +60,8 @@ class Cycle extends Model
 
     public static function cycle()
     {
-        return Cycle::select('cycle.*', 'cycle.id as id')
-            ->where('cycle.status', 'not like', 'Finalizado')
-            ->where('cycle.status', 'not like', 'Creado')
+        return Cycle::select(DB::raw(' CONCAT(cycle.cycle_number, "-", cycle.year) as cycle', 'cycle.*'), 'cycle.id as id')
+            ->where('cycle.status', 'Activo')
 
             ->get();
     }
