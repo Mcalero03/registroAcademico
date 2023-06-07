@@ -191,6 +191,7 @@ class SubjectController extends Controller
             ->join('cycle_subject_detail', 'subject.id', '=', 'cycle_subject_detail.subject_id')
             ->join('cycle', 'cycle_subject_detail.cycle_id', '=', 'cycle.id')
             ->where('cycle.status', "Activo")
+            ->whereNull('cycle.deleted_at')
             ->where('cycle_subject_detail.deleted_at', null)
             ->where('school.school_name', $request->school)
             ->get('subject.subject_name');

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('status', 100)->comment('Retirado', 'Inscrito');
             $table->foreignId('cycle_id')->constrained('cycle');
             $table->foreignId('student_id')->constrained('student');
+            $table->bigInteger('pensum_id');
             $table->softDeletes();
             $table->timestamps();
         });

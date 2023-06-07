@@ -22,6 +22,7 @@ class InscriptionSeeder extends Seeder
                 "status" => "Reprobado",
                 "cycle_id" => 1,
                 "student_id" => 1,
+                "pensum_id" => 1
             ],
             // [
             //     "id" => 2,
