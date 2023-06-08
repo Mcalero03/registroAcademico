@@ -167,7 +167,7 @@ class CycleController extends Controller
         $id = Encrypt::decryptValue($request->id);
 
         Cycle::where('id', $id)->delete();
-        CycleSubjectDetail::where('id', $id)->delete();
+        CycleSubjectDetail::where('cycle_id', $id)->delete();
 
         return response()->json([
             "message" => "Registro eliminado correctamente",

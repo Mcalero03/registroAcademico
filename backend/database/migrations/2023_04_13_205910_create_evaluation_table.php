@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('evaluation_name', 100);
             $table->float('ponder', 10, 0);
-            $table->foreignId('subject_id')->constrained('subject');
+            $table->integer('group_id');
             $table->softDeletes();
             $table->timestamps();
         });

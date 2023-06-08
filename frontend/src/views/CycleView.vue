@@ -121,37 +121,27 @@
               <!-- school  -->
               <v-col cols="12" sm="6" md="6" v-if="editedIndex == -1">
                 <v-label>Escuela</v-label>
-                <select
-                  class="form-select"
-                  @change="changePensum"
+                <base-select
+                  :items="schools"
+                  item-title="school_name"
+                  item-value="school_name"
                   v-model="v$.editedItem.school.$model"
-                >
-                  <option
-                    v-for="(option, index) in schools"
-                    :key="index"
-                    :value="option.school_name"
-                  >
-                    {{ option.school_name }}
-                  </option>
-                </select>
+                  :rules="v$.editedItem.school"
+                  @blur="changePensum"
+                />
               </v-col>
               <!-- school  -->
               <!-- pensum  -->
               <v-col cols="12" sm="6" md="6" v-if="editedIndex == -1">
                 <v-label>Pensum</v-label>
-                <select
-                  @change="changeSubject"
-                  class="form-select"
+                <base-select
+                  :items="pensums"
+                  item-title="program_name"
+                  item-value="program_name"
                   v-model="v$.editedItem.pensum.$model"
-                >
-                  <option
-                    v-for="(option, index) in pensums"
-                    :key="index"
-                    :value="option.program_name"
-                  >
-                    {{ option.program_name }}
-                  </option>
-                </select>
+                  :rules="v$.editedItem.pensum"
+                  @blur="changeSubject"
+                />
               </v-col>
               <!-- pensum  -->
             </v-row>
@@ -168,7 +158,7 @@
                   show-select
                   density="compact"
                   class="elevation-1"
-                  items-per-page="5"
+                  items-per-page="3"
                 ></v-data-table
               ></v-col>
               <v-col
@@ -178,39 +168,25 @@
                 sm="12"
                 v-if="editedIndex != -1"
               >
-                <div class="table-responsive-md">
-                  <v-table hover density="compact" height="auto">
-                    <thead>
-                      <tr>
-                        <th>MATERIAS SELECCIONADAS</th>
-                        <th>ACCIÓN</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr
-                        v-for="(subject, index) in editedItem.subjects"
-                        v-bind:index="index"
-                        :key="index"
-                      >
-                        <td v-text="subject.subject_name"></td>
-                        <td class="text-center">
-                          <v-icon
-                            size="20"
-                            class="mr-2"
-                            @click="deleteSubjetct(index)"
-                            icon="mdi-delete"
-                          />
-                        </td>
-                      </tr>
-                      <tr v-if="editedItem.subjects.length == 0">
-                        <td colspan="5" class="text-center pt-3">
-                          <loader v-if="loading" />
-                          <p>No se han seleccionado materias para este ciclo</p>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </v-table>
-                </div>
+                <v-data-table
+                  :headers="headersSubjectSelected"
+                  v-model="this.editedItem.subjects"
+                  :items="editedItem.subjects"
+                  items-title="subject_name"
+                  item-value="subject_name"
+                  density="compact"
+                  class="elevation-1"
+                  items-per-page="10"
+                >
+                  <template v-slot:[`item.actions`]="{ index }">
+                    <v-icon
+                      size="20"
+                      class="mr-2"
+                      @click="deleteSubjetct(index)"
+                      icon="mdi-delete"
+                    />
+                  </template>
+                </v-data-table>
               </v-col>
               <v-col
                 align="center"
@@ -219,30 +195,16 @@
                 sm="6"
                 v-if="editedIndex == -1"
               >
-                <div class="table-responsive-md">
-                  <v-table hover density="compact" height="300px">
-                    <thead>
-                      <tr>
-                        <th>MATERIAS SELECCIONADAS</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr
-                        v-for="(subject, index) in selected"
-                        v-bind:index="index"
-                        :key="index"
-                      >
-                        <td v-text="subject.subject_name"></td>
-                      </tr>
-                      <tr v-if="selected.length == 0">
-                        <td colspan="5" class="text-center pt-3">
-                          <loader v-if="loading" />
-                          <p>No se han seleccionado materias para este ciclo</p>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </v-table>
-                </div>
+                <v-data-table
+                  :headers="headerSelected"
+                  :items="selected"
+                  items-title="subject_name"
+                  item-value="subject_name"
+                  density="compact"
+                  class="elevation-1"
+                  items-per-page="4"
+                >
+                </v-data-table>
               </v-col>
             </v-row>
             <!-- Subject table -->
@@ -333,6 +295,13 @@ export default {
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       headersSubject: [{ title: "SELECCIONE MATERIAS", key: "subject_name" }],
+      headerSelected: [
+        { title: "MATERIAS SELECCIONADAS", key: "subject_name" },
+      ],
+      headersSubjectSelected: [
+        { title: "MATERIAS SELECCIONADAS", key: "subject_name" },
+        { title: "ACCIONES", key: "actions", sortable: false },
+      ],
       total: 0,
       records: [],
       schools: [],
@@ -451,7 +420,6 @@ export default {
         });
 
       this.pensums = data.pensum;
-      console.log(this.pensums);
     },
     async changeSubject() {
       const { data } = await cycleApi
@@ -465,12 +433,10 @@ export default {
         });
 
       this.subjects = data.subject;
-      console.log(this.subjects);
     },
 
     async deleteSubjetct(index) {
       this.editedItem.subjects.splice(index, 1);
-      console.log(this.editedItem.subjects);
     },
 
     async initialize() {

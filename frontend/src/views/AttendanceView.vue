@@ -65,7 +65,7 @@
             <v-row class="pt-0" v-if="editedIndex == -1">
               <!-- teacher  -->
               <v-col cols="12" sm="6" md="6">
-                <v-label>Maestro</v-label>
+                <!-- <v-label>Maestro</v-label>
                 <select
                   v-model="v$.editedItem.teacher.$model"
                   @change="changeSubject"
@@ -78,13 +78,23 @@
                   >
                     {{ option.full_name }}
                   </option>
-                </select>
+                </select> -->
+
+                <v-label>Maestro</v-label>
+                <base-select
+                  :items="teachers"
+                  item-title="full_name"
+                  item-value="full_name"
+                  v-model="v$.editedItem.teacher.$model"
+                  :rules="v$.editedItem.teacher"
+                  @blur="changeSubject"
+                />
               </v-col>
               <!-- teacher  -->
               <!-- subject  -->
               <v-col cols="12" sm="6" md="6">
                 <v-label>Materia</v-label>
-                <select
+                <!-- <select
                   v-model="v$.editedItem.subject.$model"
                   @change="changeGroup"
                   class="form-select"
@@ -96,13 +106,21 @@
                   >
                     {{ option.subject_name }}
                   </option>
-                </select>
+                </select> -->
+                <base-select
+                  :items="teacherSubject"
+                  item-title="subject_name"
+                  item-value="subject_name"
+                  v-model="v$.editedItem.subject.$model"
+                  :rules="v$.editedItem.subject"
+                  @blur="changeGroup"
+                />
               </v-col>
               <!-- subject  -->
               <!-- group  -->
               <v-col cols="12" sm="6" md="6">
                 <v-label>Grupo</v-label>
-                <select
+                <!-- <select
                   v-model="v$.editedItem.group.$model"
                   @change="changeStudents"
                   label="Grupo"
@@ -115,7 +133,15 @@
                   >
                     {{ option.group }}
                   </option>
-                </select>
+                </select> -->
+                <base-select
+                  :items="teacherStudentGroup"
+                  item-title="group"
+                  item-value="group"
+                  v-model="v$.editedItem.group.$model"
+                  :rules="v$.editedItem.group"
+                  @blur="changeStudents"
+                />
               </v-col>
               <!-- group  -->
             </v-row>
@@ -230,7 +256,6 @@ import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
 import Loader from "@/components/Loader.vue";
-// import moment from "moment";
 
 import useAlert from "../composables/useAlert";
 
@@ -267,11 +292,17 @@ export default {
       debounce: 0,
       options: {},
       editedItem: {
+        teacher: "",
+        subject: "",
+        group: "",
         attendance_date: this.getDate(),
         attendance_time: this.getTime(),
         attendances: [],
       },
       defaultItem: {
+        teacher: "",
+        subject: "",
+        group: "",
         attendance_date: this.getDate(),
         attendance_time: this.getTime(),
         attendances: [],
@@ -428,9 +459,6 @@ export default {
           });
 
           this.records = data.data;
-          // this.records.forEach((item) => {
-          //   item.attendance_date = moment().format("L");
-          // });
           this.total = data.total;
           this.loading = false;
         } catch (error) {
@@ -546,20 +574,4 @@ export default {
     },
   },
 };
-
-function toISOLocal(d) {
-  const z = (n) => ("0" + n).slice(-2);
-  let off = d.getTimezoneOffset();
-  const sign = off < 0 ? "+" : "-";
-  off = Math.abs(off);
-  return (
-    new Date(d.getTime() - d.getTimezoneOffset() * 60000)
-      .toISOString()
-      .slice(0, -1) +
-    sign +
-    z((off / 60) | 0) +
-    ":" +
-    z(off % 60)
-  );
-}
 </script>
