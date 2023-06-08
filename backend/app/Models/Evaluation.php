@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Encrypt;
+use DB;
 
 class Evaluation extends Model
 {
@@ -21,7 +21,7 @@ class Evaluation extends Model
         'id',
         'evaluation_name',
         'ponder',
-        'subject_id',
+        'group_id',
     ];
 
     public $hidden = [
@@ -32,13 +32,21 @@ class Evaluation extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Evaluation::where('evaluation.evaluation_name', 'like', $search)
-            ->join('subject', 'evaluation.subject_id', '=', 'subject.id')
-            ->join('group', 'subject.id', '=', 'group.subject_id')
-            ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
-            ->join('teacher', 'group.teacher_id', '=', 'teacher.id')
+        return Evaluation::select(DB::raw("CONCAT(teacher.name, ', ', teacher.last_name) as teacher_name"), 'evaluation.evaluation_name', 'evaluation.ponder', 'subject.subject_name', 'group.group_code', 'evaluation.id', 'school.school_name',)
+            ->join('calification', 'evaluation.id', '=', 'calification.evaluation_id')
+            ->leftjoin('inscription_detail', 'calification.inscription_detail_id', '=', 'inscription_detail.id')
+            ->leftjoin('group', 'inscription_detail.group_id', '=', 'group.id')
+            ->leftjoin('subject', 'group.subject_id', '=', 'subject.id')
+            ->leftjoin('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
+            ->leftjoin('teacher', 'group.teacher_id', '=', 'teacher.id')
+            ->leftjoin('school', 'teacher.school_id', '=', 'school.id')
+            ->where('subject.subject_name', 'like', $search)
             ->orWhere('evaluation.ponder', 'like', $search)
-            ->orWhere('evaluation.subject_id', 'like', $search)
+            ->orWhere('group.group_code', 'like', $search)
+            ->orWhere('evaluation.evaluation_name', 'like', $search)
+            ->groupBy('evaluation.evaluation_name')
+            ->groupBy('subject.subject_name')
+            ->groupBy('group.group_code')
 
             ->skip($skip)
             ->take($itemsPerpage)
@@ -48,17 +56,22 @@ class Evaluation extends Model
 
     public static function counterPagination($search)
     {
-        return Evaluation::where('evaluation.evaluation_name', 'like', $search)
-            ->join('subject', 'evaluation.subject_id', '=', 'subject.id')
-            ->join('group', 'subject.id', '=', 'group.subject_id')
-            ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
-            ->join('teacher', 'group.teacher_id', '=', 'teacher.id')
+        return Evaluation::select(DB::raw("CONCAT(teacher.name, ', ', teacher.last_name) as full_name_teacher"), 'evaluation.evaluation_name', 'evaluation.ponder', 'subject.subject_name', 'group.group_code', 'evaluation.id', 'school.school_name')
+            ->join('calification', 'evaluation.id', '=', 'calification.evaluation_id')
+            ->leftjoin('inscription_detail', 'calification.inscription_detail_id', '=', 'inscription_detail.id')
+            ->leftjoin('group', 'inscription_detail.group_id', '=', 'group.id')
+            ->leftjoin('subject', 'group.subject_id', '=', 'subject.id')
+            ->leftjoin('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
+            ->leftjoin('teacher', 'group.teacher_id', '=', 'teacher.id')
+            ->leftjoin('school', 'teacher.school_id', '=', 'school.id')
+            ->where('subject.subject_name', 'like', $search)
             ->orWhere('evaluation.ponder', 'like', $search)
-            ->orWhere('evaluation.subject_id', 'like', $search)
+            ->orWhere('group.group_code', 'like', $search)
+            ->orWhere('evaluation.evaluation_name', 'like', $search)
+            ->groupBy('evaluation.evaluation_name')
+            ->groupBy('subject.subject_name')
+            ->groupBy('group.group_code')
 
-            ->where('evaluation.evaluation_name', 'like', $search)
-            ->orWhere('evaluation.ponder', 'like', $search)
-            ->orWhere('evaluation.subject_id', 'like', $search)
 
             ->count();
     }

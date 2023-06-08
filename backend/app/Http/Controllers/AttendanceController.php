@@ -70,17 +70,17 @@ class AttendanceController extends Controller
 
         if ($data['attendances'] != null) {
             $date = $data['attendance_date'];
-            $group = Encrypt::decryptValue($data['group']);
+            $group_id = Group::where('group_code', $data['group'])->first()?->id;
 
             $dataExists = Attendance::where('attendance_date', $date)
-                ->where('group_id', $group)
+                ->where('group_id', $group_id)
                 ->exists();
 
             if (!$dataExists) {
                 $attendance = Attendance::create([
                     'attendance_date' => $data['attendance_date'],
                     'attendance_time' => $data['attendance_time'],
-                    'group_id' =>  $group,
+                    'group_id' =>  $group_id,
                 ]);
 
                 foreach ($data['attendances'] as $value) {
@@ -172,7 +172,7 @@ class AttendanceController extends Controller
             ->join('group', 'i.group_id', '=', 'group.id')
             ->join('subject', 'group.subject_id', '=', 'subject.id')
             ->join('student', 'inscription.student_id', '=', 'student.id')
-            ->where('group.id', Encrypt::decryptValue($group))
+            ->where('group.group_code', $group)
             ->where('subject.subject_name', $subject)
             ->orderby('student.last_name', 'asc')
             ->get();

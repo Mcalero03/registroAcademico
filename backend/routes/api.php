@@ -74,3 +74,7 @@ Route::get('/attendance/bySubject/{name}/{last_name}/{subject}', [AttendanceCont
 Route::get('/attendance/byGroup/{group}/{subject}', [AttendanceController::class, 'student']);
 Route::resource('/classroom', ClassroomController::class);
 Route::resource('/evaluation', EvaluationController::class);
+Route::get('/evaluation/showTeacher/{school}', [EvaluationController::class, 'showTeacher']);
+Route::get('/evaluation/showSubjects/{name}/{last_name}', [EvaluationController::class, 'showSubjects']);
+Route::get('/evaluation/showGroups/{subject}', [EvaluationController::class, 'showGroups']);
+Route::get('/evaluation/showStudents/{group}', [EvaluationController::class, 'showStudents']);

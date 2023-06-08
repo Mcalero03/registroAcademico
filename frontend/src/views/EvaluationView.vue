@@ -63,8 +63,60 @@
           <v-container>
             <!-- Form -->
             <v-row class="pt-0">
+              <!-- school  -->
+              <v-col cols="12" sm="6" md="6">
+                <v-label>Escuela</v-label>
+                <base-select
+                  :items="schools"
+                  item-title="school_name"
+                  item-value="school_name"
+                  v-model="v$.editedItem.school_name.$model"
+                  :rules="v$.editedItem.school_name"
+                  @blur="showTeachers"
+                />
+              </v-col>
+              <!-- school  -->
+              <!-- teacher_name  -->
+              <v-col cols="12" sm="6" md="6">
+                <v-label>Maestro</v-label>
+                <base-select
+                  :items="teachers"
+                  item-title="full_name"
+                  item-value="full_name"
+                  v-model="v$.editedItem.teacher_name.$model"
+                  :rules="v$.editedItem.teacher_name"
+                  @blur="showSubjects"
+                />
+              </v-col>
+              <!-- teacher_name  -->
+              <!-- subject_name  -->
+              <v-col cols="12" sm="6" md="6">
+                <v-label>Materia</v-label>
+                <base-select
+                  :items="subjects"
+                  item-title="subject_name"
+                  item-value="subject_name"
+                  v-model="v$.editedItem.subject_name.$model"
+                  :rules="v$.editedItem.subject_name"
+                  @blur="showGroups"
+                />
+              </v-col>
+              <!-- subject_name  -->
+              <!-- group_code  -->
+              <v-col cols="12" sm="6" md="6">
+                <v-label>Grupo</v-label>
+                <base-select
+                  :items="groups"
+                  item-title="group_code"
+                  item-value="group_code"
+                  v-model="v$.editedItem.group_code.$model"
+                  :rules="v$.editedItem.group_code"
+                  @blur="showStudents"
+                />
+              </v-col>
+              <!-- group_code  -->
               <!-- evaluation_name  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Nombre de la evaluación"
                   v-model="v$.editedItem.evaluation_name.$model"
@@ -73,7 +125,7 @@
               </v-col>
               <!-- evaluation_name  -->
               <!-- ponder  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Ponderación"
                   v-model="v$.editedItem.ponder.$model"
@@ -82,19 +134,92 @@
                 />
               </v-col>
               <!-- ponder  -->
-              <!-- subject_name  -->
-              <v-col cols="12" sm="12" md="6">
-                <base-select
-                  label="Materia"
-                  :items="subjects"
-                  item-title="subject_name"
-                  item-value="subject_name"
-                  v-model="v$.editedItem.subject_name.$model"
-                  :rules="v$.editedItem.subject_name"
-                />
-              </v-col>
-              <!-- subject_name  -->
             </v-row>
+            <v-row>
+              <v-col align="center" cols="12" md="12" sm="12" class="pt-4">
+                <div class="table-responsive-md">
+                  <v-table>
+                    <thead>
+                      <tr>
+                        <th>NOMBRE</th>
+                        <th>CALIFICACIÓN</th>
+                        <th>ACCIÓN</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(student, index) in editedItem.califications"
+                        v-bind:index="index"
+                        :key="index"
+                      >
+                        <td v-text="student.full_name"></td>
+                        <td v-text="student.score"></td>
+                        <td>
+                          <v-icon
+                            size="20"
+                            class="mr-2"
+                            @click="editItemStatus(index)"
+                            icon="mdi-pencil"
+                          />
+                        </td>
+                      </tr>
+                      <tr v-if="editedItem.califications.length == 0">
+                        <td colspan="5" class="text-center pt-3">
+                          <loader v-if="loading" />
+                          <p>No se ha encontrado ningún estudiante</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </v-table>
+                </div>
+              </v-col>
+            </v-row>
+            <!-- Student Table -->
+
+            <!-- Modal -->
+            <v-dialog v-model="dialogEditStatus" max-width="600px" persistent>
+              <v-card height="100%">
+                <v-container>
+                  <h2 class="black-secondary text-center mt-4 mb-4">
+                    Ingrese la calificación
+                  </h2>
+                  <v-row>
+                    <!-- student_name  -->
+                    <v-col cols="8" sm="8" md="8">
+                      <base-input
+                        label="Estudiante"
+                        v-model="v$.calification.full_name.$model"
+                        :rules="v$.calification.full_name"
+                      />
+                    </v-col>
+                    <!-- student_name  -->
+                    <!-- score  -->
+                    <v-col cols="4" sm="4" md="4">
+                      <base-input
+                        label="Calificación"
+                        v-model="v$.calification.score.$model"
+                        :rules="v$.calification.score"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="10"
+                      />
+                    </v-col>
+                    <!-- score  -->
+                  </v-row>
+                  <v-row>
+                    <v-col align="center">
+                      <base-button
+                        type="primary"
+                        title="Actualizar"
+                        @click="addEditItemStatus()"
+                      />
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-card>
+            </v-dialog>
+            <!-- Modal -->
             <!-- Form -->
             <v-row>
               <v-col align="center">
@@ -147,10 +272,12 @@ import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
 
 import evaluationApi from "@/services/evaluationApi";
-import subjectApi from "@/services/subjectApi";
+import schoolApi from "@/services/schoolApi";
+// import subjectApi from "@/services/subjectApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
+import Loader from "@/components/Loader.vue";
 
 import useAlert from "../composables/useAlert";
 
@@ -158,7 +285,7 @@ const { alert } = useAlert();
 const langMessages = messages["es"].validations;
 
 export default {
-  components: { BaseButton, BaseInput, BaseSelect },
+  components: { BaseButton, BaseInput, BaseSelect, Loader },
 
   setup() {
     return { v$: useVuelidate() };
@@ -169,17 +296,24 @@ export default {
       search: "",
       dialog: false,
       dialogDelete: false,
+      dialogEditStatus: false,
       editedIndex: -1,
       title: "EVALUACIÓN",
       headers: [
+        { title: "MATERIA", key: "subject_name" },
+        { title: "GRUPO", key: "group_code" },
         { title: "EVALUACIÓN", key: "evaluation_name" },
         { title: "PONDERACIÓN", key: "ponder" },
-        { title: "MATERIA", key: "subject_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
+      headerStudent: [{ title: "NOMBRE", key: "full_name" }],
       total: 0,
       records: [],
+      schools: [],
+      teachers: [],
       subjects: [],
+      students: [],
+      groups: [],
       loading: false,
       debounce: 0,
       options: {},
@@ -187,11 +321,23 @@ export default {
         evaluation_name: "",
         ponder: "",
         subject_name: "",
+        group_code: "",
+        teacher_name: "",
+        school_name: "",
+        califications: [],
       },
       defaultItem: {
         evaluation_name: "",
         ponder: "",
         subject_name: "",
+        group_code: "",
+        teacher_name: "",
+        school_name: "",
+        califications: [],
+      },
+      calification: {
+        full_name: "",
+        score: "",
       },
     };
   },
@@ -239,18 +385,119 @@ export default {
         subject_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
+        group_code: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
+        school_name: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
+        teacher_name: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
+        califications: {
+          required: helpers.withMessage(langMessages.required, required),
+          minLength: helpers.withMessage(
+            ({ $params }) => langMessages.minLength($params),
+            minLength(1)
+          ),
+          maxLength: (({ $params }) => maxLength($params), maxLength(2)),
+        },
+      },
+      calification: {
+        full_name: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
+        score: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
       },
     };
   },
 
   methods: {
+    //CHANGE METHODS
+    async showTeachers() {
+      const { data } = await evaluationApi
+        .get("/showTeacher/" + this.editedItem.school_name)
+        .catch((error) => {
+          alert.error(
+            true,
+            "No fue posible obtener la información de los espacios.",
+            "fail"
+          );
+        });
+
+      this.teachers = data.teachers;
+    },
+
+    async showSubjects() {
+      const teacher = this.v$.editedItem.teacher_name.$model;
+      var arr = teacher.split(", ");
+      const name = arr[0];
+      const last_name = arr[1];
+
+      const { data } = await evaluationApi
+        .get("/showSubjects/" + name + "/" + last_name)
+        .catch((error) => {
+          alert.error(
+            true,
+            "No fue posible obtener la información de los espacios.",
+            "fail"
+          );
+        });
+
+      this.subjects = data.subjects;
+    },
+
+    async showGroups() {
+      const { data } = await evaluationApi
+        .get("/showGroups/" + this.editedItem.subject_name)
+        .catch((error) => {
+          alert.error(
+            true,
+            "No fue posible obtener la información de los espacios.",
+            "fail"
+          );
+        });
+
+      this.groups = data.groups;
+    },
+
+    async showGroups() {
+      const { data } = await evaluationApi
+        .get("/showGroups/" + this.editedItem.subject_name)
+        .catch((error) => {
+          alert.error(
+            true,
+            "No fue posible obtener la información de los espacios.",
+            "fail"
+          );
+        });
+
+      this.groups = data.groups;
+    },
+
+    async showStudents() {
+      const { data } = await evaluationApi
+        .get("/showStudents/" + this.editedItem.group_code)
+        .catch((error) => {
+          alert.error(
+            true,
+            "No fue posible obtener la información de los espacios.",
+            "fail"
+          );
+        });
+
+      this.editedItem.califications = data.students;
+    },
+
     async initialize() {
       this.loading = true;
       this.records = [];
 
       let requests = [
         this.getDataFromApi(),
-        subjectApi.get(null, {
+        schoolApi.get(null, {
           params: {
             itemsPerPage: -1,
           },
@@ -261,7 +508,7 @@ export default {
       });
 
       if (responses) {
-        this.subjects = responses[1].data.data;
+        this.schools = responses[1].data.data;
       }
 
       this.loading = false;
@@ -300,6 +547,40 @@ export default {
       });
     },
 
+    //EDIT SCORE OF STUDENT
+    editItemStatus(index) {
+      this.editedStudent = this.editedItem.califications[index];
+      this.editedItem.califications.splice(index, 1);
+      this.calification = Object.assign({}, this.editedStudent);
+      this.dialogEditStatus = true;
+    },
+
+    async addEditItemStatus() {
+      this.v$.calification.$validate();
+      if (this.v$.calification.$invalid) {
+        alert.error("Campo obligatorio");
+        return;
+      }
+
+      // Creating record
+      try {
+        this.editedItem.califications.push({ ...this.calification });
+      } catch (error) {
+        alert.error("No fue posible crear el registro.");
+      }
+
+      this.closeEditStatus();
+      this.initialize();
+      this.loading = false;
+      return;
+    },
+
+    closeEditStatus() {
+      this.v$.calification.$reset();
+      this.dialogEditStatus = false;
+    },
+
+    //EVALUATION
     close() {
       this.dialog = false;
       this.$nextTick(() => {
