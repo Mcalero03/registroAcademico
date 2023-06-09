@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Evaluation;
-use App\Models\Subject;
+use App\Models\Inscription;
 use App\Models\Calification;
+use App\Models\Cycle;
 use App\Models\Teacher;
 use App\Models\School;
 use App\Models\Group;
@@ -155,12 +156,23 @@ class EvaluationController extends Controller
 
     public function showSubjects($name, $last_name)
     {
-        $subjects = Group::select('subject.subject_name')
+        $active_cycle = Cycle::where('cycle.status', 'Activo')->first()?->id;
+
+        $subjects = Group::select('subject.subject_name', 'subject.id')
             ->join('subject', 'group.subject_id', '=', 'subject.id')
+            ->join('cycle_subject_detail', 'subject.id', '=', 'cycle_subject_detail.subject_id')
+            ->join('cycle', 'cycle_subject_detail.cycle_id', '=', 'cycle.id')
+            ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
             ->join('teacher', 'group.teacher_id', '=', 'teacher.id')
             ->where('teacher.name', $name)
             ->where('teacher.last_name', $last_name)
-            ->get('subject.subject_name');
+            ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
+            ->where('cycle.status', 'Activo')
+            ->whereNull('cycle.deleted_at')
+            ->whereNull('cycle_subject_detail.deleted_at')
+
+            ->get('subject.subject_name', 'subject.id')->unique();
+
 
         return response()->json([
             "message" => "Registro encontrado correctamente",
@@ -170,10 +182,20 @@ class EvaluationController extends Controller
 
     public function showGroups($subject)
     {
+        $active_cycle = Cycle::where('cycle.status', 'Activo')->first()?->id;
+
         $groups = Group::select('group.group_code')
+            ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
             ->join('subject', 'group.subject_id', '=', 'subject.id')
+            ->join('cycle_subject_detail', 'subject.id', '=', 'cycle_subject_detail.subject_id')
+            ->join('cycle', 'cycle_subject_detail.cycle_id', '=', 'cycle.id')
             ->where('subject.subject_name', $subject)
-            ->get('group.group_code');
+            ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
+            ->where('cycle.status', 'Activo')
+            ->whereNull('cycle.deleted_at')
+            ->whereNull('cycle_subject_detail.deleted_at')
+
+            ->get('group.group_code')->unique();
 
         return response()->json([
             "message" => "Registro encontrado correctamente",
@@ -183,21 +205,22 @@ class EvaluationController extends Controller
 
     public function showStudents($group)
     {
-        $id = Group::where('group_code', $group)->first()?->id;
-
-        $students = InscriptionDetail::select(DB::raw("CONCAT(student.last_name, ', ',student.name) as full_name"), 'inscription_detail.id as inscription_detail_id')
+        $student = Inscription::select(DB::raw("CONCAT(student.last_name, ', ',student.name) as full_name"), 'i.id as inscription_detail_id')
             ->selectRaw("0 as score")
-            ->join('inscription', 'inscription_detail.id', '=', 'inscription.id')
-            ->join('group', 'inscription_detail.group_id', '=', 'group.id')
+            ->leftjoin('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
+            ->join('group', 'i.group_id', '=', 'group.id')
             ->join('subject', 'group.subject_id', '=', 'subject.id')
+            ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
             ->join('student', 'inscription.student_id', '=', 'student.id')
-            ->where('group.id', $id)
+            ->where('group.group_code', $group)
+            ->where('i.status', 'not like', 'Retirado')
+            ->where('cycle.status', 'Activo')
             ->orderby('student.last_name', 'asc')
             ->get();
 
         return response()->json([
             "message" => "Registro encontrado correctamente",
-            "students" => $students
+            "students" => $student
         ]);
     }
 }

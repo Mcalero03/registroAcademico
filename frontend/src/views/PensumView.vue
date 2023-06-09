@@ -230,7 +230,7 @@ export default {
       dialog: false,
       dialogDelete: false,
       editedIndex: -1,
-      title: "PENSUM",
+      title: "PENSUMS",
       headers: [
         { title: "PROGRAMA", key: "program_name" },
         { title: "TOTAL U.V", key: "uv_total" },

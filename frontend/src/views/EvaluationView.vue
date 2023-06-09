@@ -298,7 +298,7 @@ export default {
       dialogDelete: false,
       dialogEditStatus: false,
       editedIndex: -1,
-      title: "EVALUACIÓN",
+      title: "EVALUACIONES",
       headers: [
         { title: "MATERIA", key: "subject_name" },
         { title: "GRUPO", key: "group_code" },
@@ -447,20 +447,6 @@ export default {
         });
 
       this.subjects = data.subjects;
-    },
-
-    async showGroups() {
-      const { data } = await evaluationApi
-        .get("/showGroups/" + this.editedItem.subject_name)
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
-
-      this.groups = data.groups;
     },
 
     async showGroups() {

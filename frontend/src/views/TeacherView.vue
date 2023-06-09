@@ -224,7 +224,7 @@ export default {
       dialog: false,
       dialogDelete: false,
       editedIndex: -1,
-      title: "PROFESOR",
+      title: "PROFESORES",
       headers: [
         { title: "NOMBRE", key: "name" },
         { title: "APELLIDO", key: "last_name" },
@@ -363,7 +363,6 @@ export default {
       });
 
       if (responses) {
-        console.log(responses);
         this.school = responses[1].data.data;
       }
 

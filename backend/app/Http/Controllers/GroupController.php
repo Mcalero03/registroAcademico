@@ -187,6 +187,7 @@ class GroupController extends Controller
             ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
             ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
             ->where('group.teacher_id', $teacher_id)
+            ->whereNull('schedule_classroom_group_detail.deleted_at')
             ->get();
 
         $scheduleAvailable = Schedule::select('schedule.*')
@@ -211,6 +212,8 @@ class GroupController extends Controller
             ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
             ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
             ->where('group.teacher_id', $teacher_id)
+            ->whereNull('schedule_classroom_group_detail.deleted_at')
+
             ->get();
 
         $start_time = Schedule::select('schedule.start_time')

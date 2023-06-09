@@ -140,7 +140,7 @@ export default {
         { title: "TIPO PENSUM", key: "pensum_type_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
-      title: "TIPO PENSUM",
+      title: "TIPOS DE PENSUM",
       total: 0,
       records: [],
       loading: false,

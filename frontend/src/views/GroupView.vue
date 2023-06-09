@@ -66,72 +66,95 @@
               <!-- schools  -->
               <v-col cols="12" sm="4" md="4">
                 <v-label>Escuela</v-label>
-                <select
+                <base-select
+                  :items="schools"
+                  item-title="school_name"
+                  item-value="school_name"
                   v-model="v$.editedItem.school_name.$model"
-                  @change="changeSubject"
-                  class="form-select"
-                >
-                  <option
-                    v-for="(option, index) in schools"
-                    :key="index"
-                    :value="option.school_name"
-                  >
-                    {{ option.school_name }}
-                  </option>
-                </select>
+                  :rules="v$.editedItem.school_name"
+                  @blur="changeSubject"
+                  v-if="editedIndex == -1"
+                />
+                <base-select
+                  :items="schools"
+                  item-title="school_name"
+                  item-value="school_name"
+                  v-model="v$.editedItem.school_name.$model"
+                  :rules="v$.editedItem.school_name"
+                  @blur="changeSubject"
+                  v-if="editedIndex != -1"
+                  readonly
+                />
               </v-col>
               <!-- schools  -->
               <!-- subject_name  -->
               <v-col cols="12" sm="4" md="4">
                 <v-label>Materia</v-label>
-                <select
+                <base-select
+                  :items="subjects"
+                  item-title="subject_name"
+                  item-value="subject_name"
                   v-model="v$.editedItem.subject_name.$model"
-                  @change="change"
-                  class="form-select"
-                >
-                  <option
-                    v-for="(option, index) in subjects"
-                    :key="index"
-                    :value="option.subject_name"
-                  >
-                    {{ option.subject_name }}
-                  </option>
-                </select>
+                  :rules="v$.editedItem.subject_name"
+                  @blur="change"
+                  v-if="editedIndex == -1"
+                />
+                <base-select
+                  :items="subjects"
+                  item-title="subject_name"
+                  item-value="subject_name"
+                  v-model="v$.editedItem.subject_name.$model"
+                  :rules="v$.editedItem.subject_name"
+                  @blur="change"
+                  v-if="editedIndex != -1"
+                  readonly
+                />
               </v-col>
               <!-- subject_name  -->
               <!-- subject_code  -->
               <v-col cols="12" sm="4" md="4">
                 <v-label>Código de materia</v-label>
-                <select
+                <base-select
+                  :items="codes"
+                  item-title="subject_code"
+                  item-value="subject_code"
                   v-model="v$.editedItem.subject_code.$model"
-                  @change="change"
-                  class="form-select"
-                >
-                  <option
-                    v-for="(option, index) in codes"
-                    :key="index"
-                    :value="option.subject_code"
-                  >
-                    {{ option.subject_code }}
-                  </option>
-                </select>
+                  :rules="v$.editedItem.subject_code"
+                  @blur="change"
+                  v-if="editedIndex == -1"
+                />
+                <base-select
+                  :items="codes"
+                  item-title="subject_code"
+                  item-value="subject_code"
+                  v-model="v$.editedItem.subject_code.$model"
+                  :rules="v$.editedItem.subject_code"
+                  @blur="change"
+                  v-if="editedIndex != -1"
+                  readonly
+                />
               </v-col>
               <!-- subject_code  -->
               <!-- teacher  -->
-              <v-col cols="12" sm="4" md="4">
+              <v-col cols="12" sm="4" md="4" class="m-0 pr-4 pb-5 pt-0">
                 <v-label>Profesor</v-label>
-                <select
+                <base-select
+                  :items="teachers"
+                  item-title="full_name"
+                  item-value="full_name"
                   v-model="v$.editedItem.teacher_full_name.$model"
-                  class="form-select"
-                >
-                  <option
-                    v-for="(option, index) in teachers"
-                    :key="index"
-                    :value="option.full_name"
-                  >
-                    {{ option.full_name }}
-                  </option>
-                </select>
+                  :rules="v$.editedItem.teacher_full_name"
+                  v-if="editedIndex == -1"
+                />
+                <base-select
+                  :items="teachers"
+                  item-title="full_name"
+                  item-value="full_name"
+                  v-model="v$.editedItem.teacher_full_name.$model"
+                  :rules="v$.editedItem.teacher_full_name"
+                  v-if="editedIndex != -1"
+                  readonly
+                />
               </v-col>
               <!-- teacher  -->
               <!-- group_code  -->
@@ -231,19 +254,14 @@
                       <!-- classroom_name  -->
                       <v-col cols="12" sm="4" md="4">
                         <v-label>Aulas</v-label>
-                        <select
+                        <base-select
+                          :items="classrooms"
+                          item-title="classroom_name"
+                          item-value="classroom_name"
                           v-model="v$.schedule.classroom_name.$model"
-                          @change="changeSchedules()"
-                          class="form-select"
-                        >
-                          <option
-                            v-for="(option, index) in classrooms"
-                            :key="index"
-                            :value="option.classroom_name"
-                          >
-                            {{ option.classroom_name }}
-                          </option>
-                        </select>
+                          :rules="v$.schedule.classroom_name"
+                          @blur="changeSchedules"
+                        />
                       </v-col>
                       <!-- classroom_name  -->
                     </v-row>
@@ -251,54 +269,39 @@
                       <!-- week_day  -->
                       <v-col cols="12" sm="4" md="4">
                         <v-label>Día</v-label>
-                        <select
+                        <base-select
+                          :items="weekdays"
+                          item-title="weekdays"
+                          item-value="weekdays"
                           v-model="v$.schedule.week_day.$model"
-                          @change="changestarttime()"
-                          class="form-select"
-                        >
-                          <option
-                            v-for="(option, index) in weekdays"
-                            :key="index"
-                            :value="option"
-                          >
-                            {{ option }}
-                          </option>
-                        </select>
+                          :rules="v$.schedule.week_day"
+                          @blur="changestarttime"
+                        />
                       </v-col>
                       <!-- week_day  -->
                       <!-- start_time  -->
                       <v-col cols="12" sm="4" md="4">
                         <v-label>Hora Inicio</v-label>
-                        <select
+                        <base-select
+                          :items="start_time"
+                          item-title="start_time"
+                          item-value="start_time"
                           v-model="v$.schedule.start_time.$model"
-                          class="form-select"
-                          @change="changeendtime()"
-                        >
-                          <option
-                            v-for="(option, index) in start_time"
-                            :key="index"
-                            :value="option.start_time"
-                          >
-                            {{ option.start_time }}
-                          </option>
-                        </select>
+                          :rules="v$.schedule.start_time"
+                          @blur="changeendtime"
+                        />
                       </v-col>
                       <!-- start_time  -->
                       <!-- end_time  -->
                       <v-col cols="12" sm="4" md="4">
                         <v-label>Hora Fin</v-label>
-                        <select
+                        <base-select
+                          :items="end_time"
+                          item-title="end_time"
+                          item-value="end_time"
                           v-model="v$.schedule.end_time.$model"
-                          class="form-select"
-                        >
-                          <option
-                            v-for="(option, index) in end_time"
-                            :key="index"
-                            :value="option.end_time"
-                          >
-                            {{ option.end_time }}
-                          </option>
-                        </select>
+                          :rules="v$.schedule.end_time"
+                        />
                       </v-col>
                       <!-- end_time  -->
                       <v-col align="center" cols="12" md="12" sm="12">
@@ -416,7 +419,7 @@ export default {
       dialogDelete: false,
       dialogSchedule: false,
       editedIndex: -1,
-      title: "GRUPO",
+      title: "GRUPOS",
       headers: [
         { title: "GRUPO", key: "group_code" },
         { title: "CANTIDAD", key: "students_quantity" },
@@ -613,7 +616,6 @@ export default {
         });
 
       this.start_time = data.start_time;
-      console.log(this.start_time);
     },
 
     async changeendtime() {
@@ -726,7 +728,6 @@ export default {
       // Creating record
       try {
         this.editedItem.selectedSchedule.push({ ...this.schedule });
-        console.log(this.editedItem.selectedSchedule);
       } catch (error) {
         alert.error("No fue posible crear el registro.");
       }

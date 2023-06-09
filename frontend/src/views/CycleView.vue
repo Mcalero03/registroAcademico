@@ -285,7 +285,7 @@ export default {
       dialog: false,
       dialogDelete: false,
       editedIndex: -1,
-      title: "CICLO",
+      title: "CICLOS",
       headers: [
         { title: "CICLO", key: "cycle_number" },
         { title: "AÑO", key: "year" },

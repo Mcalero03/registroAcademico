@@ -46,7 +46,7 @@
       </v-data-table-server>
     </v-card>
 
-    <v-dialog v-model="dialog" max-width="800px" persistent>
+    <v-dialog v-model="dialog" max-width="500px" persistent>
       <v-card>
         <v-card-title>
           <h2 class="mx-auto pt-3 mb-3 text-center black-secondary">
@@ -264,7 +264,6 @@ export default {
       // Creating record
       try {
         const { data } = await schoolApi.post(null, this.editedItem);
-        console.log(data);
         alert.success(data.message);
       } catch (error) {
         alert.error("No fue posible crear el registro.");
@@ -321,7 +320,6 @@ export default {
           this.loading = false;
         } catch (error) {
           alert.error("No fue posible obtener los registros.");
-          console.log(error);
         }
       });
     },
