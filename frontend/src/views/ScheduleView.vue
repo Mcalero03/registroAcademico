@@ -64,17 +64,26 @@
             <!-- Form -->
             <v-row class="pt-0">
               <!-- week_day  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-select
                   label="Día de la semana"
                   :items="weekdays"
                   v-model="v$.editedItem.week_day.$model"
                   :rules="v$.editedItem.week_day"
+                  v-if="editedIndex == -1"
+                />
+                <base-input
+                  label="Día de la semana"
+                  :items="weekdays"
+                  v-model="v$.editedItem.week_day.$model"
+                  :rules="v$.editedItem.week_day"
+                  v-if="editedIndex != -1"
+                  readonly
                 />
               </v-col>
               <!-- week_day  -->
               <!-- start_time  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Hora de inicio"
                   v-model="v$.editedItem.start_time.$model"
@@ -84,7 +93,7 @@
               </v-col>
               <!-- start_time  -->
               <!-- end_time  -->
-              <v-col cols="12" sm="12" md="6">
+              <v-col cols="12" sm="6" md="6">
                 <base-input
                   label="Hora de fin"
                   v-model="v$.editedItem.end_time.$model"

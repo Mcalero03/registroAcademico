@@ -160,7 +160,7 @@ export default {
       dialog: false,
       dialogDelete: false,
       editedIndex: -1,
-      title: "ESCUELA",
+      title: "SUB-ESCUELAS",
       headers: [
         { title: "SUB-ESCUELA", key: "sub_school_name" },
         { title: "ESCUELA", key: "school_name" },

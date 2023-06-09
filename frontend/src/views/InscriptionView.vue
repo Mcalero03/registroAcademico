@@ -110,14 +110,8 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col
-                cols="12"
-                sm="6"
-                md="6"
-                v-if="editedIndex == -1"
-                class="p-0 m-0 pr-4"
-              >
-                <v-table>
+              <v-col cols="12" sm="6" md="6" v-if="editedIndex == -1">
+                <!-- <v-table>
                   <thead>
                     <tr>
                       <th>Estudiante</th>
@@ -132,7 +126,16 @@
                       <td v-text="schedule.full_name"></td>
                     </tr>
                   </tbody>
-                </v-table>
+                </v-table> -->
+                <v-label>Estudiante</v-label>
+                <base-input
+                  :items="students"
+                  item-value="full_name"
+                  item-title="full_name"
+                  v-model="v$.editedItem.full_name.$model"
+                  :rules="v$.editedItem.full_name"
+                  readonly
+                />
               </v-col>
               <!-- student_name  -->
               <!-- student_name  -->
@@ -349,7 +352,9 @@
                         ></v-data-table
                       ></v-col>
                       <v-col align="center" cols="12" md="12" sm="12">
-                        <h4 class="pb-2" align="left">GRUPOS DISPONIBLES</h4>
+                        <h4 class="pb-2" align="left">
+                          GRUPOS Y HORARIOS DISPONIBLES
+                        </h4>
                         <v-data-table
                           :headers="headerGroups"
                           :items="groups"
@@ -567,7 +572,7 @@ export default {
       dialogEditStatus: false,
       editedIndex: -1,
       editedGroup: -1,
-      title: "INSCRIPCIÓN",
+      title: "INSCRIPCIONES",
       headers: [
         { title: "ESTUDIANTE", key: "full_name" },
         { title: "CICLO", key: "cycle" },

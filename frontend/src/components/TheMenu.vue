@@ -121,9 +121,9 @@ export default {
         icon: "mdi-school",
       },
       {
-        title: "Profesor",
-        url: "/teacher",
-        icon: "mdi-human-male-board",
+        title: "Pensum",
+        url: "/pensum",
+        icon: "mdi-view-list",
       },
       {
         title: "Materia",
@@ -137,9 +137,9 @@ export default {
         icon: "mdi-list-status",
       },
       {
-        title: "Pensum",
-        url: "/pensum",
-        icon: "mdi-view-list",
+        title: "Profesor",
+        url: "/teacher",
+        icon: "mdi-human-male-board",
       },
       {
         title: "Aulas",
@@ -160,14 +160,14 @@ export default {
     ],
     academic: [
       {
-        title: "Estudiante",
-        url: "/student",
-        icon: "mdi-account",
-      },
-      {
         title: "Grupo",
         url: "/group",
         icon: "mdi-account-group",
+      },
+      {
+        title: "Estudiante",
+        url: "/student",
+        icon: "mdi-account",
       },
       {
         title: "Inscripción",

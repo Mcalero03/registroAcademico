@@ -364,7 +364,7 @@ export default {
       dialogDelete: false,
       dialogPrerequisite: false,
       editedIndex: -1,
-      title: "MATERIA",
+      title: "MATERIAS",
       headers: [
         { title: "MATERIA", key: "subject_name" },
         { title: "CÓDIGO", key: "subject_code" },

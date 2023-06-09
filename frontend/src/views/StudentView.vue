@@ -486,7 +486,7 @@ export default {
       dialogCareer: false,
       editedIndex: -1,
       editedRelative: -1,
-      title: "ESTUDIANTE",
+      title: "ESTUDIANTES",
       headers: [
         { title: "NOMBRES", key: "name" },
         { title: "APELLIDOS", key: "last_name" },
@@ -795,7 +795,6 @@ export default {
       // Creating record
       try {
         this.editedItem.relatives.push({ ...this.relative });
-        console.log(this.editedItem.relatives);
       } catch (error) {
         alert.error("No fue posible crear el registro.");
       }

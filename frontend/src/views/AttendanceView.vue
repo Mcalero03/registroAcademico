@@ -65,21 +65,6 @@
             <v-row class="pt-0" v-if="editedIndex == -1">
               <!-- teacher  -->
               <v-col cols="12" sm="6" md="6">
-                <!-- <v-label>Maestro</v-label>
-                <select
-                  v-model="v$.editedItem.teacher.$model"
-                  @change="changeSubject"
-                  class="form-select"
-                >
-                  <option
-                    v-for="(option, index) in teachers"
-                    :key="index"
-                    :value="option.full_name"
-                  >
-                    {{ option.full_name }}
-                  </option>
-                </select> -->
-
                 <v-label>Maestro</v-label>
                 <base-select
                   :items="teachers"
@@ -94,19 +79,6 @@
               <!-- subject  -->
               <v-col cols="12" sm="6" md="6">
                 <v-label>Materia</v-label>
-                <!-- <select
-                  v-model="v$.editedItem.subject.$model"
-                  @change="changeGroup"
-                  class="form-select"
-                >
-                  <option
-                    v-for="(option, index) in teacherSubject"
-                    :key="index"
-                    :value="option.subject_name"
-                  >
-                    {{ option.subject_name }}
-                  </option>
-                </select> -->
                 <base-select
                   :items="teacherSubject"
                   item-title="subject_name"
@@ -120,20 +92,6 @@
               <!-- group  -->
               <v-col cols="12" sm="6" md="6">
                 <v-label>Grupo</v-label>
-                <!-- <select
-                  v-model="v$.editedItem.group.$model"
-                  @change="changeStudents"
-                  label="Grupo"
-                  class="form-select"
-                >
-                  <option
-                    v-for="(option, index) in teacherStudentGroup"
-                    :key="index"
-                    :value="option.id"
-                  >
-                    {{ option.group }}
-                  </option>
-                </select> -->
                 <base-select
                   :items="teacherStudentGroup"
                   item-title="group"
@@ -275,7 +233,7 @@ export default {
       dialog: false,
       dialogDelete: false,
       editedIndex: -1,
-      title: "ASISTENCIA",
+      title: "ASISTENCIAS",
       headers: [
         { title: "FECHA", key: "attendance_date" },
         { title: "HORA", key: "attendance_time" },

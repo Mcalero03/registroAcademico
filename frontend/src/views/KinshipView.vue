@@ -52,7 +52,7 @@
       </v-data-table-server>
     </v-card>
 
-    <v-dialog v-model="dialog" max-width="800px" persistent>
+    <v-dialog v-model="dialog" max-width="500px" persistent>
       <v-card>
         <v-card-title>
           <h2 class="mx-auto pt-3 mb-3 text-center black-secondary">

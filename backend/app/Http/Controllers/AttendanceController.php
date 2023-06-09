@@ -174,6 +174,7 @@ class AttendanceController extends Controller
             ->join('student', 'inscription.student_id', '=', 'student.id')
             ->where('group.group_code', $group)
             ->where('subject.subject_name', $subject)
+            ->where('i.status', 'not like', 'Retirado')
             ->orderby('student.last_name', 'asc')
             ->get();
 
