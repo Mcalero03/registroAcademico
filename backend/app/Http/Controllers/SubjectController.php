@@ -6,8 +6,10 @@ use App\Models\PensumSubjectDetail;
 use App\Models\Subject;
 use App\Models\Prerequisite;
 use App\Models\Pensum;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Encrypt;
+use DB;
 use App\Models\School;
 
 class SubjectController extends Controller
@@ -182,8 +184,10 @@ class SubjectController extends Controller
         ]);
     }
 
-    public function subjectByCycle(Request $request)
+    public function subjectByCycle($school)
     {
+        $school_id = School::where('school_name', $school)->first()?->id;
+
         $subject = Subject::select('subject.subject_name')
             ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
             ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
@@ -194,13 +198,19 @@ class SubjectController extends Controller
             ->where('cycle.status', "Activo")
             ->whereNull('cycle.deleted_at')
             ->where('cycle_subject_detail.deleted_at', null)
-            ->where('school.school_name', $request->school)
+            ->where('school.school_name', $school)
             ->get('subject.subject_name');
 
 
+        $teacher = Teacher::select(DB::raw("CONCAT(teacher.name, ', ', teacher.last_name) as full_name"))
+            ->join('school', 'teacher.school_id', '=', 'school.id')
+            ->where('school.id', 'like', $school_id)
+            ->get();
+
         return response()->json([
             "message" => "Registro encontrado correctamente",
-            "subject" => $subject
+            "subject" => $subject,
+            "teacher" => $teacher,
         ]);
     }
 
