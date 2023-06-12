@@ -64,7 +64,7 @@
             <!-- Form -->
             <v-row class="pt-0">
               <!-- program_name  -->
-              <v-col cols="12" sm="8" md="8">
+              <v-col cols="12" sm="6" md="8">
                 <base-input
                   label="Nombre del programa"
                   v-model="v$.editedItem.program_name.$model"
@@ -72,6 +72,29 @@
                 />
               </v-col>
               <!-- program_name  -->
+              <!-- cycle_quantity  -->
+              <v-col cols="4" sm="3" md="2">
+                <base-input
+                  label="Ciclos"
+                  v-model="v$.editedItem.cycle_quantity.$model"
+                  :rules="v$.editedItem.cycle_quantity"
+                  type="number"
+                  max="10"
+                  min="1"
+                />
+              </v-col>
+              <!-- cycle_quantity  -->
+              <!-- study_plan_year  -->
+              <v-col cols="4" sm="3" md="2">
+                <base-input
+                  label="Año"
+                  v-model="v$.editedItem.study_plan_year.$model"
+                  :rules="v$.editedItem.study_plan_year"
+                  type="number"
+                  min="1900"
+                  max="2099"
+                />
+              </v-col>
               <!-- uv_total  -->
               <v-col cols="4" sm="4" md="4">
                 <base-input
@@ -84,7 +107,7 @@
               </v-col>
               <!-- uv_total  -->
               <!-- required_subject  -->
-              <v-col cols="8" sm="4" md="4">
+              <v-col cols="6" sm="4" md="4">
                 <base-input
                   label="Materias requeridas"
                   v-model="v$.editedItem.required_subject.$model"
@@ -95,7 +118,7 @@
               </v-col>
               <!-- required_subject  -->
               <!-- optional_subject  -->
-              <v-col cols="8" sm="4" md="4">
+              <v-col cols="6" sm="4" md="4">
                 <base-input
                   label="Materias opcionales"
                   v-model="v$.editedItem.optional_subject.$model"
@@ -105,34 +128,24 @@
                 />
               </v-col>
               <!-- optional_subject  -->
-              <!-- cycle_quantity  -->
-              <v-col cols="4" sm="2" md="2">
-                <base-input
-                  label="Ciclos"
-                  v-model="v$.editedItem.cycle_quantity.$model"
-                  :rules="v$.editedItem.cycle_quantity"
-                  type="number"
-                  max="10"
-                  min="1"
-                />
-              </v-col>
-              <!-- cycle_quantity  -->
               <!-- study_plan_year  -->
-              <v-col cols="4" sm="2" md="2">
-                <base-input
-                  label="Año"
-                  v-model="v$.editedItem.study_plan_year.$model"
-                  :rules="v$.editedItem.study_plan_year"
-                  type="number"
-                  min="1900"
-                  max="2099"
-                />
-              </v-col>
-              <!-- study_plan_year  -->
-              <!-- sub_school_name  -->
-              <v-col cols="8" sm="6" md="6">
+              <!-- school  -->
+              <v-col cols="12" sm="12" md="12">
+                <v-label>Escuela</v-label>
                 <base-select
-                  label="Escuela"
+                  :items="schools"
+                  item-title="school_name"
+                  item-value="school_name"
+                  v-model="v$.editedItem.school_name.$model"
+                  :rules="v$.editedItem.school_name"
+                  @blur="showSubSchools"
+                />
+              </v-col>
+              <!-- school  -->
+              <!-- sub_school_name  -->
+              <v-col cols="12" sm="6" md="6">
+                <v-label>Sub-escuela</v-label>
+                <base-select
                   :items="subSchools"
                   item-title="sub_school_name"
                   item-value="sub_school_name"
@@ -143,8 +156,8 @@
               <!-- sub_school_name  -->
               <!-- pensum_type_name  -->
               <v-col cols="12" sm="6" md="6">
+                <v-label>Tipo de pensum</v-label>
                 <base-select
-                  label="Tipo de pensum"
                   :items="pensumTypes"
                   item-title="pensum_type_name"
                   item-value="pensum_type_name"
@@ -206,7 +219,7 @@ import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
 
 import pensumApi from "@/services/pensumApi";
-import subSchoolApi from "@/services/subSchoolApi";
+import schoolApi from "@/services/schoolApi";
 import pensumTypeApi from "@/services/pensumTypeApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
@@ -236,12 +249,13 @@ export default {
         { title: "TOTAL U.V", key: "uv_total" },
         { title: "CICLOS", key: "cycle_quantity" },
         { title: "PLAN DE ESTUDIO", key: "study_plan_year" },
-        { title: "ESCUELA", key: "sub_school_name" },
+        { title: "SUB-ESCUELA", key: "sub_school_name" },
         { title: "TIPO DE PENSUM", key: "pensum_type_name" },
         { title: "ACCIONES", key: "actions", sortable: false },
       ],
       total: 0,
       records: [],
+      schools: [],
       subSchools: [],
       pensumTypes: [],
       loading: false,
@@ -256,6 +270,7 @@ export default {
         study_plan_year: "",
         sub_school_name: "",
         pensum_type_name: "",
+        school_name: "",
       },
       defaultItem: {
         program_name: "",
@@ -266,6 +281,7 @@ export default {
         study_plan_year: "",
         sub_school_name: "",
         pensum_type_name: "",
+        school_name: "",
       },
     };
   },
@@ -348,6 +364,9 @@ export default {
             maxLength(4)
           ),
         },
+        school_name: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
         sub_school_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
@@ -359,13 +378,27 @@ export default {
   },
 
   methods: {
+    async showSubSchools() {
+      const { data } = await pensumApi
+        .get("/showSubSchools/" + this.editedItem.school_name)
+        .catch((error) => {
+          alert.error(
+            true,
+            "No fue posible obtener la información de los espacios.",
+            "fail"
+          );
+        });
+
+      this.subSchools = data.sub_schools;
+    },
+
     async initialize() {
       this.loading = true;
       this.records = [];
 
       let requests = [
         this.getDataFromApi(),
-        subSchoolApi.get(null, {
+        schoolApi.get(null, {
           params: {
             itemsPerPage: -1,
           },
@@ -381,7 +414,7 @@ export default {
       });
 
       if (responses) {
-        this.subSchools = responses[1].data.data;
+        this.schools = responses[1].data.data;
         this.pensumTypes = responses[2].data.data;
       }
 

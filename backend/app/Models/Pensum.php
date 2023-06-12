@@ -62,7 +62,11 @@ class Pensum extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Pensum::where('pensum.program_name', 'like', $search)
+        return Pensum::select('pensum.*', 'sub_school.sub_school_name', 'pensum_type.pensum_type_name', 'school.school_name',)
+            ->join('sub_school', 'pensum.sub_school_id', '=', 'sub_school.id')
+            ->join('pensum_type', 'pensum.pensum_type_id', '=', 'pensum_type.id')
+            ->join('school', 'sub_school.school_id', '=', 'school.id')
+            ->where('pensum.program_name', 'like', $search)
             ->orWhere('pensum.uv_total', 'like', $search)
             ->orWhere('pensum.required_subject', 'like', $search)
             ->orWhere('pensum.optional_subject', 'like', $search)
@@ -73,14 +77,16 @@ class Pensum extends Model
             ->skip($skip)
             ->take($itemsPerpage)
             ->orderBy("pensum.$sortBy", $sort)
-            ->get()
-            ->map(fn ($pensum) => $pensum->format());
+            ->get();
+        // ->map(fn ($pensum) => $pensum->format());
     }
 
     public static function counterPagination($search)
     {
-        return Pensum::select('pensum.*', 'pensum.id as id')
-
+        return Pensum::select('pensum.*', 'sub_school.sub_school_name', 'pensum_type.pensum_type_name', 'school.school_name',)
+            ->join('sub_school', 'pensum.sub_school_id', '=', 'sub_school.id')
+            ->join('pensum_type', 'pensum.pensum_type_id', '=', 'pensum_type.id')
+            ->join('school', 'sub_school.school_id', '=', 'school.id')
             ->where('pensum.program_name', 'like', $search)
             ->orWhere('pensum.uv_total', 'like', $search)
             ->orWhere('pensum.required_subject', 'like', $search)
