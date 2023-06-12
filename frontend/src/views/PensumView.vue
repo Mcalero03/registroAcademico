@@ -86,15 +86,16 @@
               <!-- cycle_quantity  -->
               <!-- study_plan_year  -->
               <v-col cols="4" sm="3" md="2">
-                <base-input
-                  label="Año"
+                <base-select
+                  label="Plan de estudio"
+                  :items="years"
+                  item-title="index"
+                  item-value="option"
                   v-model="v$.editedItem.study_plan_year.$model"
                   :rules="v$.editedItem.study_plan_year"
-                  type="number"
-                  min="1900"
-                  max="2099"
                 />
               </v-col>
+              <!-- study_plan_year  -->
               <!-- uv_total  -->
               <v-col cols="4" sm="4" md="4">
                 <base-input
@@ -256,6 +257,7 @@ export default {
       total: 0,
       records: [],
       schools: [],
+      years: [],
       subSchools: [],
       pensumTypes: [],
       loading: false,
@@ -435,6 +437,7 @@ export default {
           this.records = data.data;
           this.total = data.total;
           this.loading = false;
+          this.years = data.years;
         } catch (error) {
           alert.error("No fue posible obtener los registros.");
         }

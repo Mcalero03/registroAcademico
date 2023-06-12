@@ -45,11 +45,15 @@ class CycleController extends Controller
         $cycles = Cycle::cycle();
         $total = Cycle::counterPagination($search);
 
+        $years = range(2023, 2099);
+        $yearsAsString = array_map('strval', $years);
+
         return response()->json([
             "message" => "Registros obtenidos correctamente.",
             "data" => $cycle,
             "cycles" => $cycles,
             "total" => $total,
+            "years" => $yearsAsString
         ]);
     }
 

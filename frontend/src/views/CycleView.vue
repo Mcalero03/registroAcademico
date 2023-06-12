@@ -76,13 +76,21 @@
               <!-- cycle_number  -->
               <!-- year  -->
               <v-col cols="6" sm="3" md="3">
-                <base-input
+                <!-- <base-input
                   label="Año lectivo"
                   v-model="v$.editedItem.year.$model"
                   :rules="v$.editedItem.year"
                   type="number"
                   min="1900"
                   max="2099"
+                />  -->
+                <base-select
+                  label="Año lectivo"
+                  :items="years"
+                  item-title="index"
+                  item-value="option"
+                  v-model="v$.editedItem.year.$model"
+                  :rules="v$.editedItem.year"
                 />
               </v-col>
               <!-- year  -->
@@ -304,6 +312,7 @@ export default {
       ],
       total: 0,
       records: [],
+      years: [],
       schools: [],
       pensums: [],
       selected: [],
@@ -480,6 +489,7 @@ export default {
 
           this.records = data.data;
           this.total = data.total;
+          this.years = data.years;
           this.loading = false;
         } catch (error) {
           alert.error("No fue posible obtener los registros.");
