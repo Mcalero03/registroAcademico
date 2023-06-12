@@ -39,12 +39,6 @@
             @click="editItem(item.raw)"
             icon="mdi-eye"
           />
-          <!-- <v-icon
-            size="20"
-            class="mr-2"
-            @click="deleteItem(item.raw)"
-            icon="mdi-delete"
-          /> -->
         </template>
         <template v-slot:no-data>
           <v-icon @click="initialize" icon="mdi-refresh" />
@@ -63,6 +57,19 @@
           <v-container>
             <!-- Form -->
             <v-row class="pt-0" v-if="editedIndex == -1">
+              <!-- school  -->
+              <v-col cols="12" sm="6" md="6">
+                <v-label>Escuela</v-label>
+                <base-select
+                  :items="schools"
+                  item-title="school_name"
+                  item-value="school_name"
+                  v-model="v$.editedItem.school.$model"
+                  :rules="v$.editedItem.school"
+                  @blur="changeTeacher"
+                />
+              </v-col>
+              <!-- school  -->
               <!-- teacher  -->
               <v-col cols="12" sm="6" md="6">
                 <v-label>Maestro</v-label>
@@ -209,7 +216,7 @@ import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, required } from "@vuelidate/validators";
 import attendanceApi from "@/services/attendanceApi";
-import teacherApi from "@/services/teacherApi";
+import schoolApi from "@/services/schoolApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
@@ -243,6 +250,7 @@ export default {
       ],
       total: 0,
       records: [],
+      schools: [],
       teachers: [],
       teacherSubject: [],
       teacherStudentGroup: [],
@@ -251,6 +259,7 @@ export default {
       options: {},
       editedItem: {
         teacher: "",
+        school: "",
         subject: "",
         group: "",
         attendance_date: this.getDate(),
@@ -261,6 +270,7 @@ export default {
         teacher: "",
         subject: "",
         group: "",
+        school: "",
         attendance_date: this.getDate(),
         attendance_time: this.getTime(),
         attendances: [],
@@ -307,12 +317,29 @@ export default {
         group: {
           required: helpers.withMessage(langMessages.required, required),
         },
+        school: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
       },
     };
   },
 
   methods: {
     //METHODS TO CHANGE
+    async changeTeacher() {
+      const { data } = await attendanceApi
+        .get("/bySchool/" + this.editedItem.school)
+        .catch((error) => {
+          alert.error(
+            true,
+            "No fue posible obtener la información de los espacios.",
+            "fail"
+          );
+        });
+
+      this.teachers = data.teachers;
+    },
+
     async changeSubject() {
       const teacher = this.v$.editedItem.teacher.$model;
       var arr = teacher.split(", ");
@@ -378,7 +405,7 @@ export default {
 
       let requests = [
         this.getDataFromApi(),
-        teacherApi.get(null, {
+        schoolApi.get(null, {
           params: {
             itemsPerPage: -1,
           },
@@ -389,7 +416,7 @@ export default {
       });
 
       if (responses) {
-        this.teachers = responses[1].data.data;
+        this.schools = responses[1].data.data;
       }
 
       this.loading = false;
