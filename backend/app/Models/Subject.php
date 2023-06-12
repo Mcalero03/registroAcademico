@@ -33,9 +33,11 @@ class Subject extends Model
     ];
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Subject::select(DB::raw('CASE WHEN subject.status=0 THEN "Sin prerrequisito" ELSE "Con prerrequisito" END as prerequisite'), 'subject.*', 'subject.id as id', 'pensum.program_name', 'pensum_subject_detail.id as pensum_subject_detail_id')
+        return Subject::select(DB::raw('CASE WHEN subject.status=0 THEN "Sin prerrequisito" ELSE "Con prerrequisito" END as prerequisite'), 'subject.*', 'subject.id as id', 'pensum.program_name', 'pensum_subject_detail.id as pensum_subject_detail_id', 'school.school_name')
             ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
             ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+            ->leftjoin('sub_school', 'pensum.sub_school_id', '=', 'sub_school.id')
+            ->leftjoin('school', 'sub_school.school_id', '=', 'school.id')
             ->where('subject.subject_name', 'like', $search)
             ->orwhere('subject.subject_code', 'like', $search)
             ->orWhere('subject.average_approval', 'like', $search)
@@ -50,9 +52,11 @@ class Subject extends Model
 
     public static function counterPagination($search)
     {
-        return Subject::select(DB::raw('CASE WHEN subject.status=0 THEN "Sin prerrequisito" ELSE "Con prerrequisito" END as prerequisite'), 'subject.*', 'subject.id as id', 'pensum_subject_detail.program_name')
+        return Subject::select(DB::raw('CASE WHEN subject.status=0 THEN "Sin prerrequisito" ELSE "Con prerrequisito" END as prerequisite'), 'subject.*', 'subject.id as id', 'pensum.program_name', 'pensum_subject_detail.id as pensum_subject_detail_id', 'school.school_name')
             ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
             ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+            ->leftjoin('sub_school', 'pensum.sub_school_id', '=', 'sub_school.id')
+            ->leftjoin('school', 'sub_school.school_id', '=', 'school.id')
             ->where('subject.subject_name', 'like', $search)
             ->orwhere('subject.subject_code', 'like', $search)
             ->orWhere('subject.average_approval', 'like', $search)
