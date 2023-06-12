@@ -72,7 +72,7 @@
             <!-- Form -->
             <v-row class="pt-0">
               <!-- subject_name  -->
-              <v-col cols="12" sm="6" md="6">
+              <v-col cols="12" sm="7" md="7">
                 <base-input
                   label="Nombre de la materia"
                   v-model="v$.editedItem.subject_name.$model"
@@ -81,7 +81,7 @@
               </v-col>
               <!-- subject_name  -->
               <!-- subject_code  -->
-              <v-col cols="12" sm="6" md="6">
+              <v-col cols="12" sm="5" md="5">
                 <base-input
                   label="Código de la materia"
                   v-model="v$.editedItem.subject_code.$model"
@@ -90,7 +90,7 @@
               </v-col>
               <!-- subject_code  -->
               <!-- average_approval  -->
-              <v-col cols="6" sm="6" md="6">
+              <v-col cols="7" sm="7" md="7">
                 <base-input
                   label="Promedio de aprobación"
                   v-model="v$.editedItem.average_approval.$model"
@@ -103,9 +103,9 @@
               </v-col>
               <!-- average_approval  -->
               <!-- units_value  -->
-              <v-col cols="6" sm="6" md="6">
+              <v-col cols="5" sm="5" md="5">
                 <base-input
-                  label="Unidades valorativas"
+                  label="U.V"
                   v-model="v$.editedItem.units_value.$model"
                   :rules="v$.editedItem.units_value"
                   type="number"
@@ -114,10 +114,61 @@
                 />
               </v-col>
               <!-- units_value  -->
-              <!-- status  -->
-              <v-col cols="6" sm="6" md="6">
+              <!-- school_name  -->
+              <v-col cols="12" sm="7" md="7">
+                <v-label>Escuela</v-label>
                 <base-select
-                  label="Estado"
+                  :items="schools"
+                  item-title="school_name"
+                  item-value="school_name"
+                  v-model="v$.editedItem.school_name.$model"
+                  :rules="v$.editedItem.school_name"
+                  readonly
+                  v-if="editedIndex != -1"
+                >
+                </base-select>
+                <base-select
+                  :items="schools"
+                  item-title="school_name"
+                  item-value="school_name"
+                  v-model="v$.editedItem.school_name.$model"
+                  :rules="v$.editedItem.school_name"
+                  v-else-if="editedIndex == -1"
+                  @blur="changePensum"
+                >
+                  >
+                </base-select>
+              </v-col>
+              <!-- school_name  -->
+              <!-- program_name  -->
+              <v-col cols="12" sm="5" md="5">
+                <v-label>Programa</v-label>
+                <base-select
+                  :items="pensums"
+                  item-title="program_name"
+                  item-value="program_name"
+                  v-model="v$.editedItem.program_name.$model"
+                  :rules="v$.editedItem.program_name"
+                  readonly
+                  v-if="editedIndex != -1"
+                >
+                </base-select>
+                <base-select
+                  :items="pensums"
+                  item-title="program_name"
+                  item-value="program_name"
+                  v-model="v$.editedItem.program_name.$model"
+                  :rules="v$.editedItem.program_name"
+                  v-else-if="editedIndex == -1"
+                >
+                  >
+                </base-select>
+              </v-col>
+              <!-- program_name  -->
+              <!-- status  -->
+              <v-col cols="12" sm="6" md="6">
+                <v-label>Estado</v-label>
+                <base-select
                   :items="status"
                   v-model="v$.editedItem.prerequisite.$model"
                   :rules="v$.editedItem.prerequisite"
@@ -126,7 +177,6 @@
                 >
                 </base-select>
                 <base-select
-                  label="Estado"
                   :items="status"
                   v-model="v$.editedItem.prerequisite.$model"
                   :rules="v$.editedItem.prerequisite"
@@ -135,36 +185,12 @@
                 </base-select>
               </v-col>
               <!-- status  -->
-              <!-- program_name  -->
-              <v-col cols="6" sm="6" md="6">
-                <base-select
-                  label="Programa"
-                  :items="pensums"
-                  item-title="program_name"
-                  item-value="program_name"
-                  v-model="v$.editedItem.program_name.$model"
-                  :rules="v$.editedItem.program_name"
-                  readonly
-                  v-if="editedIndex != -1"
-                >
-                </base-select>
-                <base-select
-                  label="Programa"
-                  :items="pensums"
-                  item-title="program_name"
-                  item-value="program_name"
-                  v-model="v$.editedItem.program_name.$model"
-                  :rules="v$.editedItem.program_name"
-                  v-else-if="editedIndex == -1"
-                  @change="change"
-                >
-                  >
-                </base-select>
-              </v-col>
-              <!-- program_name  -->
               <!-- prerequisite -->
               <v-col
-                class="pt-5 pb-5 mt-2"
+                cols="12"
+                sm="6"
+                md="6"
+                class="pl-4 pt-6 pb-5 mt-6"
                 v-if="
                   editedIndex != -1 &&
                   editedItem.prerequisite == 'Con prerrequisito'
@@ -338,7 +364,7 @@ import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
 
 import subjectApi from "@/services/subjectApi";
-import pensumApi from "@/services/pensumApi";
+import schoolApi from "@/services/schoolApi";
 import pensumSubjectDetailApi from "@/services/pensumSubjectDetailApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
@@ -376,6 +402,7 @@ export default {
       ],
       total: 0,
       records: [],
+      schools: [],
       pensums: [],
       pensumSubject: [],
       status: ["Sin prerrequisito", "Con prerrequisito"],
@@ -390,6 +417,7 @@ export default {
         program_name: "",
         prerequisite: "",
         prerequisites: [],
+        school_name: "",
       },
       defaultItem: {
         subject_name: "",
@@ -399,6 +427,7 @@ export default {
         prerequisite: "",
         program_name: "",
         prerequisites: [],
+        school_name: "",
       },
       prerequisite: {
         prerequisite: "",
@@ -480,6 +509,9 @@ export default {
         program_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
+        school_name: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
       },
       prerequisite: {
         prerequisite: {},
@@ -488,6 +520,20 @@ export default {
   },
 
   methods: {
+    async changePensum() {
+      const { data } = await subjectApi
+        .get("/bySchool/" + this.editedItem.school_name)
+        .catch((error) => {
+          alert.error(
+            true,
+            "No fue posible obtener la información de los espacios.",
+            "fail"
+          );
+        });
+
+      this.pensums = data.program_name;
+    },
+
     async change() {
       const { data } = await pensumSubjectDetailApi
         .get(
@@ -509,7 +555,7 @@ export default {
 
       let requests = [
         this.getDataFromApi(),
-        pensumApi.get(null, {
+        schoolApi.get(null, {
           params: {
             itemsPerPage: -1,
           },
@@ -520,7 +566,7 @@ export default {
       });
 
       if (responses) {
-        this.pensums = responses[1].data.data;
+        this.schools = responses[1].data.data;
       }
 
       this.loading = false;

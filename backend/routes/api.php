@@ -50,6 +50,7 @@ Route::get('/group/byStartTime/{start_time}/{week_day}', [GroupController::class
 Route::get('/group/classroombyTeacher/{teacher}', [GroupController::class, 'classroombyTeacher']);
 Route::resource('/relative', RelativeController::class);
 Route::resource('/subject', SubjectController::class);
+Route::get('/subject/bySchool/{school}', [SubjectController::class, 'bySchool']);
 Route::get('/subject/subjectByCycle/{school}', [SubjectController::class, 'subjectByCycle']);
 Route::resource('/teacher', TeacherController::class);
 Route::resource('/subSchool', SubSchoolController::class);

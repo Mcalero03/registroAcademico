@@ -8,6 +8,7 @@ use App\Models\Prerequisite;
 use App\Models\Pensum;
 use Illuminate\Http\Request;
 use Encrypt;
+use App\Models\School;
 
 class SubjectController extends Controller
 {
@@ -200,6 +201,22 @@ class SubjectController extends Controller
         return response()->json([
             "message" => "Registro encontrado correctamente",
             "subject" => $subject
+        ]);
+    }
+
+    public function bySchool($school)
+    {
+        $school_id = School::where('school_name', $school)->first()->id;
+
+        $program_name = Pensum::select('pensum.program_name')
+            ->join('sub_school', 'pensum.sub_school_id', '=', 'sub_school.id')
+            ->join('school', 'sub_school.school_id', '=', 'school.id')
+            ->where('sub_school.school_id', $school_id)
+            ->get();
+
+        return response()->json([
+            "message" => "Registro encontrado correctamente",
+            "program_name" => $program_name
         ]);
     }
 }
