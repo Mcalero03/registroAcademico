@@ -64,7 +64,7 @@
             <!-- Form -->
             <v-row class="pt-0">
               <!-- schools  -->
-              <v-col cols="12" sm="4" md="4">
+              <v-col cols="12" sm="8" md="8">
                 <v-label>Escuela</v-label>
                 <base-select
                   :items="schools"
@@ -81,7 +81,6 @@
                   item-value="school_name"
                   v-model="v$.editedItem.school_name.$model"
                   :rules="v$.editedItem.school_name"
-                  @blur="changeSubject"
                   v-if="editedIndex != -1"
                   readonly
                 />
@@ -105,14 +104,13 @@
                   item-value="subject_name"
                   v-model="v$.editedItem.subject_name.$model"
                   :rules="v$.editedItem.subject_name"
-                  @blur="change"
                   v-if="editedIndex != -1"
                   readonly
                 />
               </v-col>
               <!-- subject_name  -->
               <!-- subject_code  -->
-              <v-col cols="12" sm="4" md="4">
+              <v-col cols="12" sm="6" md="6" class="m-0 pr-4 pt-0">
                 <v-label>Código de materia</v-label>
                 <base-select
                   :items="codes"
@@ -129,14 +127,13 @@
                   item-value="subject_code"
                   v-model="v$.editedItem.subject_code.$model"
                   :rules="v$.editedItem.subject_code"
-                  @blur="change"
                   v-if="editedIndex != -1"
                   readonly
                 />
               </v-col>
               <!-- subject_code  -->
               <!-- teacher  -->
-              <v-col cols="12" sm="4" md="4" class="m-0 pr-4 pb-5 pt-0">
+              <v-col cols="12" sm="6" md="6" class="m-0 pr-4 pt-0">
                 <v-label>Profesor</v-label>
                 <base-select
                   :items="teachers"
@@ -158,7 +155,7 @@
               </v-col>
               <!-- teacher  -->
               <!-- group_code  -->
-              <v-col cols="12" sm="4" md="4" class="mt-2">
+              <v-col cols="12" sm="4" md="4">
                 <base-input
                   label="Código de grupo"
                   v-model="v$.editedItem.group_code.$model"
@@ -167,7 +164,7 @@
               </v-col>
               <!-- group_code  -->
               <!-- student_quantity  -->
-              <v-col cols="12" sm="4" md="4" class="mt-2">
+              <v-col cols="12" sm="4" md="4">
                 <base-input
                   label="Cantidad de estudiantes"
                   v-model="v$.editedItem.students_quantity.$model"
@@ -394,7 +391,6 @@ import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
 import groupApi from "@/services/groupApi";
 import schoolApi from "@/services/schoolApi";
 import subjectApi from "@/services/subjectApi";
-import teacherApi from "@/services/teacherApi";
 import classroomApi from "@/services/classroomApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
@@ -554,7 +550,7 @@ export default {
     //METHODS TO CHANGE
     async changeSubject() {
       const { data } = await subjectApi
-        .get("/subjectByCycle/" + this.v$.editedItem.school_name.$model)
+        .get("/subjectByCycle/" + this.editedItem.school_name)
         .catch((error) => {
           alert.error(
             true,
@@ -562,13 +558,13 @@ export default {
             "fail"
           );
         });
-
       this.subjects = data.subject;
+      this.teachers = data.teacher;
     },
 
     async change() {
       const { data } = await groupApi
-        .get("/bySubject/" + this.v$.editedItem.subject_name.$model)
+        .get("/bySubject/" + this.editedItem.subject_name)
         .catch((error) => {
           alert.error(
             true,
@@ -647,7 +643,7 @@ export default {
 
       let requests = [
         this.getDataFromApi(),
-        teacherApi.get(null, { params: { itemsPerPage: -1 } }),
+        // teacherApi.get(null, { params: { itemsPerPage: -1 } }),
         schoolApi.get(null, { params: { itemsPerPage: -1 } }),
         classroomApi.get(null, { params: { itemsPerPage: -1 } }),
       ];
@@ -656,9 +652,9 @@ export default {
       });
 
       if (responses) {
-        this.teachers = responses[1].data.data;
-        this.schools = responses[2].data.data;
-        this.classrooms = responses[3].data.available;
+        // this.teachers = responses[1].data.data;
+        this.schools = responses[1].data.data;
+        this.classrooms = responses[2].data.available;
       }
 
       this.loading = false;
@@ -741,7 +737,6 @@ export default {
     closeScheduleDialog() {
       this.v$.schedule.$reset();
       this.dialogSchedule = false;
-      // this.editedRelative = -1;
     },
 
     addRecord() {

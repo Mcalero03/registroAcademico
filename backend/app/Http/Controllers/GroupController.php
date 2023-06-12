@@ -150,20 +150,6 @@ class GroupController extends Controller
             "message" => "Registro eliminado correctamente.",
         ]);
     }
-    public function bySchool($school)
-    {
-        $school_id = School::where('school_name', $school)->first()?->id;
-
-        $teacher = Teacher::select(DB::raw("CONCAT(teacher.name, ', ', teacher.last_name) as full_name"))
-            ->join('school', 'teacher.school_id', '=', 'school.id')
-            ->where('school.id', 'like', $school_id)
-            ->get();
-
-        return response()->json([
-            "message" => "Registros obtenidos correctamente.",
-            "teacher" => $teacher,
-        ]);
-    }
 
     public function bySubject($subject)
     {
