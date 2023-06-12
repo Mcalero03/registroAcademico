@@ -31,6 +31,8 @@ class PensumController extends Controller
 
         $pensum = Pensum::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
 
+        $pensum = Encrypt::encryptObject($pensum, 'id');
+
         $total = Pensum::counterPagination($search);
 
         return response()->json([
@@ -103,6 +105,19 @@ class PensumController extends Controller
 
         return response()->json([
             "message" => "Registo eliminado correctamente",
+        ]);
+    }
+
+    public function showSubSchools($school)
+    {
+        $sub_schools = SubSchool::select('sub_school.sub_school_name')
+            ->join('school', 'sub_school.school_id', '=', 'school.id')
+            ->where('school_name', $school)
+            ->get();
+
+        return response()->json([
+            "message" => "Registro encontrado correctamente",
+            "sub_schools" => $sub_schools,
         ]);
     }
 }

@@ -57,6 +57,7 @@ Route::resource('/cycle', CycleController::class);
 Route::get('/cycle/bySchool/{school}', [CycleController::class, 'bySchool']);
 Route::get('/cycle/byPensum/{pensum}', [CycleController::class, 'byPensum']);
 Route::resource('/pensum', PensumController::class);
+Route::get('/pensum/showSubSchools/{school}', [PensumController::class, 'showSubSchools']);
 Route::resource('/pensumSubjectDetail', PensumSubjectDetailController::class);
 Route::resource('/municipality', MunicipalityController::class);
 Route::resource('/schedule', ScheduleController::class);
