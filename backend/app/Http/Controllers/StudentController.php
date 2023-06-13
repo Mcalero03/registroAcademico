@@ -8,6 +8,7 @@ use App\Models\Relative;
 use App\Models\Kinship;
 use App\Models\StudentPensumDetail;
 use App\Models\Pensum;
+use App\Models\School;
 use Encrypt;
 use Illuminate\Support\Facades\Crypt;
 
@@ -200,8 +201,13 @@ class StudentController extends Controller
 
     public function career(Request $request)
     {
+        $school_id = School::where('school_name', $request->school)->first()->id;
+
         if ($request->id == 0) {
             $career = Pensum::select('pensum.program_name')
+                ->join('sub_school', 'pensum.sub_school_id', '=', 'sub_school.id')
+                ->join('school', 'sub_school.school_id', '=', 'school.id')
+                ->where('sub_school.school_id', $school_id)
                 ->get('pensum.program_name');
 
             return response()->json([
@@ -224,6 +230,9 @@ class StudentController extends Controller
                     ->get();
 
                 $careerList = Pensum::select('pensum.program_name')
+                    ->join('sub_school', 'pensum.sub_school_id', '=', 'sub_school.id')
+                    ->join('school', 'sub_school.school_id', '=', 'school.id')
+                    ->where('sub_school.school_id', $school_id)
                     ->whereNotIn('pensum.program_name', $careerExists)
                     ->get('pensum.program_name');
 
@@ -233,6 +242,9 @@ class StudentController extends Controller
                 ]);
             } else {
                 $career = Pensum::select('pensum.program_name')
+                    ->join('sub_school', 'pensum.sub_school_id', '=', 'sub_school.id')
+                    ->join('school', 'sub_school.school_id', '=', 'school.id')
+                    ->where('sub_school.school_id', $school_id)
                     ->get('pensum.program_name');
 
                 return response()->json([

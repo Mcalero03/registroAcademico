@@ -27,6 +27,8 @@ class StudentSeeder extends Seeder
                 "mail" => "marta.gonzalez@gmail.com",
                 "admission_date" => "2023-01-14",
                 "municipalities_id" => 111,
+                "school_id" => 1,
+
             ],
             // [
             //     "id" => 2,
