@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('mail');
             $table->date('admission_date');
             $table->foreignId('municipalities_id')->constrained('municipalities');
+            $table->foreignId('school_id')->constrained('school');
             $table->softDeletes();
             $table->timestamps();
         });

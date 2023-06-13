@@ -63,7 +63,9 @@ Route::resource('/pensumSubjectDetail', PensumSubjectDetailController::class);
 Route::resource('/municipality', MunicipalityController::class);
 Route::resource('/schedule', ScheduleController::class);
 Route::resource('/student', StudentController::class);
-Route::get('/student/byCareer/{id}', [StudentController::class, 'career']);
+// Route::get('/student/byCareer/{id}', [StudentController::class, 'career']);
+Route::get('/student/byCareer/{id}/{school}', [StudentController::class, 'career']);
+
 Route::resource('/inscription', InscriptionController::class);
 Route::get('/inscription/showSchedules/{inscription}', [InscriptionController::class, 'showSchedules']);
 Route::get('/inscription/showCareers/{student}', [InscriptionController::class, 'showCareers']);
