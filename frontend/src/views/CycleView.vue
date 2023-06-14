@@ -76,14 +76,6 @@
               <!-- cycle_number  -->
               <!-- year  -->
               <v-col cols="6" sm="3" md="3">
-                <!-- <base-input
-                  label="Año lectivo"
-                  v-model="v$.editedItem.year.$model"
-                  :rules="v$.editedItem.year"
-                  type="number"
-                  min="1900"
-                  max="2099"
-                />  -->
                 <base-select
                   label="Año lectivo"
                   :items="years"

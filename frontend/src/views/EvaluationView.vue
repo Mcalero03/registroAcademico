@@ -73,6 +73,16 @@
                   v-model="v$.editedItem.school_name.$model"
                   :rules="v$.editedItem.school_name"
                   @blur="showTeachers"
+                  v-if="editedIndex == -1"
+                />
+                <base-select
+                  :items="schools"
+                  item-title="school_name"
+                  item-value="school_name"
+                  v-model="v$.editedItem.school_name.$model"
+                  :rules="v$.editedItem.school_name"
+                  v-if="editedIndex != -1"
+                  readonly
                 />
               </v-col>
               <!-- school  -->
@@ -86,6 +96,16 @@
                   v-model="v$.editedItem.teacher_name.$model"
                   :rules="v$.editedItem.teacher_name"
                   @blur="showSubjects"
+                  v-if="editedIndex == -1"
+                />
+                <base-select
+                  :items="teachers"
+                  item-title="full_name"
+                  item-value="full_name"
+                  v-model="v$.editedItem.teacher_name.$model"
+                  :rules="v$.editedItem.teacher_name"
+                  v-if="editedIndex != -1"
+                  readonly
                 />
               </v-col>
               <!-- teacher_name  -->
@@ -99,6 +119,16 @@
                   v-model="v$.editedItem.subject_name.$model"
                   :rules="v$.editedItem.subject_name"
                   @blur="showGroups"
+                  v-if="editedIndex == -1"
+                />
+                <base-select
+                  :items="subjects"
+                  item-title="subject_name"
+                  item-value="subject_name"
+                  v-model="v$.editedItem.subject_name.$model"
+                  :rules="v$.editedItem.subject_name"
+                  v-if="editedIndex != -1"
+                  readonly
                 />
               </v-col>
               <!-- subject_name  -->
@@ -112,6 +142,16 @@
                   v-model="v$.editedItem.group_code.$model"
                   :rules="v$.editedItem.group_code"
                   @blur="showStudents"
+                  v-if="editedIndex == -1"
+                />
+                <base-select
+                  :items="groups"
+                  item-title="group_code"
+                  item-value="group_code"
+                  v-model="v$.editedItem.group_code.$model"
+                  :rules="v$.editedItem.group_code"
+                  v-if="editedIndex != -1"
+                  readonly
                 />
               </v-col>
               <!-- group_code  -->
