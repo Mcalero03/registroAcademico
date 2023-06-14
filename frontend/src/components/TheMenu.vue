@@ -1,88 +1,108 @@
 <template>
-  <!-- v-icon size= "25" -->
   <div
     class="menu-sidebar d-flex flex-column align-center"
     :class="stateSideBar"
   >
-    <div class="menu-button mt-5 mb-4">
+    <div class="menu-button mt-5">
       <a href="#" @click="stateSideBar = 'inactive'">
-        <v-icon icon="mdi-menu mt-1" :size="45"></v-icon>
+        <v-icon icon="mdi-menu mt-1" :size="50" class="pl-16 ml-6"></v-icon>
       </a>
     </div>
-    <div class="menu-options mt-3 text-center">
+    <div class="menu-options">
       <template v-if="isLoggedIn">
-        <!-- <RouterLink to="/" class="d-flex flex-column align-center mb-4">
-          <v-icon icon="mdi-home" size="15"></v-icon>
-          <span>Bases de datos</span>
-        </RouterLink> -->
-        <v-menu>
-          <template v-slot:activator="{ props }">
-            <v-btn v-bind="props" class="align-center mb-4"
-              ><v-icon icon="mdi-security" size="15" color="#313945"></v-icon>
-            </v-btn>
-          </template>
-          <v-list>
-            <v-list-item
-              v-for="(item, index) in admin"
-              :key="index"
-              :value="index"
-              :prepend-icon="item.icon"
-              :to="item.url"
-            >
-              <v-list-item-title size="15">{{ item.title }} </v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-        <v-menu>
-          <template v-slot:activator="{ props }">
-            <v-btn v-bind="props" class="align-center mb-4"
-              ><v-icon icon="mdi-school" size="15" color="#313945"></v-icon>
-            </v-btn>
-          </template>
-          <v-list>
-            <v-list-item
-              v-for="(item, index) in academic"
-              :key="index"
-              :value="index"
-              :prepend-icon="item.icon"
-              :to="item.url"
-            >
-              <v-list-item-title size="15">{{ item.title }} </v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
+        <v-expansion-panels class="my-1">
+          <v-expansion-panel :elevation="0">
+            <v-expansion-panel-title id="panel" :elevation="0">
+              <v-icon
+                icon="mdi-security"
+                size="15"
+                color="white"
+                class="mr-2"
+              ></v-icon
+              >Administrador
+            </v-expansion-panel-title>
+            <v-expansion-panel-text id="panel">
+              <v-btn
+                v-for="(item, index) in admin"
+                :key="index"
+                :value="index"
+                :append-icon="item.icon"
+                :href="item.url"
+                :text="item.title"
+                id="btn-menu"
+                :elevation="0"
+                class="justify-content-start"
+              ></v-btn>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
 
-        <v-menu>
-          <template v-slot:activator="{ props }">
-            <v-btn v-bind="props" class="align-center mb-4"
-              ><v-icon icon="mdi-cogs" size="15" color="#313945"></v-icon>
-            </v-btn>
-          </template>
-          <v-list>
-            <v-list-item
-              v-for="(item, index) in settings"
-              :key="index"
-              :value="index"
-              :prepend-icon="item.icon"
-              :to="item.url"
+          <v-expansion-panel :elevation="0">
+            <v-expansion-panel-title id="panel">
+              <v-icon
+                icon="mdi-school"
+                size="15"
+                color="white"
+                class="mr-2"
+              ></v-icon>
+              Administración Académica
+            </v-expansion-panel-title>
+            <v-expansion-panel-text id="panel">
+              <v-btn
+                v-for="(item, index) in academic"
+                :key="index"
+                :value="index"
+                :append-icon="item.icon"
+                :href="item.url"
+                :text="item.title"
+                id="btn-menu"
+                :elevation="0"
+                class="justify-content-start"
+              ></v-btn>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+
+          <v-expansion-panel :elevation="0">
+            <v-expansion-panel-title id="panel">
+              <v-icon
+                icon="mdi-cogs"
+                size="15"
+                color="white"
+                class="mr-2"
+              ></v-icon>
+              Ajustes
+            </v-expansion-panel-title>
+            <v-expansion-panel-text id="panel">
+              <v-btn
+                v-for="(item, index) in settings"
+                :key="index"
+                :value="index"
+                :append-icon="item.icon"
+                :href="item.url"
+                :text="item.title"
+                id="btn-menu"
+                :elevation="0"
+                class="justify-content-start"
+              ></v-btn>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+          <RouterLink
+            to="/"
+            @click="logout()"
+            class="d-flex flex-column align-center mt-4"
+          >
+            <span class="justify-content-start">
+              <v-icon icon="mdi-logout" size="15" class="mr-2"></v-icon>Cerrar
+              sesión</span
             >
-              <v-list-item-title size="15">{{ item.title }} </v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-        <RouterLink
-          to="/"
-          class="d-flex flex-column align-center mb-4"
-          @click="logout()"
-        >
-          <v-icon icon="mdi-logout" size="15"></v-icon>
-          <span>Cerrar sesión</span>
-        </RouterLink>
+          </RouterLink>
+        </v-expansion-panels>
       </template>
       <template v-else>
-        <RouterLink to="/" class="d-flex flex-column align-center mb-4">
-          <v-icon icon="mdi-login" size="15"></v-icon>
-          <span>Iniciar sesión</span>
+        <RouterLink to="/" class="mt-4">
+          <span>
+            <v-icon icon="mdi-login" size="15" class="mr-2"></v-icon>
+            Iniciar sesión</span
+          >
         </RouterLink>
         <!-- <RouterLink to="/register" class="d-flex flex-column align-center mb-4">
           <v-icon icon="mdi-account-plus" size="15"></v-icon>
@@ -151,12 +171,6 @@ export default {
       //   url: "/pensumSubjectDetail",
       //   icon: "mdi-details",
       // },
-
-      // {
-      //   title: "Detalle Profesor Materia",
-      //   url: "/teacherSubjectDetail",
-      //   icon: "mdi-details",
-      // },
     ],
     academic: [
       {
@@ -215,8 +229,24 @@ export default {
 <style lang="scss">
 @import "@/assets/styles/variables.scss";
 
+span {
+  font-size: 14px;
+}
+
+#btn-menu {
+  width: 8rem;
+  background-color: $menu-color !important;
+  color: white;
+  font-size: 12px;
+}
+
+#panel {
+  background-color: $menu-color !important;
+  color: white;
+}
+
 .menu-sidebar {
-  width: 6rem;
+  width: 12.5rem;
   height: 100vh;
   position: fixed;
   top: 0;
@@ -230,7 +260,7 @@ export default {
 }
 
 .inactive {
-  left: -6rem;
+  left: -12.5rem;
   animation: linear;
   animation-name: hideMenu;
   animation-duration: 0.4s;
@@ -242,8 +272,8 @@ export default {
     transform: translateX(0);
   }
   100% {
-    left: -6rem;
-    transform: translateX(-6rem);
+    left: -12.5rem;
+    transform: translateX(-12.5rem);
   }
 }
 
@@ -256,8 +286,8 @@ export default {
 
 @keyframes showMenu {
   0% {
-    left: -6rem;
-    transform: translateX(-6rem);
+    left: -12.5rem;
+    transform: translateX(-12.5rem);
   }
   100% {
     left: 0;

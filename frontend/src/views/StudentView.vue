@@ -64,6 +64,31 @@
           <v-container>
             <!-- Form -->
             <v-row class="pt-0">
+              <!-- school_name -->
+              <v-col cols="12" sm="8" md="8">
+                <v-label>Escuela</v-label>
+                <base-select
+                  :items="schools"
+                  item-title="school_name"
+                  item-value="school_name"
+                  placeholder="Seleccione una escuela"
+                  v-model="v$.editedItem.school_name.$model"
+                  :rules="v$.editedItem.school_name"
+                  v-if="editedIndex == -1"
+                >
+                </base-select>
+                <base-select
+                  :items="schools"
+                  item-title="school_name"
+                  item-value="school_name"
+                  v-model="v$.editedItem.school_name.$model"
+                  :rules="v$.editedItem.school_name"
+                  v-if="editedIndex != -1"
+                  readonly
+                >
+                </base-select>
+              </v-col>
+              <!-- school_name -->
               <!-- name  -->
               <v-col cols="12" sm="6" md="6">
                 <base-input
@@ -149,6 +174,7 @@
               </v-col>
             </v-row>
             <!-- municipality_name  -->
+
             <!-- relative -->
             <v-row align="center" justify="center">
               <v-col cols="auto" class="pt-5 pb-5 mt-2">
@@ -308,7 +334,7 @@
                   <v-table>
                     <thead>
                       <tr>
-                        <th>NOMBRE</th>
+                        <th>CARRERA</th>
                         <th class="text-center">ACCIÓN</th>
                       </tr>
                     </thead>
@@ -362,8 +388,8 @@
                       <v-row>
                         <!-- program_name -->
                         <v-col cols="12" sm="12" md="12">
+                          <v-label>Carreras</v-label>
                           <base-select
-                            label="Carreras"
                             :items="pensums"
                             item-title="program_name"
                             item-value="program_name"
@@ -461,6 +487,7 @@ import {
 import studentApi from "@/services/studentApi";
 import municipalityApi from "@/services/municipalityApi";
 import kinshipApi from "@/services/kinshipApi";
+import schoolApi from "@/services/schoolApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
@@ -497,6 +524,7 @@ export default {
       ],
       total: 0,
       records: [],
+      schools: [],
       municipalities: [],
       kinship: [],
       pensums: [],
@@ -515,6 +543,7 @@ export default {
         municipality_name: "",
         relatives: [],
         pensums: [],
+        school_name: "",
       },
       defaultItem: {
         name: "",
@@ -528,6 +557,7 @@ export default {
         municipality_name: "",
         relatives: [],
         pensums: [],
+        school_name: "",
       },
       relative: {
         name: "",
@@ -638,6 +668,9 @@ export default {
         municipality_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
+        school_name: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
       },
       relative: {
         name: {
@@ -688,15 +721,38 @@ export default {
       if (this.editedItem.id == null) {
         this.editedItem.id = 0;
 
+        //   const { data } = await studentApi
+        //     .get("/byCareer/" + this.editedItem.id)
+        //     .catch((error) => {
+        //       alert.error(true, "No fue posible obtener la información.", "fail");
+        //     });
+        //   this.pensums = data.career;
+        // } else {
+        //   const { data } = await studentApi
+        //     .get("/byCareer/" + this.editedItem.id)
+        //     .catch((error) => {
+        //       alert.error(true, "No fue posible obtener la información.", "fail");
+        //     });
+
         const { data } = await studentApi
-          .get("/byCareer/" + this.editedItem.id)
+          .get(
+            "/byCareer/" +
+              this.editedItem.id +
+              "/" +
+              this.editedItem.school_name
+          )
           .catch((error) => {
             alert.error(true, "No fue posible obtener la información.", "fail");
           });
         this.pensums = data.career;
       } else {
         const { data } = await studentApi
-          .get("/byCareer/" + this.editedItem.id)
+          .get(
+            "/byCareer/" +
+              this.editedItem.id +
+              "/" +
+              this.editedItem.school_name
+          )
           .catch((error) => {
             alert.error(true, "No fue posible obtener la información.", "fail");
           });
@@ -720,6 +776,11 @@ export default {
             itemsPerPage: -1,
           },
         }),
+        schoolApi.get(null, {
+          params: {
+            itemsPerPage: -1,
+          },
+        }),
       ];
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
@@ -728,6 +789,7 @@ export default {
       if (responses) {
         this.municipalities = responses[1].data.data;
         this.kinship = responses[2].data.data;
+        this.schools = responses[3].data.data;
       }
 
       this.loading = false;
