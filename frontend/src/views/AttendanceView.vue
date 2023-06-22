@@ -33,12 +33,17 @@
         @update:options="getDataFromApi"
       >
         <template v-slot:[`item.actions`]="{ item }">
-          <v-icon
-            size="20"
-            class="ml-6"
-            @click="editItem(item.raw)"
-            icon="mdi-eye"
-          />
+          <v-tooltip text="Ver asistencias" location="end">
+            <template v-slot:activator="{ props }">
+              <v-icon
+                size="20"
+                class="ml-6"
+                @click="editItem(item.raw)"
+                icon="mdi-eye"
+                v-bind="props"
+              />
+            </template>
+          </v-tooltip>
         </template>
         <template v-slot:no-data>
           <v-icon @click="initialize" icon="mdi-refresh" />
@@ -112,7 +117,23 @@
             </v-row>
             <v-row>
               <v-col align="center" cols="12" md="12" sm="12" class="pt-4">
-                <div class="table-responsive-md">
+                <div v-if="editedIndex != -1">
+                  <div
+                    v-for="(attendance, index) in editedItem.attendances"
+                    v-bind:index="index"
+                    :key="index"
+                  >
+                    <h4 align="left">
+                      Asistentes:
+                      <v-label>{{ attendance.attendance_count }}</v-label>
+                    </h4>
+                    <h4 align="left">
+                      Inasistentes:
+                      <v-label>{{ attendance.no_attendance_count }}</v-label>
+                    </h4>
+                  </div>
+                </div>
+                <div class="table-responsive-md mt-4">
                   <v-table>
                     <thead>
                       <tr>
@@ -267,6 +288,8 @@ export default {
         attendance_date: this.getDate(),
         attendance_time: this.getTime(),
         attendances: [],
+        attendance_count: "",
+        no_attendance_count: "",
       },
       defaultItem: {
         teacher: "",
@@ -276,6 +299,8 @@ export default {
         attendance_date: this.getDate(),
         attendance_time: this.getTime(),
         attendances: [],
+        attendance_count: "",
+        no_attendance_count: "",
       },
     };
   },

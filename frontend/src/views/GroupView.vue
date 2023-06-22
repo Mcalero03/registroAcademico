@@ -33,18 +33,28 @@
         @update:options="getDataFromApi"
       >
         <template v-slot:[`item.actions`]="{ item }">
-          <v-icon
-            size="20"
-            class="mr-2"
-            @click="editItem(item.raw)"
-            icon="mdi-clock-edit-outline"
-          />
-          <v-icon
-            size="20"
-            class="mr-2"
-            @click="deleteItem(item.raw)"
-            icon="mdi-delete"
-          />
+          <v-tooltip text="Horario" location="start">
+            <template v-slot:activator="{ props }">
+              <v-icon
+                size="20"
+                class="mr-2"
+                @click="editItem(item.raw)"
+                icon="mdi-clock-edit-outline"
+                v-bind="props"
+              />
+            </template>
+          </v-tooltip>
+          <v-tooltip text="Eliminar" location="end">
+            <template v-slot:activator="{ props }">
+              <v-icon
+                size="20"
+                class="mr-2"
+                @click="deleteItem(item.raw)"
+                icon="mdi-delete"
+                v-bind="props"
+              />
+            </template>
+          </v-tooltip>
         </template>
         <template v-slot:no-data>
           <v-icon @click="initialize" icon="mdi-refresh" />
@@ -222,12 +232,17 @@
                         <td v-text="schedule.end_time"></td>
                         <td v-text="schedule.classroom_name"></td>
                         <td class="text-center">
-                          <v-icon
-                            size="20"
-                            class="mr-2"
-                            @click="deleteSchedule(index)"
-                            icon="mdi-delete"
-                          />
+                          <v-tooltip text="Eliminar" location="start">
+                            <template v-slot:activator="{ props }">
+                              <v-icon
+                                size="20"
+                                class="mr-2"
+                                @click="deleteSchedule(index)"
+                                icon="mdi-delete"
+                                v-bind="props"
+                              />
+                            </template>
+                          </v-tooltip>
                         </td>
                       </tr>
                       <tr v-if="editedItem.selectedSchedule.length == 0">

@@ -20,7 +20,7 @@
           <!-- school_name -->
           <!-- sub_school_name -->
           <v-col cols="12" sm="6" md="6">
-            <base-select
+            <!-- <base-select
               label="Sub-Escuelas"
               :items="sub_schools"
               item-title="sub_school_name"
@@ -31,7 +31,7 @@
               v-if="schools.length == 0"
               readonly
             >
-            </base-select>
+            </base-select> -->
             <base-select
               label="Sub-Escuelas"
               :items="sub_schools"
@@ -40,7 +40,6 @@
               v-model="v$.filter.sub_school_name.$model"
               :rules="v$.filter.sub_school_name"
               @blur="showPensums"
-              v-if="schools.length != 0"
             >
             </base-select>
           </v-col>
@@ -83,7 +82,7 @@
                 <v-col v-for="subject in subjects" :key="subject.subject_id">
                   <v-card
                     id="card"
-                    class="mr-auto"
+                    class="mx-auto"
                     max-width="200"
                     min-width="200"
                     height="170"
@@ -93,7 +92,7 @@
                     <v-card-actions>
                       <!-- id -->
                       <div class="mx-auto">
-                        {{ subject.subject_id }}
+                        {{ subject.index }}
                       </div>
                       <!-- id -->
                       <!-- subject_code -->

@@ -33,19 +33,28 @@
         @update:options="getDataFromApi"
       >
         <template v-slot:[`item.actions`]="{ item }">
-          <v-icon
-            size="20"
-            class="mr-2"
-            @change="change"
-            @click="editItem(item.raw)"
-            icon="mdi-pencil"
-          />
-          <v-icon
-            size="20"
-            class="mr-2"
-            @click="deleteItem(item.raw)"
-            icon="mdi-delete"
-          />
+          <v-tooltip text="Editar" location="start">
+            <template v-slot:activator="{ props }">
+              <v-icon
+                size="20"
+                class="mr-2"
+                @click="editItem(item.raw)"
+                icon="mdi-pencil"
+                v-bind="props"
+              />
+            </template>
+          </v-tooltip>
+          <v-tooltip text="Eliminar" location="end">
+            <template v-slot:activator="{ props }">
+              <v-icon
+                size="20"
+                class="mr-2"
+                @click="deleteItem(item.raw)"
+                icon="mdi-delete"
+                v-bind="props"
+              />
+            </template>
+          </v-tooltip>
         </template>
         <template v-slot:no-data>
           <v-icon @click="initialize" icon="mdi-refresh" />
@@ -225,12 +234,17 @@
                         <td v-text="relative.phone_number"></td>
                         <td v-text="relative.kinship"></td>
                         <td class="text-center">
-                          <v-icon
-                            size="20"
-                            class="mr-2"
-                            @click="deleteRelative(index)"
-                            icon="mdi-delete"
-                          />
+                          <v-tooltip text="Eliminar pariente" location="end">
+                            <template v-slot:activator="{ props }">
+                              <v-icon
+                                size="20"
+                                class="mr-2"
+                                @click="deleteRelative(index)"
+                                icon="mdi-delete"
+                                v-bind="props"
+                              />
+                            </template>
+                          </v-tooltip>
                         </td>
                       </tr>
                       <tr v-if="editedItem.relatives.length == 0">
@@ -349,12 +363,17 @@
                       >
                         <td v-text="career.program_name"></td>
                         <td class="text-center">
-                          <v-icon
-                            size="20"
-                            class="mr-2"
-                            @click="deleteCareer(index)"
-                            icon="mdi-delete"
-                          />
+                          <v-tooltip text="Eliminar carrera" location="end">
+                            <template v-slot:activator="{ props }">
+                              <v-icon
+                                size="20"
+                                class="mr-2"
+                                @click="deleteCareer(index)"
+                                icon="mdi-delete"
+                                v-bind="props"
+                              />
+                            </template>
+                          </v-tooltip>
                         </td>
                       </tr>
                       <tr v-if="editedItem.pensums.length == 0">
@@ -661,21 +680,30 @@ export default {
         school_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
+        relatives: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
+        pensums: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
       },
       relative: {
         name: {
+          required: helpers.withMessage(langMessages.required, required),
           minLength: helpers.withMessage(
             ({ $params }) => langMessages.minLength($params),
             minLength(3)
           ),
         },
         last_name: {
+          required: helpers.withMessage(langMessages.required, required),
           minLength: helpers.withMessage(
             ({ $params }) => langMessages.minLength($params),
             minLength(3)
           ),
         },
         dui: {
+          required: helpers.withMessage(langMessages.required, required),
           minLength: helpers.withMessage(
             ({ $params }) => langMessages.minLength($params),
             minLength(9)
@@ -686,6 +714,7 @@ export default {
           ),
         },
         phone_number: {
+          required: helpers.withMessage(langMessages.required, required),
           minLength: helpers.withMessage(
             ({ $params }) => langMessages.minLength($params),
             minLength(8)
@@ -696,12 +725,17 @@ export default {
           ),
         },
         mail: {
+          required: helpers.withMessage(langMessages.required, required),
           email: helpers.withMessage(langMessages.email, email),
         },
-        kinship: {},
+        kinship: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
       },
       career: {
-        program_name: {},
+        program_name: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
       },
     };
   },
@@ -835,7 +869,11 @@ export default {
     async addNewRelative() {
       this.v$.relative.$validate();
       if (this.v$.relative.$invalid) {
-        alert.error("Campo obligatorio");
+        toast.error("Llene los campos obligatorios.", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+          multiple: false,
+        });
         return;
       }
 
@@ -898,7 +936,11 @@ export default {
     async addNewCareer() {
       this.v$.career.$validate();
       if (this.v$.career.$invalid) {
-        alert.error("Campo obligatorio");
+        toast.error("Llene los campos obligatorios.", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+          multiple: false,
+        });
         return;
       }
 
@@ -948,9 +990,13 @@ export default {
     },
 
     async save() {
-      this.v$.$validate();
-      if (this.v$.$invalid) {
-        alert.error("Campo obligatorio");
+      this.v$.editedItem.$validate();
+      if (this.v$.editedItem.$invalid) {
+        toast.warn("Llene los campos y tablas.", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+          multiple: false,
+        });
         return;
       }
 

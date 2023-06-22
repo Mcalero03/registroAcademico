@@ -72,7 +72,7 @@ class StudentController extends Controller
         $info = explode(', ', $data['municipality_name']);
         $id = Student::municipalityId($info[0], $info[1])->pluck('id');
         $municipality_id = Student::clean($id);
-
+        $school_id = School::where('school_name', $data['school_name'])->first()?->id;
 
         $dataExists = Student::where('name', $data['name'])
             ->where('last_name', $data['last_name'])
@@ -89,6 +89,8 @@ class StudentController extends Controller
                 'mail' => $data['mail'],
                 'admission_date' => $data['admission_date'],
                 'municipalities_id' => $municipality_id,
+                'school_id' => $school_id,
+
             ]);
             $student->save();
 
@@ -140,6 +142,8 @@ class StudentController extends Controller
         $info = explode(', ', $data['municipality_name']);
         $id = Student::municipalityId($info[0], $info[1])->pluck('id');
         $municipality_id = Student::clean($id);;
+        $school_id = School::where('school_name', $data['school_name'])->first()?->id;
+
 
         Student::where('id', $data['id'])->update([
             'name' => $data['name'],
@@ -151,6 +155,8 @@ class StudentController extends Controller
             'mail' => $data['mail'],
             'admission_date' => $data['admission_date'],
             'municipalities_id' => $municipality_id,
+            'school_id' => $school_id,
+
         ]);
 
         Relative::where('student_id', $data['id'])->delete();
