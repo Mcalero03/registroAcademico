@@ -35,7 +35,7 @@ class PensumController extends Controller
 
         $total = Pensum::counterPagination($search);
 
-        $years = range(1950, 2099);
+        $years = range(1990, 2099);
         $yearsAsString = array_map('strval', $years);
 
         return response()->json([

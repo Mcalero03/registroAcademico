@@ -273,7 +273,7 @@ export default {
           ),
           maxLength: helpers.withMessage(
             ({ $params }) => langMessages.maxLength($params),
-            maxLength(2)
+            maxLength(3)
           ),
         },
         status: {

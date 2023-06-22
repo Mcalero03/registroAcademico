@@ -64,6 +64,31 @@
           <v-expansion-panel :elevation="0">
             <v-expansion-panel-title id="panel">
               <v-icon
+                icon="mdi-account-school"
+                size="15"
+                color="white"
+                class="mr-2"
+              ></v-icon>
+              Estudiante
+            </v-expansion-panel-title>
+            <v-expansion-panel-text id="panel">
+              <v-btn
+                v-for="(item, index) in student"
+                :key="index"
+                :value="index"
+                :append-icon="item.icon"
+                :href="item.url"
+                :text="item.title"
+                id="btn-menu"
+                :elevation="0"
+                class="justify-content-start"
+              ></v-btn>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+
+          <v-expansion-panel :elevation="0">
+            <v-expansion-panel-title id="panel">
+              <v-icon
                 icon="mdi-cogs"
                 size="15"
                 color="white"
@@ -85,17 +110,17 @@
               ></v-btn>
             </v-expansion-panel-text>
           </v-expansion-panel>
-          <RouterLink
-            to="/"
-            @click="logout()"
-            class="d-flex flex-column align-center mt-4"
-          >
-            <span class="justify-content-start">
-              <v-icon icon="mdi-logout" size="15" class="mr-2"></v-icon>Cerrar
-              sesión</span
-            >
-          </RouterLink>
         </v-expansion-panels>
+        <RouterLink
+          to="/"
+          @click="logout()"
+          class="d-flex justify-content-end align-items-end mr-6 mt-4"
+        >
+          <span>
+            <v-icon icon="mdi-logout" size="15" class="mr-2"></v-icon>Cerrar
+            sesión</span
+          >
+        </RouterLink>
       </template>
       <template v-else>
         <RouterLink to="/" class="mt-4">
@@ -104,10 +129,6 @@
             Iniciar sesión</span
           >
         </RouterLink>
-        <!-- <RouterLink to="/register" class="d-flex flex-column align-center mb-4">
-          <v-icon icon="mdi-account-plus" size="15"></v-icon>
-          <span>Registrarse</span>
-        </RouterLink> -->
       </template>
     </div>
   </div>
@@ -166,11 +187,6 @@ export default {
         url: "/classroom",
         icon: "mdi-desk",
       },
-      // {
-      //   title: "Detalle Prerequisitos",
-      //   url: "/pensumSubjectDetail",
-      //   icon: "mdi-details",
-      // },
     ],
     academic: [
       {
@@ -197,6 +213,13 @@ export default {
         title: "Asistencia",
         url: "/attendance",
         icon: "mdi-checkbox-multiple-outline",
+      },
+    ],
+    student: [
+      {
+        title: "Pensum",
+        url: "/pensumSubjectDetail",
+        icon: "mdi-details",
       },
     ],
     settings: [

@@ -6,7 +6,10 @@ use App\Models\PensumSubjectDetail;
 use App\Models\Pensum;
 use App\Models\Prerequisite;
 use App\Models\Subject;
+use App\Models\SubSchool;
+use App\Models\School;
 use Encrypt;
+
 use Illuminate\Http\Request;
 
 class PensumSubjectDetailController extends Controller
@@ -30,26 +33,30 @@ class PensumSubjectDetailController extends Controller
 
         $search = (isset($request->search)) ? "%$request->search%" : '%%';
 
-        $pensum_subject_detail = PensumSubjectDetail::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage)->unique();
+        // $pensum_subject_detail = PensumSubjectDetail::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage)->unique();
 
+        $pensums = PensumSubjectDetail::pensum();
 
-        foreach ($pensum_subject_detail as $item) {
-            $item->prerequisites = Prerequisite::select('prerequisite.*', 'subject.subject_name as prerequisite')
-                ->join('subject', 'prerequisite.subject_id', '=', 'subject.id')
-                ->where('pensum_subject_detail_id', $item->id)
-                ->get();
+        // foreach ($pensum_subject_detail as $item) {
+        //     $item->prerequisites = Prerequisite::select('prerequisite.*', 'subject.subject_name as prerequisite')
+        //         ->join('subject', 'prerequisite.subject_id', '=', 'subject.id')
+        //         ->where('pensum_subject_detail_id', $item->id)
+        //         ->get();
 
-            $item->prerequisites = Encrypt::encryptObject($item->prerequisites, 'id');
-        }
+        //     $item->prerequisites = Encrypt::encryptObject($item->prerequisites, 'id');
+        // }
 
-        $pensum_subject_detail = Encrypt::encryptObject($pensum_subject_detail, 'id');
+        // $pensum_subject_detail = Encrypt::encryptObject($pensum_subject_detail, 'id');
+        // $pensums = Encrypt::encryptObject($pensums, 'id');
+
 
         $total = PensumSubjectDetail::counterPagination($search);
 
         return response()->json([
             "message" => "Registros obtenidos correctamente.",
-            "data" => $pensum_subject_detail,
+            // "data" => $pensum_subject_detail,
             "total" => $total,
+            'programs' => $pensums,
         ]);
     }
 
@@ -188,5 +195,65 @@ class PensumSubjectDetailController extends Controller
                 "subject" => $subject,
             ]);
         }
+    }
+
+    public function pensumSubject($pensum)
+    {
+
+        $program_id = Pensum::where('pensum.program_name', $pensum)->first()?->id;
+        $subject = Subject::select('subject.status', 'subject.subject_name', 'subject.units_value', 'subject.id as subject_id', 'subject.subject_code', 'pensum.program_name', 'school.school_name',)
+            ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+            ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+            ->leftjoin('sub_school', 'pensum.sub_school_id', '=', 'sub_school.id')
+            ->leftjoin('school', 'sub_school.school_id', '=', 'school.id')
+            ->where('pensum.id', $program_id)
+            ->get();
+
+        foreach ($subject as $item) {
+            $item->prerequisites = Prerequisite::select('prerequisite.*', 'subject.subject_name as prerequisite')
+                ->join('subject', 'prerequisite.subject_id', '=', 'subject.id')
+                ->where('pensum_subject_detail_id', $item->subject_id)
+                ->whereNull('subject.deleted_at')
+                ->get();
+
+            $item->count = count($item->prerequisites);
+
+            $item->prerequisites = Encrypt::encryptObject($item->prerequisites, 'id');
+        }
+
+        return response()->json([
+            "message" => "Registros obtenidos correctamente.",
+            "subject" => $subject,
+        ]);
+    }
+
+    public function showSubSchool($school)
+    {
+        $school_id = School::where('school.school_name', $school)->first()?->id;
+
+        $sub_school = SubSchool::select('sub_school.sub_school_name', 'school.school_name',)
+            ->join('school', 'sub_school.school_id', '=', 'school.id')
+            ->where('sub_school.school_id', $school_id)
+            ->get();
+
+        return response()->json([
+            "message" => "Registros obtenidos correctamente.",
+            "sub_school" => $sub_school,
+        ]);
+    }
+
+    public function showPensums($sub_schools)
+    {
+        $sub_school_id = SubSchool::where('sub_school.sub_school_name', $sub_schools)->first()?->id;
+
+        $pensum = Pensum::select('pensum.id', 'pensum.program_name', 'sub_school.sub_school_name',)
+            ->join('sub_school', 'pensum.sub_school_id', '=', 'sub_school.id')
+            ->where('pensum.sub_school_id', $sub_school_id)
+            ->get();
+
+        return response()->json([
+            "message" => "Registros obtenidos correctamente.",
+            "pensum" => $pensum,
+        ]);
     }
 }

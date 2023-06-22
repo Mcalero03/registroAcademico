@@ -104,6 +104,7 @@
                   :rules="v$.editedItem.uv_total"
                   type="number"
                   min="1"
+                  max="10"
                 />
               </v-col>
               <!-- uv_total  -->
@@ -115,6 +116,7 @@
                   :rules="v$.editedItem.required_subject"
                   type="number"
                   min="1"
+                  max="50"
                 />
               </v-col>
               <!-- required_subject  -->
@@ -126,6 +128,7 @@
                   :rules="v$.editedItem.optional_subject"
                   type="number"
                   min="0"
+                  max="50"
                 />
               </v-col>
               <!-- optional_subject  -->
@@ -140,6 +143,17 @@
                   v-model="v$.editedItem.school_name.$model"
                   :rules="v$.editedItem.school_name"
                   @blur="showSubSchools"
+                  v-if="editedIndex == -1"
+                />
+                <base-select
+                  :items="schools"
+                  item-title="school_name"
+                  item-value="school_name"
+                  v-model="v$.editedItem.school_name.$model"
+                  :rules="v$.editedItem.school_name"
+                  @blur="showSubSchools"
+                  v-if="editedIndex != -1"
+                  readonly
                 />
               </v-col>
               <!-- school  -->
@@ -152,6 +166,16 @@
                   item-value="sub_school_name"
                   v-model="v$.editedItem.sub_school_name.$model"
                   :rules="v$.editedItem.sub_school_name"
+                  v-if="editedIndex == -1"
+                />
+                <base-select
+                  :items="subSchools"
+                  item-title="sub_school_name"
+                  item-value="sub_school_name"
+                  v-model="v$.editedItem.sub_school_name.$model"
+                  :rules="v$.editedItem.sub_school_name"
+                  v-if="editedIndex != -1"
+                  readonly
                 />
               </v-col>
               <!-- sub_school_name  -->
@@ -381,17 +405,19 @@ export default {
 
   methods: {
     async showSubSchools() {
-      const { data } = await pensumApi
-        .get("/showSubSchools/" + this.editedItem.school_name)
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
+      if (this.editedItem.school_name != "") {
+        const { data } = await pensumApi
+          .get("/showSubSchools/" + this.editedItem.school_name)
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
 
-      this.subSchools = data.sub_schools;
+        this.subSchools = data.sub_schools;
+      }
     },
 
     async initialize() {

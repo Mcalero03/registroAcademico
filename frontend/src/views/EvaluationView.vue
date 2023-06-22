@@ -230,6 +230,7 @@
                         label="Estudiante"
                         v-model="v$.calification.full_name.$model"
                         :rules="v$.calification.full_name"
+                        readonly
                       />
                     </v-col>
                     <!-- student_name  -->
@@ -307,13 +308,15 @@
 
 
 <script>
+import { toast } from "../../node_modules/vue3-toastify";
+import "vue3-toastify/dist/index.css";
+
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
 
 import evaluationApi from "@/services/evaluationApi";
 import schoolApi from "@/services/schoolApi";
-// import subjectApi from "@/services/subjectApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
@@ -457,64 +460,72 @@ export default {
   methods: {
     //CHANGE METHODS
     async showTeachers() {
-      const { data } = await evaluationApi
-        .get("/showTeacher/" + this.editedItem.school_name)
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
+      if (this.editedItem.school_name != "") {
+        const { data } = await evaluationApi
+          .get("/showTeacher/" + this.editedItem.school_name)
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
 
-      this.teachers = data.teachers;
+        this.teachers = data.teachers;
+      }
     },
 
     async showSubjects() {
-      const teacher = this.v$.editedItem.teacher_name.$model;
-      var arr = teacher.split(", ");
-      const name = arr[0];
-      const last_name = arr[1];
+      if (this.v$.editedItem.teacher_name.$model != "") {
+        const teacher = this.v$.editedItem.teacher_name.$model;
+        var arr = teacher.split(", ");
+        const name = arr[0];
+        const last_name = arr[1];
 
-      const { data } = await evaluationApi
-        .get("/showSubjects/" + name + "/" + last_name)
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
+        const { data } = await evaluationApi
+          .get("/showSubjects/" + name + "/" + last_name)
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
 
-      this.subjects = data.subjects;
+        this.subjects = data.subjects;
+      }
     },
 
     async showGroups() {
-      const { data } = await evaluationApi
-        .get("/showGroups/" + this.editedItem.subject_name)
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
+      if (this.editedItem.subject_name != "") {
+        const { data } = await evaluationApi
+          .get("/showGroups/" + this.editedItem.subject_name)
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
 
-      this.groups = data.groups;
+        this.groups = data.groups;
+      }
     },
 
     async showStudents() {
-      const { data } = await evaluationApi
-        .get("/showStudents/" + this.editedItem.group_code)
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
+      if (this.editedItem.group_code != "") {
+        const { data } = await evaluationApi
+          .get("/showStudents/" + this.editedItem.group_code)
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
 
-      this.editedItem.califications = data.students;
+        this.editedItem.califications = data.students;
+      }
     },
 
     async initialize() {
@@ -591,6 +602,11 @@ export default {
       // Creating record
       try {
         this.editedItem.califications.push({ ...this.calification });
+        toast.success("Calificación guardada.", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+          multiple: false,
+        });
       } catch (error) {
         alert.error("No fue posible crear el registro.");
       }
@@ -631,7 +647,10 @@ export default {
     async save() {
       this.v$.$validate();
       if (this.v$.$invalid) {
-        alert.error("Campo obligatorio");
+        toast.warn("Llene los campos obligatorios.", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+        });
         return;
       }
 

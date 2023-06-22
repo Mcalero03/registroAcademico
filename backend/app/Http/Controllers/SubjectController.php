@@ -41,6 +41,8 @@ class SubjectController extends Controller
                 ->join('pensum_subject_detail', 'prerequisite.pensum_subject_detail_id', 'pensum_subject_detail.id')
                 ->join('subject', 'prerequisite.subject_id', '=', 'subject.id')
                 ->where('pensum_subject_detail_id', $item->pensum_subject_detail_id)
+                ->whereNull('subject.deleted_at')
+
                 ->get();
 
             $item->prerequisites = Encrypt::encryptObject($item->prerequisites, 'id');

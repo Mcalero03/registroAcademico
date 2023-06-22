@@ -57,4 +57,13 @@ class PensumSubjectDetail extends Model
             ->orWhere('pensum_subject_detail.subject_id', 'like', $search)
             ->count();
     }
+
+
+
+    public static function pensum()
+    {
+        return Pensum::select('pensum.program_name', 'pensum.id')
+
+            ->get();
+    }
 }

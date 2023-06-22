@@ -206,20 +206,32 @@ export default {
     return {
       editedItem: {
         department_name: {
-          required,
-          minLength: minLength(1),
+          required: helpers.withMessage(langMessages.required, required),
+          minLength: helpers.withMessage(
+            ({ $params }) => langMessages.minLength($params),
+            minLength(1)
+          ),
         },
         min_dpto: {
-          required,
-          minLength: minLength(1),
+          required: helpers.withMessage(langMessages.required, required),
+          minLength: helpers.withMessage(
+            ({ $params }) => langMessages.minLength($params),
+            minLength(1)
+          ),
         },
         may_dpto: {
-          required,
-          minLength: minLength(1),
+          required: helpers.withMessage(langMessages.required, required),
+          minLength: helpers.withMessage(
+            ({ $params }) => langMessages.minLength($params),
+            minLength(1)
+          ),
         },
         cod_dpto: {
-          required,
-          minLength: minLength(1),
+          required: helpers.withMessage(langMessages.required, required),
+          minLength: helpers.withMessage(
+            ({ $params }) => langMessages.minLength($params),
+            minLength(1)
+          ),
         },
       },
     };

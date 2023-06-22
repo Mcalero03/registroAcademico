@@ -359,6 +359,9 @@
 
 
 <script>
+import { toast } from "../../node_modules/vue3-toastify";
+import "vue3-toastify/dist/index.css";
+
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
@@ -512,41 +515,53 @@ export default {
         school_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
+        prerequisites: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
       },
       prerequisite: {
-        prerequisite: {},
+        prerequisite: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
       },
     };
   },
 
   methods: {
     async changePensum() {
-      const { data } = await subjectApi
-        .get("/bySchool/" + this.editedItem.school_name)
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
+      if (this.editedItem.school_name != "") {
+        const { data } = await subjectApi
+          .get("/bySchool/" + this.editedItem.school_name)
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
 
-      this.pensums = data.program_name;
+        this.pensums = data.program_name;
+      }
     },
 
     async change() {
-      const { data } = await pensumSubjectDetailApi
-        .get(
-          "/byPensum/" +
-            this.v$.editedItem.program_name.$model +
-            "/" +
-            this.v$.editedItem.subject_name.$model
-        )
-        .catch((error) => {
-          alert.error(true, "No fue posible obtener la información.", "fail");
-        });
+      if (
+        this.editedItem.program_name != "" &&
+        this.editedItem.subject_name != ""
+      ) {
+        const { data } = await pensumSubjectDetailApi
+          .get(
+            "/byPensum/" +
+              this.editedItem.program_name +
+              "/" +
+              this.editedItem.subject_name
+          )
+          .catch((error) => {
+            alert.error(true, "No fue posible obtener la información.", "fail");
+          });
 
-      this.pensumSubject = data.subject;
+        this.pensumSubject = data.subject;
+      }
     },
 
     async initialize() {
@@ -615,13 +630,22 @@ export default {
     async addNewPrerequisite() {
       this.v$.prerequisite.$validate();
       if (this.v$.prerequisite.$invalid) {
-        alert.error("Campo obligatorio");
+        toast.warn("Llene los campos obligatorios.", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+          multiple: false,
+        });
         return;
       }
 
       // Creating record
       try {
         this.editedItem.prerequisites.push({ ...this.prerequisite });
+        toast.success("Prerequisito agregado. Guarde cambios.", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+          multiple: false,
+        });
       } catch (error) {
         alert.error("No fue posible crear el registro.");
       }
@@ -640,6 +664,11 @@ export default {
 
     async deletePrerequisite(index) {
       this.editedItem.prerequisites.splice(index, 1);
+      toast.success("Prerequisito eliminado. Guarde cambios.", {
+        autoClose: 2000,
+        position: toast.POSITION.TOP_CENTER,
+        multiple: false,
+      });
     },
 
     close() {
@@ -673,14 +702,42 @@ export default {
     },
 
     async save() {
-      this.v$.$validate();
-      if (this.v$.$invalid) {
-        alert.error("Campo obligatorio");
-        return;
-      }
+      if (this.editedIndex == -1) {
+        this.v$.editedItem.$validate();
 
-      // Updating record
+        if (
+          this.v$.editedItem.subject_name.$invalid ||
+          this.v$.editedItem.average_approval.$invalid ||
+          this.v$.editedItem.units_value.$invalid ||
+          this.v$.editedItem.subject_code.$invalid ||
+          this.v$.editedItem.prerequisite.$invalid ||
+          this.v$.editedItem.program_name.$invalid ||
+          this.v$.editedItem.school_name.$invalid
+        ) {
+          toast.warn("Llene los campos obligatorios.", {
+            autoClose: 2000,
+            position: toast.POSITION.TOP_CENTER,
+            multiple: false,
+          });
+          return;
+        }
+      } else if (this.editedIndex > -1) {
+        this.v$.editedItem.$validate();
+
+        if (this.v$.editedItem.$invalid) {
+          toast.warn(
+            "Llene los campos obligatorios, verifique las materias agregadas.",
+            {
+              autoClose: 2000,
+              position: toast.POSITION.TOP_CENTER,
+              multiple: false,
+            }
+          );
+          return;
+        }
+      }
       if (this.editedIndex > -1) {
+        // Updating record
         const edited = Object.assign(
           this.records[this.editedIndex],
           this.editedItem
