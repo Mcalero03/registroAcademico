@@ -1,274 +1,247 @@
 <template>
   <div data-app>
-    <v-card class="p-3 mt-3">
-      <v-container>
-        <h2>
-          {{ title }}
-        </h2>
-        <div class="options-table">
-          <base-button
-            type="primary"
-            title="Agregar"
-            @click="addRecord()"
-          ></base-button>
-          <v-col cols="12" sm="4" lg="4" xl="4" class="pl-0 pb-0 pr-0">
-            <v-text-field
-              class="mt-3"
-              variant="outlined"
-              label="Buscar"
-              type="text"
-              v-model="search"
+    <v-container fluid>
+      <v-card class="p-3 mt-3">
+        <h2 class="black-secondary text-uppercase text-center my-4">pensum</h2>
+        <v-row class="pb-4">
+          <!-- school_name -->
+          <v-col cols="12" sm="6" md="6">
+            <base-select
+              label="Escuelas"
+              :items="schools"
+              item-title="school_name"
+              item-value="school_name"
+              v-model="v$.filter.school_name.$model"
+              :rules="v$.filter.school_name"
+              @blur="showSubSchool"
             >
-            </v-text-field>
+            </base-select>
           </v-col>
+          <!-- school_name -->
+          <!-- sub_school_name -->
+          <v-col cols="12" sm="6" md="6">
+            <base-select
+              label="Sub-Escuelas"
+              :items="sub_schools"
+              item-title="sub_school_name"
+              item-value="sub_school_name"
+              v-model="v$.filter.sub_school_name.$model"
+              :rules="v$.filter.sub_school_name"
+              @blur="showPensums"
+              v-if="schools.length == 0"
+              readonly
+            >
+            </base-select>
+            <base-select
+              label="Sub-Escuelas"
+              :items="sub_schools"
+              item-title="sub_school_name"
+              item-value="sub_school_name"
+              v-model="v$.filter.sub_school_name.$model"
+              :rules="v$.filter.sub_school_name"
+              @blur="showPensums"
+              v-if="schools.length != 0"
+            >
+            </base-select>
+          </v-col>
+          <!-- sub_school_name -->
+        </v-row>
+
+        <div v-if="pensums.length == 0">
+          <loader v-if="loading" />
+          <p class="text-center mt-6">No hay pensums por mostrar</p>
         </div>
-      </v-container>
-      <v-data-table-server
-        :headers="headers"
-        :items-length="total"
-        :items="records"
-        :loading="loading"
-        items-title="id"
-        item-value="id"
-        hover
-        @update:options="getDataFromApi"
-      >
-        <template v-slot:[`item.actions`]="{ item }">
-          <v-icon
-            size="20"
-            class="mr-2"
-            @click="editItem(item.raw)"
-            icon="mdi-pencil"
-          />
-          <v-icon
-            size="20"
-            class="mr-2"
-            @click="deleteItem(item.raw)"
-            icon="mdi-delete"
-          />
-        </template>
-        <template v-slot:no-data>
-          <v-icon @click="initialize" icon="mdi-refresh" />
-        </template>
-      </v-data-table-server>
-    </v-card>
 
-    <v-dialog v-model="dialog" max-width="800px" persistent>
-      <v-card>
-        <v-card-title>
-          <h2 class="mx-auto pt-3 mb-3 text-center black-secondary">
-            {{ formTitle }}
-          </h2>
-        </v-card-title>
-        <v-card-text class="pt-0">
-          <v-container>
-            <!-- Form -->
-            <v-row class="pt-0">
-              <!-- subject_name  -->
-              <v-col cols="12" sm="6" md="6">
-                <v-label>Materia</v-label>
-                <select
-                  v-model="v$.editedItem.subject_name.$model"
-                  class="form-select"
-                >
-                  <option
-                    v-for="(option, index) in subjects"
-                    :key="index"
-                    :value="option.subject_name"
-                  >
-                    {{ option.subject_name }}
-                  </option>
-                </select>
-              </v-col>
-              <!-- subject_name  -->
-              <!-- program_name  -->
-              <v-col cols="12" sm="6" md="6">
-                <v-label>Nombre del programa</v-label>
-                <select
-                  v-model="v$.editedItem.program_name.$model"
-                  @change="change"
-                  class="form-select"
-                >
-                  <option
-                    v-for="(option, index) in pensums"
-                    :key="index"
-                    :value="option.program_name"
-                  >
-                    {{ option.program_name }}
-                  </option>
-                </select>
-              </v-col>
-              <!-- program_name  -->
-              <!-- relative -->
-              <v-col class="pt-5 pb-5 mt-2">
-                <base-button
-                  type="primary"
-                  title="Agregar prerequisito"
-                  @click="addPrerequisite()"
-                />
-              </v-col>
-            </v-row>
-            <!-- relative -->
-            <!-- Prerequisite Table -->
-            <v-row>
-              <v-col align="center" cols="12" md="12" sm="12" class="pt-4">
-                <div class="table-responsive-md">
-                  <v-table>
-                    <thead>
-                      <tr>
-                        <th>MATERIA</th>
-                        <th class="text-center">ACCIÓN</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr
-                        v-for="(
-                          prerequisite, index
-                        ) in editedItem.prerequisites"
-                        v-bind:index="index"
-                        :key="index"
-                      >
-                        <td v-text="prerequisite.prerequisite"></td>
-                        <td class="text-center">
-                          <v-icon
-                            size="20"
-                            class="mr-2"
-                            @click="deletePrerequisite(index)"
-                            icon="mdi-delete"
-                          />
-                        </td>
-                      </tr>
-                      <tr v-if="editedItem.prerequisites.length == 0">
-                        <td colspan="5" class="text-center pt-3">
-                          <p>No se ha asignado ningún prerequisito</p>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </v-table>
-                </div>
-                <!-- Modal -->
-                <v-dialog
-                  v-model="dialogPrerequisite"
-                  max-width="600px"
-                  persistent
-                >
-                  <v-card height="100%">
-                    <!-- Container when there are no prerequisites available  -->
-                    <v-container v-if="pensumSubject == 0">
-                      <h2 class="black-secondary text-center mt-4 mb-4">
-                        No hay materias para asignar como prerrequisito!
-                      </h2>
-                      <v-row>
-                        <v-col align="center"
-                          ><base-button
-                            class="ms-1"
-                            type="secondary"
-                            title="Cancelar"
-                            @click="closePrerequisiteDialog()"
-                        /></v-col> </v-row
-                    ></v-container>
-                    <!-- Container when there are no prerequisites available  -->
+        <!-- TABS -->
+        <v-tabs
+          v-model="tab"
+          color="deep-purple-accent-4"
+          align-tabs="center"
+          show-arrows
+          fixed-tabs
+          slider-color="deep-purple-accent-4"
+        >
+          <v-tab
+            v-for="program in pensums"
+            :key="program.id"
+            :value="program.program_name"
+            @click="change()"
+            >{{ program.program_name }}</v-tab
+          >
+        </v-tabs>
 
-                    <!-- Container when there are prerequisites available  -->
-                    <v-container v-if="pensumSubject != 0">
-                      <h2 class="black-secondary text-center mt-4 mb-4">
-                        Agregar prerequisito
-                      </h2>
-                      <v-row>
-                        <!-- subject_name -->
-                        <v-col cols="12" sm="12" md="12">
-                          <base-select
-                            label="Materia prerequisito"
-                            :items="pensumSubject"
-                            item-title="subject_name"
-                            item-value="subject_name"
-                            v-model="v$.prerequisite.prerequisite.$model"
-                            :rules="v$.prerequisite.prerequisite"
+        <!-- CONTENIDO POR TAB -->
+        <v-window v-model="tab">
+          <v-window-item
+            v-for="program in pensums"
+            v-bind:index="program.program_name"
+            :key="program.program_name"
+            :value="program.program_name"
+          >
+            <v-container fluid>
+              <v-row dense class="p-3 mt-3">
+                <v-col v-for="subject in subjects" :key="subject.subject_id">
+                  <v-card
+                    id="card"
+                    class="mr-auto"
+                    max-width="200"
+                    min-width="200"
+                    height="170"
+                    theme="dark"
+                    :elevation="2"
+                  >
+                    <v-card-actions>
+                      <!-- id -->
+                      <div class="mx-auto">
+                        {{ subject.subject_id }}
+                      </div>
+                      <!-- id -->
+                      <!-- subject_code -->
+                      <div class="mx-auto">
+                        {{ subject.subject_code }}
+                      </div>
+                      <!-- subject_code -->
+                    </v-card-actions>
+                    <v-card-text>
+                      <!-- subject_name -->
+                      <p class="text-primary text-center">
+                        {{ subject.subject_name }}
+                      </p>
+                      <!-- subject_name -->
+                    </v-card-text>
+                    <v-card-actions>
+                      <!-- prerequisites -->
+                      <div v-if="subject.status == 1">
+                        <!-- subject with one prerequisite -->
+                        <div v-if="subject.count == 1">
+                          <div
+                            class="d-inline ml-8 mx-auto"
+                            v-for="prerequisite in subject.prerequisites"
+                            :key="prerequisite.id"
                           >
-                          </base-select>
-                        </v-col>
-                        <!-- subject_name -->
-                      </v-row>
-                      <v-row>
-                        <v-col align="center">
-                          <base-button
-                            type="primary"
-                            title="Agregar"
-                            @click="addNewPrerequisite()"
-                          />
-                          <base-button
-                            class="ms-1"
-                            type="secondary"
-                            title="Cancelar"
-                            @click="closePrerequisiteDialog()"
-                          />
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                    <!-- Container when there are prerequisites available  -->
+                            {{ prerequisite.subject_id }}
+                          </div>
+                        </div>
+                        <!-- subject with one prerequisite -->
+                        <!-- subject with more than one prerequisite -->
+                        <div class="ml-6" v-else-if="subject.count >= 1">
+                          <div
+                            class="d-inline"
+                            v-for="prerequisite in subject.prerequisites"
+                            :key="prerequisite.id"
+                          >
+                            {{ prerequisite.subject_id }},
+                          </div>
+                        </div>
+                        <!-- subject with more than one prerequisite -->
+                      </div>
+                      <!-- subject without prerequisite -->
+                      <div class="ml-8 mr-auto" v-if="subject.status == 0">
+                        N/A
+                      </div>
+                      <!-- subject without prerequisite -->
+                      <!-- prerequisites -->
+                      <!-- units_value -->
+                      <div class="mr-8 ml-auto">
+                        {{ subject.units_value }}
+                      </div>
+                      <!-- units_value -->
+                    </v-card-actions>
                   </v-card>
-                </v-dialog>
-                <!-- Modal -->
-              </v-col>
-            </v-row>
-            <!-- Prerequisite Table -->
-            <!-- Form -->
-            <v-row>
-              <v-col align="center">
-                <base-button type="primary" title="Guardar" @click="save" />
-                <base-button
-                  class="ms-1"
-                  type="secondary"
-                  title="Cancelar"
-                  @click="close"
-                />
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card-text>
+                </v-col>
+              </v-row>
+              <v-row dense class="p-3 mt-3">
+                <v-col>
+                  <v-card
+                    class="mr-auto"
+                    max-width="200"
+                    min-width="200"
+                    height="170"
+                    variant="tonal"
+                    :elevation="2"
+                    id="example-card"
+                  >
+                    <v-card-actions>
+                      <v-tooltip
+                        text="Correlativo de la asignatura"
+                        location="start"
+                      >
+                        <template v-slot:activator="{ props }">
+                          <div class="mx-auto" v-bind="props">N°</div>
+                        </template>
+                      </v-tooltip>
+                      <v-tooltip text="Código de materia" location="end">
+                        <template v-slot:activator="{ props }">
+                          <div class="mx-auto" v-bind="props">Cód</div>
+                        </template>
+                      </v-tooltip>
+                    </v-card-actions>
+                    <v-card-text class="">
+                      <v-tooltip
+                        text="Nombre de la materia/curso"
+                        location="end"
+                      >
+                        <template v-slot:activator="{ props }">
+                          <p v-bind="props" class="text-primary text-center">
+                            Nombre de materia
+                          </p>
+                        </template>
+                      </v-tooltip>
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-tooltip text="Prerrequisito(s)" location="start">
+                        <template v-slot:activator="{ props }">
+                          <div v-bind="props" class="d-inline ml-2 mx-auto">
+                            Prerrequisito
+                          </div>
+                        </template>
+                      </v-tooltip>
+                      <v-tooltip text="Unidades valorativas" location="end">
+                        <template v-slot:activator="{ props }">
+                          <div v-bind="props" class="mr-8 ml-auto">U.V</div>
+                        </template>
+                      </v-tooltip>
+                    </v-card-actions>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-window-item>
+        </v-window>
       </v-card>
-    </v-dialog>
-
-    <v-dialog v-model="dialogDelete" max-width="400px">
-      <v-card class="h-100">
-        <v-container>
-          <h1 class="black-secondary text-center mt-3 mb-3">
-            Eliminar registro
-          </h1>
-          <v-row>
-            <v-col align="center">
-              <base-button
-                type="primary"
-                title="Confirmar"
-                @click="deleteItemConfirm"
-              />
-              <base-button
-                class="ms-1"
-                type="secondary"
-                title="Cancelar"
-                @click="closeDelete"
-              />
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-card>
-    </v-dialog>
+    </v-container>
   </div>
 </template> 
 
+<style lang="scss">
+@import "@/assets/styles/variables.scss";
 
+#card,
+p {
+  font-size: 1rem;
+  font-weight: bolder;
+}
+
+#card {
+  background-color: $menu-color;
+}
+
+#example-card,
+#example-card p {
+  font-size: 1rem;
+  font-weight: bolder;
+}
+</style>
 
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
+import BaseSelect from "../components/base-components/BaseSelect.vue";
 import { helpers, required } from "@vuelidate/validators";
-import "bootstrap-select/dist/css/bootstrap-select.css";
+import Loader from "@/components/Loader.vue";
 
 import pensumSubjectDetailApi from "@/services/pensumSubjectDetailApi";
-import pensumApi from "@/services/pensumApi";
-import subjectApi from "@/services/subjectApi";
-import BaseButton from "../components/base-components/BaseButton.vue";
-import BaseSelect from "../components/base-components/BaseSelect.vue";
+import schoolApi from "@/services/schoolApi";
 
 import useAlert from "../composables/useAlert";
 
@@ -276,48 +249,27 @@ const { alert } = useAlert();
 const langMessages = messages["es"].validations;
 
 export default {
-  components: { BaseButton, BaseSelect },
-
+  components: { BaseSelect, Loader },
   setup() {
     return { v$: useVuelidate() };
   },
 
   data() {
     return {
+      tab: 0,
       search: "",
-      dialog: false,
-      dialogDelete: false,
-      dialogPrerequisite: false,
-      editedIndex: -1,
-      editedPrerequisite: -1,
-      title: "DETALLE PREREQUISITOS",
-      headers: [
-        { title: "MATERIA", key: "subject_name" },
-        { title: "PREREQUISITO", key: "prerequisite" },
-        { title: "PENSUM", key: "program_name" },
-        { title: "ACCIONES", key: "actions", sortable: false },
-      ],
-
+      schools: [],
       total: 0,
-      records: [],
+      sub_schools: [],
       pensums: [],
       subjects: [],
       pensumSubject: [],
       loading: false,
       debounce: 0,
       options: {},
-      editedItem: {
-        program_name: "",
-        subject_name: "",
-        prerequisites: [],
-      },
-      defaultItem: {
-        program_name: "",
-        subject_name: "",
-        prerequisites: [],
-      },
-      prerequisite: {
-        prerequisite: "",
+      filter: {
+        school_name: "",
+        sub_school_name: "",
       },
     };
   },
@@ -326,39 +278,23 @@ export default {
     this.initialize();
   },
 
-  computed: {
-    formTitle() {
-      return this.editedIndex === -1 ? "Nuevo registro" : "Editar registro";
-    },
-  },
+  computed: {},
 
   watch: {
     search(val) {
       this.getDataFromApi();
     },
-    dialog(val) {
-      val || this.close();
-    },
-    dialogDelete(val) {
-      val || this.closeDelete();
-    },
-    dialogPrerequisite(val) {
-      val || this.closePrerequisiteDialog();
-    },
   },
 
   validations() {
     return {
-      editedItem: {
-        program_name: {
+      filter: {
+        school_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
-        subject_name: {
+        sub_school_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
-      },
-      prerequisite: {
-        prerequisite: {},
       },
     };
   },
@@ -366,18 +302,39 @@ export default {
   methods: {
     async change() {
       const { data } = await pensumSubjectDetailApi
-        .get(
-          "/byPensum/" +
-            this.v$.editedItem.program_name.$model +
-            "/" +
-            this.v$.editedItem.subject_name.$model
-        )
+        .get("/pensumSubject/" + this.tab)
         .catch((error) => {
           alert.error(true, "No fue posible obtener la información.", "fail");
         });
 
-      this.pensumSubject = data.subject;
-      console.log(this.pensumSubject);
+      this.subjects = data.subject;
+    },
+
+    async showSubSchool() {
+      if (this.filter.school_name != "") {
+        const { data } = await pensumSubjectDetailApi
+          .get("/showSubSchool/" + this.filter.school_name)
+          .catch((error) => {
+            alert.error(true, "No fue posible obtener la información.", "fail");
+          });
+
+        this.sub_schools = data.sub_school;
+      }
+    },
+
+    async showPensums() {
+      if (this.filter.sub_school_name != "") {
+        this.loading = true;
+
+        const { data } = await pensumSubjectDetailApi
+          .get("/showPensums/" + this.filter.sub_school_name)
+          .catch((error) => {
+            alert.error(true, "No fue posible obtener la información.", "fail");
+          });
+
+        this.pensums = data.pensum;
+        this.loading = false;
+      }
     },
 
     async initialize() {
@@ -386,12 +343,7 @@ export default {
 
       let requests = [
         this.getDataFromApi(),
-        pensumApi.get(null, {
-          params: {
-            itemsPerPage: -1,
-          },
-        }),
-        subjectApi.get(null, {
+        schoolApi.get(null, {
           params: {
             itemsPerPage: -1,
           },
@@ -403,10 +355,10 @@ export default {
       });
 
       if (responses) {
-        this.pensums = responses[1].data.data;
-        this.subjects = responses[2].data.data;
+        this.schools = responses[1].data.data;
       }
 
+      // this.change();
       this.loading = false;
     },
 
@@ -418,13 +370,9 @@ export default {
       this.debounce = setTimeout(async () => {
         try {
           const { data } = await pensumSubjectDetailApi.get(null, {
-            params: {
-              ...options,
-              search: this.search,
-            },
+            params: { ...options, search: this.search },
           });
 
-          this.records = data.data;
           this.total = data.total;
           this.loading = false;
         } catch (error) {
@@ -445,154 +393,6 @@ export default {
         search: "",
       });
     },
-
-    addPrerequisite() {
-      this.dialogPrerequisite = true;
-      this.editedPrerequisite = -1;
-      this.v$.prerequisite.prerequisite.$model = "";
-      this.v$.prerequisite.$reset();
-    },
-
-    async addNewPrerequisite() {
-      this.v$.prerequisite.$validate();
-      if (this.v$.prerequisite.$invalid) {
-        alert.error("Campo obligatorio");
-        return;
-      }
-
-      // Creating record
-      try {
-        this.editedItem.prerequisites.push({ ...this.prerequisite });
-      } catch (error) {
-        alert.error("No fue posible crear el registro.");
-      }
-
-      this.closePrerequisiteDialog();
-      this.initialize();
-      this.loading = false;
-      return;
-    },
-
-    closePrerequisiteDialog() {
-      this.v$.prerequisite.$reset();
-      this.dialogPrerequisite = false;
-      this.editedPrerequisite = -1;
-    },
-
-    async deletePrerequisite(index) {
-      this.editedItem.prerequisites.splice(index, 1);
-    },
-
-    close() {
-      this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
-    addRecord() {
-      this.dialog = true;
-      this.editedIndex = -1;
-      this.editedItem = Object.assign({}, this.defaultItem);
-      this.v$.$reset();
-    },
-
-    editItem(item) {
-      this.editedIndex = this.records.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialog = true;
-      this.change();
-    },
-
-    async save() {
-      this.v$.$validate();
-      if (this.v$.$invalid) {
-        alert.error("Campo obligatorio");
-        return;
-      }
-
-      // Updating record
-      if (this.editedIndex > -1) {
-        const edited = Object.assign(
-          this.records[this.editedIndex],
-          this.editedItem
-        );
-
-        try {
-          const { data } = await pensumSubjectDetailApi.put(
-            `/${edited.id}`,
-            edited
-          );
-          alert.success(data.message);
-        } catch (error) {
-          alert.error("No fue posible actualizar el registro.");
-        }
-
-        this.close();
-        this.editedItem.prerequisites.splice(
-          0,
-          this.editedItem.prerequisites.length
-        );
-        this.initialize();
-        return;
-      }
-
-      // Creating record
-      try {
-        const { data } = await pensumSubjectDetailApi.post(
-          null,
-          this.editedItem
-        );
-        if (data.message) {
-          alert.success(data.message);
-        } else {
-          alert.error(data.error);
-        }
-      } catch (error) {
-        alert.error("No fue posible crear el registro.");
-      }
-
-      this.close();
-      this.editedItem.prerequisites.splice(
-        0,
-        this.editedItem.prerequisites.length
-      );
-      this.initialize();
-      return;
-    },
-
-    deleteItem(item) {
-      this.editedIndex = this.records.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-
-      this.dialogDelete = true;
-    },
-
-    async deleteItemConfirm() {
-      try {
-        const { data } = await pensumSubjectDetailApi.delete(
-          `/${this.editedItem.id}`,
-          {
-            params: { id: this.editedItem.id },
-          }
-        );
-
-        alert.success(data.message);
-      } catch (error) {
-        this.close();
-      }
-      this.initialize();
-      this.closeDelete();
-    },
-
-    closeDelete() {
-      this.dialogDelete = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
   },
 };
-</script>
+</script> 

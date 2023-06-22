@@ -267,9 +267,9 @@
                       <v-col cols="12" sm="4" md="4">
                         <v-label>Día</v-label>
                         <base-select
-                          :items="weekdays"
-                          item-title="weekdays"
-                          item-value="weekdays"
+                          :items="schedules"
+                          item-title="week_day"
+                          item-value="week_day"
                           v-model="v$.schedule.week_day.$model"
                           :rules="v$.schedule.week_day"
                           @blur="changestarttime"
@@ -384,6 +384,8 @@
 
 
 <script>
+import { toast } from "../../node_modules/vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
@@ -432,7 +434,6 @@ export default {
       headerClassroom: [{ title: "AULA", key: "classroom_name" }],
 
       total: 0,
-      weekdays: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"],
       records: [],
       subjects: [],
       schools: [],
@@ -534,13 +535,23 @@ export default {
           required: helpers.withMessage(langMessages.required, required),
         },
         schedule: {},
-        selectedSchedule: {},
+        selectedSchedule: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
       },
       schedule: {
-        classroom_name: {},
-        week_day: {},
-        start_time: {},
-        end_time: {},
+        classroom_name: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
+        week_day: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
+        start_time: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
+        end_time: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
         selectedSchedule: {},
       },
     };
@@ -549,92 +560,116 @@ export default {
   methods: {
     //METHODS TO CHANGE
     async changeSubject() {
-      const { data } = await subjectApi
-        .get("/subjectByCycle/" + this.editedItem.school_name)
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
-      this.subjects = data.subject;
-      this.teachers = data.teacher;
+      if (this.editedItem.school_name != "") {
+        const { data } = await subjectApi
+          .get("/subjectByCycle/" + this.editedItem.school_name)
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
+        this.subjects = data.subject;
+        this.teachers = data.teacher;
+      }
     },
 
     async change() {
-      const { data } = await groupApi
-        .get("/bySubject/" + this.editedItem.subject_name)
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
+      if (this.editedItem.subject_name != "") {
+        const { data } = await groupApi
+          .get("/bySubject/" + this.editedItem.subject_name)
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
 
-      this.codes = data.subject;
+        this.codes = data.subject;
+      }
     },
 
     async changeSchedules() {
-      const { data } = await groupApi
-        .get(
-          "/byTeacher/" +
-            this.v$.editedItem.teacher_full_name.$model +
-            "/" +
-            this.v$.schedule.classroom_name.$model
-        )
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
+      if (
+        this.v$.editedItem.teacher_full_name.$model != "" &&
+        this.v$.schedule.classroom_name.$model != ""
+      ) {
+        const { data } = await groupApi
+          .get(
+            "/byTeacher/" +
+              this.v$.editedItem.teacher_full_name.$model +
+              "/" +
+              this.v$.schedule.classroom_name.$model
+          )
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
 
-      this.schedules = data.schedule;
+        this.schedules = data.schedule;
+      }
     },
 
     async changestarttime() {
-      const { data } = await groupApi
-        .get(
-          "/byDay/" +
-            this.v$.schedule.week_day.$model +
-            "/" +
-            this.v$.editedItem.teacher_full_name.$model
-        )
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
+      if (
+        this.v$.schedule.week_day.$model != "" &&
+        this.v$.editedItem.teacher_full_name.$model != ""
+      ) {
+        const { data } = await groupApi
+          .get(
+            "/byDay/" +
+              this.v$.schedule.week_day.$model +
+              "/" +
+              this.v$.editedItem.teacher_full_name.$model
+          )
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
 
-      this.start_time = data.start_time;
+        this.start_time = data.start_time;
+      }
     },
 
     async changeendtime() {
-      const { data } = await groupApi
-        .get(
-          "/byStartTime/" +
-            this.v$.schedule.start_time.$model +
-            "/" +
-            this.v$.schedule.week_day.$model
-        )
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
+      if (
+        this.v$.schedule.start_time.$model != "" &&
+        this.v$.schedule.week_day.$model != ""
+      ) {
+        const { data } = await groupApi
+          .get(
+            "/byStartTime/" +
+              this.v$.schedule.start_time.$model +
+              "/" +
+              this.v$.schedule.week_day.$model
+          )
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
 
-      this.end_time = data.end_time;
+        this.end_time = data.end_time;
+      }
     },
 
     async deleteSchedule(index) {
       this.editedItem.selectedSchedule.splice(index, 1);
+      toast.success("Dato eliminado, guarde los cambios.", {
+        autoClose: 2000,
+        position: toast.POSITION.TOP_CENTER,
+        multiple: false,
+      });
     },
 
     async initialize() {
@@ -643,7 +678,6 @@ export default {
 
       let requests = [
         this.getDataFromApi(),
-        // teacherApi.get(null, { params: { itemsPerPage: -1 } }),
         schoolApi.get(null, { params: { itemsPerPage: -1 } }),
         classroomApi.get(null, { params: { itemsPerPage: -1 } }),
       ];
@@ -652,7 +686,6 @@ export default {
       });
 
       if (responses) {
-        // this.teachers = responses[1].data.data;
         this.schools = responses[1].data.data;
         this.classrooms = responses[2].data.available;
       }
@@ -717,7 +750,11 @@ export default {
     async addNewSchedule() {
       this.v$.schedule.$validate();
       if (this.v$.schedule.$invalid) {
-        alert.error("Campo obligatorio");
+        toast.error("Complete la información del formulario.", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+          multiple: false,
+        });
         return;
       }
 
@@ -736,6 +773,7 @@ export default {
 
     closeScheduleDialog() {
       this.v$.schedule.$reset();
+      this.schedules = [];
       this.dialogSchedule = false;
     },
 
@@ -756,10 +794,40 @@ export default {
     },
 
     async save() {
-      this.v$.$validate();
-      if (this.v$.$invalid) {
-        alert.error("Campo obligatorio");
-        return;
+      if (this.editedIndex == -1) {
+        this.v$.editedItem.$validate();
+
+        if (
+          this.v$.editedItem.group_code.$invalid ||
+          this.v$.editedItem.students_quantity.$invalid ||
+          this.v$.editedItem.teacher_full_name.$invalid ||
+          this.v$.editedItem.subject_name.$invalid ||
+          this.v$.editedItem.subject_code.$invalid ||
+          this.v$.editedItem.school_name.$invalid
+        ) {
+          toast.warn("Llene los campos obligatorios.", {
+            autoClose: 2000,
+            position: toast.POSITION.TOP_CENTER,
+            multiple: false,
+          });
+
+          return;
+        }
+      } else if (this.editedIndex > -1) {
+        this.v$.editedItem.$validate();
+
+        if (this.v$.editedItem.$invalid) {
+          toast.warn(
+            "Llene los campos obligatorios, verifique los horarios asignados.",
+            {
+              autoClose: 2000,
+              position: toast.POSITION.TOP_CENTER,
+              multiple: false,
+            }
+          );
+
+          return;
+        }
       }
 
       // Updating record

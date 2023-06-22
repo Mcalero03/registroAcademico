@@ -212,6 +212,8 @@
 
 
 <script>
+import { toast } from "../../node_modules/vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, required } from "@vuelidate/validators";
@@ -320,6 +322,9 @@ export default {
         school: {
           required: helpers.withMessage(langMessages.required, required),
         },
+        attendances: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
       },
     };
   },
@@ -327,76 +332,90 @@ export default {
   methods: {
     //METHODS TO CHANGE
     async changeTeacher() {
-      const { data } = await attendanceApi
-        .get("/bySchool/" + this.editedItem.school)
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
+      if (this.editedItem.school != "") {
+        const { data } = await attendanceApi
+          .get("/bySchool/" + this.editedItem.school)
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
 
-      this.teachers = data.teachers;
+        this.teachers = data.teachers;
+      }
     },
 
     async changeSubject() {
-      const teacher = this.v$.editedItem.teacher.$model;
-      var arr = teacher.split(", ");
-      const name = arr[0];
-      const last_name = arr[1];
+      if (this.v$.editedItem.teacher.$model != "") {
+        const teacher = this.v$.editedItem.teacher.$model;
+        let arr = teacher.split(", ");
+        const name = arr[0];
+        const last_name = arr[1];
 
-      const { data } = await attendanceApi
-        .get("/byTeacher/" + name + "/" + last_name)
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
+        const { data } = await attendanceApi
+          .get("/byTeacher/" + name + "/" + last_name)
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
 
-      this.teacherSubject = data.subject;
+        this.teacherSubject = data.subject;
+      }
     },
 
     async changeGroup() {
-      const teacher = this.v$.editedItem.teacher.$model;
-      const subject = this.v$.editedItem.subject.$model;
+      if (
+        this.v$.editedItem.teacher.$model != "" &&
+        this.v$.editedItem.subject.$model != ""
+      ) {
+        const teacher = this.v$.editedItem.teacher.$model;
+        const subject = this.v$.editedItem.subject.$model;
 
-      var arr = teacher.split(", ");
-      const name = arr[0];
-      const last_name = arr[1];
+        let arr = teacher.split(", ");
+        const name = arr[0];
+        const last_name = arr[1];
 
-      const { data } = await attendanceApi
-        .get("/bySubject/" + name + "/" + last_name + "/" + subject)
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
+        const { data } = await attendanceApi
+          .get("/bySubject/" + name + "/" + last_name + "/" + subject)
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
 
-      this.teacherStudentGroup = data.group;
+        this.teacherStudentGroup = data.group;
+      }
     },
 
     async changeStudents() {
-      this.loading = true;
-      const subject = this.v$.editedItem.subject.$model;
-      const group = this.v$.editedItem.group.$model;
+      if (
+        this.v$.editedItem.subject.$model != "" &&
+        this.v$.editedItem.group.$model != ""
+      ) {
+        this.loading = true;
+        const subject = this.v$.editedItem.subject.$model;
+        const group = this.v$.editedItem.group.$model;
 
-      const { data } = await attendanceApi
-        .get("/byGroup/" + group + "/" + subject)
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
+        const { data } = await attendanceApi
+          .get("/byGroup/" + group + "/" + subject)
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
 
-      this.editedItem.attendances = data.student;
-      this.loading = false;
+        this.editedItem.attendances = data.student;
+        this.loading = false;
+      }
     },
 
     async initialize() {
@@ -489,7 +508,11 @@ export default {
     async save() {
       this.v$.$validate();
       if (this.v$.$invalid) {
-        alert.error("Campo obligatorio");
+        toast.warn("Llene los campos obligatorios.", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+          multiple: false,
+        });
         return;
       }
 

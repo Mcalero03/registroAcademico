@@ -81,7 +81,10 @@ Route::get('/pensum/showSubSchools/{school}', [PensumController::class, 'showSub
 
 //PENSUM SUBJECT DETAIL
 Route::resource('/pensumSubjectDetail', PensumSubjectDetailController::class);
-Route::get('/pensumSubjectDetail/byPensum/{pensum}/{subject}', [PensumSubjectDetailController::class, 'pensum']);
+Route::get('/pensumSubjectDetail/byPensum/{pensum}/{subject}', [PensumSubjectDetailController::class, 'pensum']); //api utilizada para asignar los prerrequisitos
+Route::get('/pensumSubjectDetail/pensumSubject/{pensum}', [PensumSubjectDetailController::class, 'pensumSubject']);
+Route::get('/pensumSubjectDetail/showSubSchool/{school}', [PensumSubjectDetailController::class, 'showSubSchool']);
+Route::get('/pensumSubjectDetail/showPensums/{sub_school}', [PensumSubjectDetailController::class, 'showPensums']);
 
 //MUNICIPALITY
 Route::resource('/municipality', MunicipalityController::class);

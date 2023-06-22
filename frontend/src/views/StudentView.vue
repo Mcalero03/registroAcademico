@@ -75,6 +75,7 @@
                   v-model="v$.editedItem.school_name.$model"
                   :rules="v$.editedItem.school_name"
                   v-if="editedIndex == -1"
+                  @blur="change()"
                 >
                 </base-select>
                 <base-select
@@ -85,6 +86,8 @@
                   :rules="v$.editedItem.school_name"
                   v-if="editedIndex != -1"
                   readonly
+                  :autofocus="true"
+                  @focus="change()"
                 >
                 </base-select>
               </v-col>
@@ -365,23 +368,7 @@
                 <!-- Modal -->
                 <v-dialog v-model="dialogCareer" max-width="600px" persistent>
                   <v-card height="100%">
-                    <!-- Container when there are no careers available  -->
-                    <v-container v-if="pensums == 0 && editedIndex != -1">
-                      <h2 class="black-secondary text-center mt-4 mb-4">
-                        No hay carreras para inscribir!
-                      </h2>
-                      <v-row>
-                        <v-col align="center"
-                          ><base-button
-                            class="ms-1"
-                            type="secondary"
-                            title="Cancelar"
-                            @click="closeCareerDialog()"
-                        /></v-col> </v-row
-                    ></v-container>
-                    <!-- Container when there are no careers available  -->
-                    <!-- Container when there are careers available  -->
-                    <v-container v-if="pensums != 0">
+                    <v-container>
                       <h2 class="black-secondary text-center mt-4 mb-4">
                         Agregar carrera
                       </h2>
@@ -474,6 +461,9 @@
 
 
 <script>
+import { toast } from "../../node_modules/vue3-toastify";
+import "vue3-toastify/dist/index.css";
+
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
 import {
@@ -718,22 +708,8 @@ export default {
 
   methods: {
     async change() {
-      if (this.editedItem.id == null) {
+      if (this.editedItem.id == null && this.editedItem.school_name != "") {
         this.editedItem.id = 0;
-
-        //   const { data } = await studentApi
-        //     .get("/byCareer/" + this.editedItem.id)
-        //     .catch((error) => {
-        //       alert.error(true, "No fue posible obtener la información.", "fail");
-        //     });
-        //   this.pensums = data.career;
-        // } else {
-        //   const { data } = await studentApi
-        //     .get("/byCareer/" + this.editedItem.id)
-        //     .catch((error) => {
-        //       alert.error(true, "No fue posible obtener la información.", "fail");
-        //     });
-
         const { data } = await studentApi
           .get(
             "/byCareer/" +
@@ -742,10 +718,16 @@ export default {
               this.editedItem.school_name
           )
           .catch((error) => {
-            alert.error(true, "No fue posible obtener la información.", "fail");
+            toast.error("No fue posible obtener la información.", {
+              autoClose: 2000,
+              position: toast.POSITION.TOP_CENTER,
+            });
           });
         this.pensums = data.career;
-      } else {
+      } else if (
+        this.editedItem.id != null &&
+        this.editedItem.school_name != ""
+      ) {
         const { data } = await studentApi
           .get(
             "/byCareer/" +
@@ -754,7 +736,10 @@ export default {
               this.editedItem.school_name
           )
           .catch((error) => {
-            alert.error(true, "No fue posible obtener la información.", "fail");
+            toast.error("No fue posible obtener la información.", {
+              autoClose: 2000,
+              position: toast.POSITION.TOP_CENTER,
+            });
           });
         this.pensums = data.career;
       }
@@ -879,10 +864,35 @@ export default {
 
     //CAREER
     addCareer() {
-      this.dialogCareer = true;
-      this.v$.career.program_name.$model = "";
-      this.v$.career.$reset();
-      this.change();
+      if (this.pensums != 0 && this.editedIndex == -1) {
+        this.dialogCareer = true;
+        this.v$.career.program_name.$model = "";
+        this.v$.career.$reset();
+      } else if (
+        this.pensums == 0 &&
+        this.editedItem.school_name == 0 &&
+        this.editedIndex == -1
+      ) {
+        this.closeCareerDialog();
+        toast.error("Complete la información del estudiante", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+        });
+      } else if (this.pensums == 0 && this.editedIndex == -1) {
+        toast.error("No hay carreras disponibles para inscribir!", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+        });
+      } else if (this.pensums != 0 && this.editedIndex != -1) {
+        this.dialogCareer = true;
+        this.v$.career.program_name.$model = "";
+        this.v$.career.$reset();
+      } else if (this.pensums == 0 && this.editedIndex != -1) {
+        toast.error("No hay carreras disponibles para inscribir!", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+        });
+      }
     },
 
     async addNewCareer() {
@@ -907,6 +917,7 @@ export default {
 
     closeCareerDialog() {
       this.v$.career.$reset();
+      this.pensums = [];
       this.dialogCareer = false;
     },
 

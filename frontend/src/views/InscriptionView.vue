@@ -108,25 +108,22 @@
                 >
                 </v-text-field>
               </v-col>
+              <v-col
+                cols="5"
+                sm="2"
+                md="3"
+                class="pt-12"
+                v-if="editedIndex == -1"
+              >
+                <base-button
+                  type="primary"
+                  title="Buscar"
+                  @click="searchStudentCard()"
+                />
+              </v-col>
             </v-row>
             <v-row>
               <v-col cols="12" sm="6" md="6" v-if="editedIndex == -1">
-                <!-- <v-table>
-                  <thead>
-                    <tr>
-                      <th>Estudiante</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="(schedule, index) in students"
-                      v-bind:index="index"
-                      :key="index"
-                    >
-                      <td v-text="schedule.full_name"></td>
-                    </tr>
-                  </tbody>
-                </v-table> -->
                 <v-label>Estudiante</v-label>
                 <base-input
                   :items="students"
@@ -166,6 +163,7 @@
                   v-model="v$.editedItem.program_name.$model"
                   :rules="v$.editedItem.program_name"
                   @click="showCareers"
+                  @blur="availableSubjects()"
                 />
               </v-col>
               <!-- program_name  -->
@@ -295,25 +293,7 @@
               </v-col>
               <!-- Modal -->
               <v-dialog v-model="dialogSubject" max-width="700px" persistent>
-                <v-card height="100%" v-if="this.groups == 'Registrado'">
-                  <v-container>
-                    <h2 class="black-secondary text-center mt-4 mb-4">
-                      Ya inscribió materias para este ciclo
-                    </h2>
-                    <v-row>
-                      <v-col align="center">
-                        <base-button
-                          class="ms-1"
-                          type="secondary"
-                          title="Cancelar"
-                          @click="closeSubjectDialog()"
-                        />
-                      </v-col>
-                    </v-row>
-                  </v-container>
-                </v-card>
-
-                <v-card height="100%" v-if="this.groups != 'Registrado'">
+                <v-card height="100%">
                   <v-container>
                     <h2 class="black-secondary text-center mt-4 mb-4">
                       Agregar materia
@@ -539,9 +519,11 @@
 
 
 <script>
+import { toast } from "../../node_modules/vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
-import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
+import { helpers, required } from "@vuelidate/validators";
 
 import inscriptionApi from "@/services/inscriptionApi";
 import cycleApi from "@/services/cycleApi";
@@ -648,9 +630,6 @@ export default {
     search(val) {
       this.getDataFromApi();
     },
-    searchStudent(val) {
-      this.searchStudentCard();
-    },
     dialog(val) {
       val || this.close();
     },
@@ -669,7 +648,9 @@ export default {
           required: helpers.withMessage(langMessages.required, required),
         },
         schedules: {},
-        inscriptions: {},
+        inscriptions: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
         pensums: {},
         program_name: {
           required: helpers.withMessage(langMessages.required, required),
@@ -689,54 +670,84 @@ export default {
 
   methods: {
     async showSchedules() {
-      const { data } = await inscriptionApi
-        .get("/showSchedules/" + this.editedItem.id)
-        .catch((error) => {
-          alert.error(true, "No fue posible obtener la información.", "fail");
-        });
-      this.editedItem.schedules = data.schedules;
+      if (this.editedItem.id != "") {
+        const { data } = await inscriptionApi
+          .get("/showSchedules/" + this.editedItem.id)
+          .catch((error) => {
+            toast.error("No fue posible obtener la información.", {
+              autoClose: 2000,
+              position: toast.POSITION.TOP_CENTER,
+            });
+          });
+        this.editedItem.schedules = data.schedules;
+      }
     },
 
     async showCareers() {
-      const { data } = await inscriptionApi
-        .get("/showCareers/" + this.editedItem.full_name)
-        .catch((error) => {
-          alert.error(true, "No fue posible obtener la información.", "fail");
-        });
-      this.pensums = data.careers;
+      if (this.editedItem.full_name != "") {
+        const { data } = await inscriptionApi
+          .get("/showCareers/" + this.editedItem.full_name)
+          .catch((error) => {
+            toast.error("No fue posible obtener la información.", {
+              autoClose: 2000,
+              position: toast.POSITION.TOP_CENTER,
+            });
+          });
+        this.pensums = data.careers;
+      }
     },
 
     async searchStudentCard() {
       try {
-        const { data } = await inscriptionApi.get(null, {
-          params: {
-            searchStudent: this.searchStudent,
-          },
-        });
-
-        this.students = data.student;
-        this.editedItem.full_name = this.students[0].full_name;
+        if (this.searchStudent != "") {
+          const { data } = await inscriptionApi.get(null, {
+            params: {
+              searchStudent: this.searchStudent,
+            },
+          });
+          this.students = data.student;
+          this.editedItem.full_name = this.students[0].full_name;
+        } else {
+          toast.error("Ingrese el carnet del estudiante.", {
+            autoClose: 2000,
+            position: toast.POSITION.TOP_CENTER,
+            multiple: false,
+          });
+        }
       } catch (error) {
-        alert.error("No fue posible obtener el estudiante.");
+        toast.error("No fue posible obtener el estudiante.", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+          multiple: false,
+        });
       }
     },
 
     async availableSubjects() {
-      const { data } = await inscriptionApi
-        .get(
-          "/availableSubjects/" +
-            this.editedItem.full_name +
-            "/" +
-            this.editedItem.program_name +
-            "/" +
-            this.editedItem.cycle
-        )
-        .catch((error) => {
-          alert.error(true, "No fue posible obtener la información.", "fail");
-        });
-      this.inscriptions = data.inscriptions;
-      this.groups = data.groups;
-      this.selectGroups = data.selectGroup;
+      if (
+        this.editedItem.full_name != "" &&
+        this.editedItem.program_name != "" &&
+        this.editedItem.cycle != ""
+      ) {
+        const { data } = await inscriptionApi
+          .get(
+            "/availableSubjects/" +
+              this.editedItem.full_name +
+              "/" +
+              this.editedItem.program_name +
+              "/" +
+              this.editedItem.cycle
+          )
+          .catch((error) => {
+            toast.error("No fue posible obtener la información.", {
+              autoClose: 2000,
+              position: toast.POSITION.TOP_CENTER,
+            });
+          });
+        this.inscriptions = data.inscriptions;
+        this.groups = data.groups;
+        this.selectGroups = data.selectGroup;
+      }
     },
 
     async initialize() {
@@ -832,8 +843,17 @@ export default {
       // Creating record
       try {
         this.editedItem.inscriptions.push({ ...this.editStatus });
+        toast.success("Datos actualizados. Guarde los cambios", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+          multiple: false,
+        });
       } catch (error) {
-        alert.error("No fue posible crear el registro.");
+        toast.error("No fue posible actualizar el registro.", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+          multiple: false,
+        });
       }
 
       this.closeEditStatus();
@@ -849,10 +869,34 @@ export default {
 
     //ADD NEW GROUP INSCRIPTION
     addSubject() {
-      this.dialogSubject = true;
-      this.availableSubjects();
-      this.v$.group.group_code.$model = "";
-      this.v$.group.$reset();
+      if (
+        this.editedItem.full_name != "" &&
+        this.editedItem.program_name != "" &&
+        this.editedItem.cycle != ""
+      ) {
+        console.log(this.groups);
+        if (this.groups != "Registrado") {
+          this.dialogSubject = true;
+          this.v$.group.group_code.$model = "";
+          this.v$.group.$reset();
+        } else if (this.groups == "Registrado") {
+          toast.error("Ya inscribió materias para este ciclo.", {
+            autoClose: 2000,
+            position: toast.POSITION.TOP_CENTER,
+            multiple: false,
+          });
+        }
+      } else if (
+        this.editedItem.full_name == "" ||
+        this.editedItem.program_name == "" ||
+        this.editedItem.cycle == ""
+      ) {
+        toast.error("Complete la información de inscripción.", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+          multiple: false,
+        });
+      }
     },
 
     closeSubjectDialog() {
@@ -864,7 +908,6 @@ export default {
       this.v$.group.$validate();
       if (this.v$.group.$invalid) {
         alert.error("Campo obligatorio");
-        return;
       }
 
       // Creating record
@@ -914,7 +957,11 @@ export default {
     async save() {
       this.v$.$validate();
       if (this.v$.$invalid) {
-        alert.error("Campo obligatorio");
+        toast.warn("Verifique el ingreso de los grupos a inscribir.", {
+          autoClose: 4000,
+          position: toast.POSITION.TOP_CENTER,
+          multiple: false,
+        });
         return;
       }
 

@@ -38,6 +38,7 @@ class CycleController extends Controller
                 ->where('cycle_id', $item->id)
                 ->get();
             $item->subjects = Encrypt::encryptObject($item->subjects, "id");
+            $item->year = strval($item->year);
         }
 
         $cycle = Encrypt::encryptObject($cycle, "id");

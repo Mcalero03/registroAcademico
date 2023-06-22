@@ -71,6 +71,7 @@
                   :rules="v$.editedItem.cycle_number"
                   type="number"
                   min="1"
+                  max="10"
                 />
               </v-col>
               <!-- cycle_number  -->
@@ -255,6 +256,9 @@
 
 
 <script>
+import { toast } from "../../node_modules/vue3-toastify";
+import "vue3-toastify/dist/index.css";
+
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
 import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
@@ -374,7 +378,7 @@ export default {
             ({ $params }) => langMessages.minLength($params),
             minLength(1)
           ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(1)),
+          maxLength: (({ $params }) => maxLength($params), maxLength(2)),
         },
         year: {
           required: helpers.withMessage(langMessages.required, required),
@@ -397,12 +401,11 @@ export default {
             minLength(4)
           ),
         },
-        school: {
-          // required: helpers.withMessage(langMessages.required, required),
+        subjects: {
+          required: helpers.withMessage(langMessages.required, required),
         },
-        pensum: {
-          // required: helpers.withMessage(langMessages.required, required),
-        },
+        school: {},
+        pensum: {},
       },
     };
   },
@@ -410,34 +413,43 @@ export default {
   methods: {
     //METHODS TO CHANGE
     async changePensum() {
-      const { data } = await cycleApi
-        .get("/bySchool/" + this.v$.editedItem.school.$model)
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
+      if (this.v$.editedItem.school.$model != "") {
+        const { data } = await cycleApi
+          .get("/bySchool/" + this.v$.editedItem.school.$model)
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
 
-      this.pensums = data.pensum;
+        this.pensums = data.pensum;
+      }
     },
     async changeSubject() {
-      const { data } = await cycleApi
-        .get("/byPensum/" + this.v$.editedItem.pensum.$model)
-        .catch((error) => {
-          alert.error(
-            true,
-            "No fue posible obtener la información de los espacios.",
-            "fail"
-          );
-        });
+      if (this.v$.editedItem.pensum.$model != "") {
+        const { data } = await cycleApi
+          .get("/byPensum/" + this.v$.editedItem.pensum.$model)
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
 
-      this.subjects = data.subject;
+        this.subjects = data.subject;
+      }
     },
 
     async deleteSubjetct(index) {
       this.editedItem.subjects.splice(index, 1);
+      toast.success("Prerequisito eliminado. Guarde cambios.", {
+        autoClose: 2000,
+        position: toast.POSITION.TOP_CENTER,
+        multiple: false,
+      });
     },
 
     async initialize() {
@@ -525,9 +537,18 @@ export default {
     },
 
     async save() {
-      this.v$.$validate();
-      if (this.v$.$invalid) {
-        alert.error("Campo obligatorio");
+      this.v$.editedItem.$validate();
+
+      if (this.v$.editedItem.$invalid) {
+        toast.warn(
+          "Verifique los campos obligatorios y las materias seleccionadas.",
+          {
+            autoClose: 2000,
+            position: toast.POSITION.TOP_CENTER,
+            multiple: false,
+          }
+        );
+
         return;
       }
 
