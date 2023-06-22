@@ -27,18 +27,28 @@
         @update:options="getDataFromApi"
       >
         <template v-slot:[`item.actions`]="{ item }">
-          <v-icon
-            size="20"
-            class="mr-2"
-            @click="editItem(item.raw)"
-            icon="mdi-pencil"
-          />
-          <v-icon
-            size="20"
-            class="mr-2"
-            @click="deleteItem(item.raw)"
-            icon="mdi-delete"
-          />
+          <v-tooltip text="Editar" location="start">
+            <template v-slot:activator="{ props }">
+              <v-icon
+                size="20"
+                class="mr-2"
+                @click="editItem(item.raw)"
+                icon="mdi-pencil"
+                v-bind="props"
+              />
+            </template>
+          </v-tooltip>
+          <v-tooltip text="Eliminar" location="end">
+            <template v-slot:activator="{ props }">
+              <v-icon
+                size="20"
+                class="mr-2"
+                @click="deleteItem(item.raw)"
+                icon="mdi-delete"
+                v-bind="props"
+              />
+            </template>
+          </v-tooltip>
         </template>
         <template v-slot:no-data>
           <v-icon @click="initialize" icon="mdi-refresh" />
@@ -46,7 +56,7 @@
       </v-data-table-server>
     </v-card>
 
-    <v-dialog v-model="dialog" max-width="800px" persistent>
+    <v-dialog v-model="dialog" max-width="500px" persistent>
       <v-card>
         <v-card-title>
           <h2 class="mx-auto pt-3 mb-3 text-center black-secondary">

@@ -199,7 +199,6 @@ class PensumSubjectDetailController extends Controller
 
     public function pensumSubject($pensum)
     {
-
         $program_id = Pensum::where('pensum.program_name', $pensum)->first()?->id;
         $subject = Subject::select('subject.status', 'subject.subject_name', 'subject.units_value', 'subject.id as subject_id', 'subject.subject_code', 'pensum.program_name', 'school.school_name',)
             ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
@@ -209,6 +208,12 @@ class PensumSubjectDetailController extends Controller
             ->where('pensum.id', $program_id)
             ->get();
 
+        for ($i = 1; $i <= count($subject); $i++) {
+            foreach ($subject as $item) {
+                $item->index = $i++;
+            }
+        }
+
         foreach ($subject as $item) {
             $item->prerequisites = Prerequisite::select('prerequisite.*', 'subject.subject_name as prerequisite')
                 ->join('subject', 'prerequisite.subject_id', '=', 'subject.id')
@@ -217,9 +222,15 @@ class PensumSubjectDetailController extends Controller
                 ->get();
 
             $item->count = count($item->prerequisites);
-
             $item->prerequisites = Encrypt::encryptObject($item->prerequisites, 'id');
+
+            // foreach ($item->prerequisites as $i) {
+            //     $i->index = 1;
+            // }
+            // array_push($item->prerequisites,  1);
         }
+
+
 
         return response()->json([
             "message" => "Registros obtenidos correctamente.",

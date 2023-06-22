@@ -37,9 +37,15 @@ class AttendanceController extends Controller
         $attendance = Attendance::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage)->unique();
 
         foreach ($attendance as $item) {
-            // $item->attendance_date = date("d/m/y");
 
-            $item->attendances = Attendance_Detail::select(DB::raw("CONCAT(student.last_name, ', ',student.name) as full_name"), 'inscription.id', 'attendance_detail.status as attendance_status')
+
+            $item->attendances = Attendance_Detail::select(
+                DB::raw("CONCAT(student.last_name, ', ',student.name) as full_name"),
+                DB::raw("COUNT(CASE WHEN attendance_detail.status = '1' THEN student.id END) as attendance_count"),
+                DB::raw("COUNT(CASE WHEN attendance_detail.status = '0' THEN student.id END) as no_attendance_count"),
+                'inscription.id',
+                'attendance_detail.status as attendance_status'
+            )
                 ->join('attendance', 'attendance_detail.attendance_id', '=', 'attendance.id')
                 ->leftjoin('inscription_detail as i', 'attendance_detail.inscription_detail_id', '=', 'i.id')
                 ->leftjoin('inscription', 'i.inscription_id', '=', 'inscription.id')
@@ -48,7 +54,8 @@ class AttendanceController extends Controller
                 ->leftjoin('student', 'inscription.student_id', '=', 'student.id')
                 ->where('attendance_detail.attendance_id', $item->id)
 
-                ->get()->unique();
+                ->get();
+
 
             $item->attendances = Encrypt::encryptObject($item->attendances, "id");
         }

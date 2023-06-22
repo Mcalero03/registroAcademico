@@ -33,18 +33,28 @@
         @update:options="getDataFromApi"
       >
         <template v-slot:[`item.actions`]="{ item }">
-          <v-icon
-            size="20"
-            class="mr-2"
-            @click="editItem(item.raw)"
-            icon="mdi-pencil"
-          />
-          <v-icon
-            size="20"
-            class="mr-2"
-            @click="deleteItem(item.raw)"
-            icon="mdi-delete"
-          />
+          <v-tooltip text="Editar" location="start">
+            <template v-slot:activator="{ props }">
+              <v-icon
+                size="20"
+                class="mr-2"
+                @click="editItem(item.raw)"
+                icon="mdi-pencil"
+                v-bind="props"
+              />
+            </template>
+          </v-tooltip>
+          <v-tooltip text="Eliminar" location="end">
+            <template v-slot:activator="{ props }">
+              <v-icon
+                size="20"
+                class="mr-2"
+                @click="deleteItem(item.raw)"
+                icon="mdi-delete"
+                v-bind="props"
+              />
+            </template>
+          </v-tooltip>
         </template>
         <template v-slot:no-data>
           <v-icon @click="initialize" icon="mdi-refresh" />
@@ -198,8 +208,8 @@ export default {
       title: "MUNICIPIOS",
       headers: [
         { title: "MUNICIPIO", key: "municipality" },
-        { title: "MIN MUN", key: "mun_min" },
-        { title: "MAY MUN", key: "mun_may" },
+        // { title: "MIN MUN", key: "mun_min" },
+        // { title: "MAY MUN", key: "mun_may" },
         { title: "DM COD", key: "dm_cod" },
         { title: "COD MUN", key: "cod_mun" },
         { title: "DEPARTAMENTO", key: "department_name" },
