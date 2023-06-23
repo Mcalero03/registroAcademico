@@ -38,23 +38,35 @@ class AttendanceController extends Controller
 
         foreach ($attendance as $item) {
 
-
             $item->attendances = Attendance_Detail::select(
                 DB::raw("CONCAT(student.last_name, ', ',student.name) as full_name"),
-                DB::raw("COUNT(CASE WHEN attendance_detail.status = '1' THEN student.id END) as attendance_count"),
-                DB::raw("COUNT(CASE WHEN attendance_detail.status = '0' THEN student.id END) as no_attendance_count"),
                 'inscription.id',
                 'attendance_detail.status as attendance_status'
             )
                 ->join('attendance', 'attendance_detail.attendance_id', '=', 'attendance.id')
                 ->leftjoin('inscription_detail as i', 'attendance_detail.inscription_detail_id', '=', 'i.id')
-                ->leftjoin('inscription', 'i.inscription_id', '=', 'inscription.id')
+                ->leftjoin(
+                    'inscription',
+                    'i.inscription_id',
+                    '=',
+                    'inscription.id'
+                )
                 ->leftjoin('group', 'i.group_id', '=', 'group.id')
                 ->leftjoin('subject', 'group.subject_id', '=', 'subject.id')
                 ->leftjoin('student', 'inscription.student_id', '=', 'student.id')
                 ->where('attendance_detail.attendance_id', $item->id)
 
                 ->get();
+
+            $item->attendance_count = Attendance_Detail::select(
+                DB::raw("COUNT(CASE WHEN attendance_detail.status = '1' THEN attendance_detail.id END) as attendance_count"),
+                DB::raw("COUNT(CASE WHEN attendance_detail.status = '0' THEN attendance_detail.id END) as no_attendance_count"),
+            )
+                ->join('attendance', 'attendance_detail.attendance_id', '=', 'attendance.id')
+                ->where('attendance_detail.attendance_id', $item->id)
+
+                ->get();
+
 
 
             $item->attendances = Encrypt::encryptObject($item->attendances, "id");

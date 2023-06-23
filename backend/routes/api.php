@@ -49,6 +49,7 @@ Route::resource('/pensumType', PensumTypeController::class);
 
 //GROUP
 Route::resource('/group', GroupController::class);
+Route::get('/group/classroomCapacity/{school}/{quantity}', [GroupController::class, 'classroomCapacity']);
 Route::get('/group/bySubject/{subject}', [GroupController::class, 'bySubject']);
 Route::get('/group/bySchool/{school}', [GroupController::class, 'bySchool']);
 Route::get('/group/byTeacher/{teacher}/{classroom}', [GroupController::class, 'byTeacher']);

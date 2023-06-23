@@ -282,7 +282,7 @@
                       <v-col cols="12" sm="4" md="4">
                         <v-label>Día</v-label>
                         <base-select
-                          :items="schedules"
+                          :items="week_days"
                           item-title="week_day"
                           item-value="week_day"
                           v-model="v$.schedule.week_day.$model"
@@ -408,7 +408,7 @@ import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
 import groupApi from "@/services/groupApi";
 import schoolApi from "@/services/schoolApi";
 import subjectApi from "@/services/subjectApi";
-import classroomApi from "@/services/classroomApi";
+// import classroomApi from "@/services/classroomApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
@@ -457,6 +457,7 @@ export default {
       teachers: [],
       codes: [],
       schedules: [],
+      week_days: [],
       classrooms: [],
       loading: false,
       debounce: 0,
@@ -574,6 +575,30 @@ export default {
 
   methods: {
     //METHODS TO CHANGE
+
+    async changeClassroom() {
+      if (
+        this.editedItem.school_name != "" &&
+        this.editedItem.students_quantity != ""
+      ) {
+        const { data } = await groupApi
+          .get(
+            "/classroomCapacity/" +
+              this.editedItem.school_name +
+              "/" +
+              this.editedItem.students_quantity
+          )
+          .catch((error) => {
+            alert.error(
+              true,
+              "No fue posible obtener la información de los espacios.",
+              "fail"
+            );
+          });
+        this.classrooms = data.classroom;
+      }
+    },
+
     async changeSubject() {
       if (this.editedItem.school_name != "") {
         const { data } = await subjectApi
@@ -627,6 +652,7 @@ export default {
           });
 
         this.schedules = data.schedule;
+        this.week_days = data.week_day;
       }
     },
 
@@ -694,7 +720,7 @@ export default {
       let requests = [
         this.getDataFromApi(),
         schoolApi.get(null, { params: { itemsPerPage: -1 } }),
-        classroomApi.get(null, { params: { itemsPerPage: -1 } }),
+        // classroomApi.get(null, { params: { itemsPerPage: -1 } }),
       ];
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
@@ -702,7 +728,7 @@ export default {
 
       if (responses) {
         this.schools = responses[1].data.data;
-        this.classrooms = responses[2].data.available;
+        // this.classrooms = responses[2].data.available;
       }
 
       this.loading = false;
@@ -750,9 +776,10 @@ export default {
       });
     },
 
-    //RELATIVE
+    //SCHEDULE
 
     addSchedule() {
+      this.changeClassroom();
       this.dialogSchedule = true;
       this.v$.schedule.classroom_name.$model = "";
       this.v$.schedule.week_day.$model = "";
