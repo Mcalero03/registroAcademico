@@ -44,6 +44,7 @@ class GroupController extends Controller
                 ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
                 ->join('classroom', 'schedule_classroom_group_detail.classroom_id', 'classroom.id')
                 ->where('group.id', $item->id)
+
                 ->get();
 
             $item->selectedSchedule = Encrypt::encryptObject($item->selectedSchedule, "id");
@@ -113,23 +114,64 @@ class GroupController extends Controller
             'subject_id' => Subject::where('subject_name', $data['subject_name'])->first()?->id,
         ]);
 
-        ScheduleClassroomGroupDetail::where('group_id', $data['id'])->delete();
+        $selectedSchedules = ScheduleClassroomGroupDetail::select('schedule_classroom_group_detail.id', 'schedule.week_day', 'schedule.start_time', 'schedule.end_time', 'classroom.classroom_name')
+            ->join('group', 'schedule_classroom_group_detail.group_id', '=', 'group.id')
+            ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
+            ->join('classroom', 'schedule_classroom_group_detail.classroom_id', 'classroom.id')
+            ->where('group.id', $data['id'])
+            ->get();
+
+        // Obtener los IDs existentes en $selectedSchedules
+        $existingIds = $selectedSchedules->pluck('id')->toArray();
 
 
         foreach ($data['selectedSchedule'] as $value) {
-            ScheduleClassroomGroupDetail::create([
-                'schedule_id' => Schedule::where('week_day', $value['week_day'])
-                    ->where('start_time', $value['start_time'])
-                    ->where('end_time', $value['end_time'])
-                    ->first()?->id,
-                'classroom_id' => Classroom::where('classroom_name', $value['classroom_name'])->first()?->id,
-                'group_id' => Group::select('id')
-                    ->where('group_code', $data['group_code'])
-                    ->where('teacher_id', $teacher_id)->first()?->id,
-                'cycle_id' => Cycle::select('id')
-                    ->where('status', 'Activo')
-                    ->first()?->id,
-            ]);
+
+            // Obtener los IDs presentes en $data['selectedSchedule']
+            $selectedIds = array_column($data['selectedSchedule'], 'id');
+
+            // Desencriptar los IDs presentes en $selectedIds
+            $decryptedIds = [];
+            foreach ($selectedIds as $encryptedId) {
+                $decryptedId = Encrypt::decryptValue($encryptedId);
+                $decryptedIds[] = $decryptedId;
+            }
+
+            // Calcular los IDs que hacen falta para eliminar
+            $idsToRemove = array_diff($existingIds, $decryptedIds);
+
+            // Eliminar los registros correspondientes a los IDs que hacen falta
+            ScheduleClassroomGroupDetail::whereIn('id', $idsToRemove)->delete();
+
+            if (!isset($value['id'])) {
+                ScheduleClassroomGroupDetail::create([
+                    'schedule_id' => Schedule::where('week_day', $value['week_day'])
+                        ->where('start_time', $value['start_time'])
+                        ->where('end_time', $value['end_time'])
+                        ->first()?->id,
+                    'classroom_id' => Classroom::where('classroom_name', $value['classroom_name'])->first()?->id,
+                    'group_id' => Group::select('id')
+                        ->where('group_code', $data['group_code'])
+                        ->where('teacher_id', $teacher_id)->first()?->id,
+                    'cycle_id' => Cycle::select('id')
+                        ->where('status', 'Activo')
+                        ->first()?->id,
+                ]);
+            } else {
+                ScheduleClassroomGroupDetail::where('id', $value['id'])->update([
+                    'schedule_id' => Schedule::where('week_day', $value['week_day'])
+                        ->where('start_time', $value['start_time'])
+                        ->where('end_time', $value['end_time'])
+                        ->first()?->id,
+                    'classroom_id' => Classroom::where('classroom_name', $value['classroom_name'])->first()?->id,
+                    'group_id' => Group::select('id')
+                        ->where('group_code', $data['group_code'])
+                        ->where('teacher_id', $teacher_id)->first()?->id,
+                    'cycle_id' => Cycle::select('id')
+                        ->where('status', 'Activo')
+                        ->first()?->id,
+                ]);
+            }
         }
         return response()->json([
             "message" => "Registro modificado correctamente.",
@@ -163,27 +205,81 @@ class GroupController extends Controller
         ]);
     }
 
+    public function classroomCapacity($school, $student_quantity)
+    {
+        $school_id = School::where('school_name', $school)->first()?->id;
+
+        $classroom = classroom::select('classroom.classroom_name')
+            ->where('classroom.school_id', $school_id)
+            ->where('classroom.capacity', ">=", $student_quantity)
+            ->whereNull('classroom.deleted_at')
+            ->get();
+
+        return response()->json([
+            "message" => "Registros obtenidos correctamente.",
+            "classroom" => $classroom,
+        ]);
+    }
+
     public function byTeacher($teacher, $classroom)
     {
         $info = explode(', ', $teacher);
         $id = Group::teacherId($info[0], $info[1])->pluck('id');
         $teacher_id = Group::clean($id);
 
+        $classroom_id = Classroom::where('classroom_name', $classroom)->first()?->id;
+        $active_cycle = Cycle::where('status', 'Activo')->first()?->id;
+
+        //Busca el registro anterior de horarios por salon del profesor
+        $schedule_classroom = Group::select('schedule.id')
+            ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
+            ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
+            ->where('group.teacher_id', $teacher_id)
+            ->where('schedule_classroom_group_detail.classroom_id', $classroom_id)
+            ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
+            ->whereNull('schedule_classroom_group_detail.deleted_at')
+            ->get();
+
+        //Busca el registro anterior de horarios para otros salones del profesor
         $schedule = Group::select('schedule.id')
             ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
             ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
             ->where('group.teacher_id', $teacher_id)
+            ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
             ->whereNull('schedule_classroom_group_detail.deleted_at')
             ->get();
 
+        //Busca registros de los horarios ya ocupados por otros profesores en ese salon
+        $schedule_other_teachers = Group::select('schedule.id')
+            ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
+            ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
+            ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
+            ->where('schedule_classroom_group_detail.classroom_id', $classroom_id)
+            ->whereNull('schedule_classroom_group_detail.deleted_at')
+            ->get();
+
+        //Devuelve el listado de horarios que no estan en el registro del profesor
         $scheduleAvailable = Schedule::select('schedule.*')
             ->whereNotIn('schedule.id', $schedule)
+            ->whereNotIn('schedule.id', $schedule_other_teachers)
+            ->whereNotIn('schedule.id', $schedule_classroom)
+            ->whereNull('schedule.deleted_at')
+            ->get();
+
+        //Devuelve la lista de dias, correspondiente a los horarios disponibles
+        $week_day = Schedule::select('schedule.week_day')
+            ->whereNotIn('schedule.id', $schedule)
+            ->whereNotIn('schedule.id', $schedule_other_teachers)
+            ->whereNotIn('schedule.id', $schedule_classroom)
+            ->whereNull('schedule.deleted_at')
+            ->distinct()
             ->get();
 
         return response()->json([
             "message" => "Registros obtenidos correctamente.",
             "schedule" => $scheduleAvailable,
             "classroom" => $classroom,
+            "week_day" => $week_day,
         ]);
     }
 
@@ -193,18 +289,28 @@ class GroupController extends Controller
         $info = explode(', ', $teacher);
         $id = Group::teacherId($info[0], $info[1])->pluck('id');
         $teacher_id = Group::clean($id);
+        $active_cycle = Cycle::where('status', 'Activo')->first()?->id;
 
         $schedule = Group::select('schedule.id')
             ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
             ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
             ->where('group.teacher_id', $teacher_id)
+            ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
             ->whereNull('schedule_classroom_group_detail.deleted_at')
 
+            ->get();
+
+        $schedule_other_teachers = Group::select('schedule.id')
+            ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
+            ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
+            ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
+            ->whereNull('schedule_classroom_group_detail.deleted_at')
             ->get();
 
         $start_time = Schedule::select('schedule.start_time')
             ->where('schedule.week_day', $day)
             ->whereNotIn('schedule.id', $schedule)
+            ->whereNotIn('schedule.id', $schedule_other_teachers)
             ->get();
 
         return response()->json([
