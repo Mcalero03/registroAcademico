@@ -7,11 +7,9 @@ use App\Models\Group;
 use App\Models\ScheduleClassroomGroupDetail;
 use App\Models\Subject;
 use App\Models\Schedule;
-use App\Models\Teacher;
 use App\Models\School;
 use App\Models\Cycle;
 use App\Models\Classroom;
-use DB;
 use Encrypt;
 
 class GroupController extends Controller
@@ -39,13 +37,20 @@ class GroupController extends Controller
         $groups = Group::Groups();
 
         foreach ($group as $item) {
-            $item->selectedSchedule = ScheduleClassroomGroupDetail::select('schedule_classroom_group_detail.id', 'schedule.week_day', 'schedule.start_time', 'schedule.end_time', 'classroom.classroom_name')
+            $item->selectedSchedule = ScheduleClassroomGroupDetail::select('schedule_classroom_group_detail.id', 'schedule.week_day', 'schedule.start_time', 'schedule.end_time', 'classroom.classroom_name', 'schedule_classroom_group_detail.cycle_id')
                 ->join('group', 'schedule_classroom_group_detail.group_id', '=', 'group.id')
                 ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
                 ->join('classroom', 'schedule_classroom_group_detail.classroom_id', 'classroom.id')
                 ->where('group.id', $item->id)
 
                 ->get();
+
+            $item->cycle_id = ScheduleClassroomGroupDetail::select('schedule_classroom_group_detail.cycle_id')
+                ->join('group', 'schedule_classroom_group_detail.group_id', '=', 'group.id')
+                ->where('group.id', $item->id)
+                ->first()?->cycle_id;
+
+            $item->active_cycle = Cycle::where('status', 'Activo')->first()?->id;
 
             $item->selectedSchedule = Encrypt::encryptObject($item->selectedSchedule, "id");
         }
