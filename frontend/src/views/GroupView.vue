@@ -195,6 +195,13 @@
                   type="secondary"
                   title="Agregar horario"
                   @click="addSchedule()"
+                  v-if="editedItem.active_cycle == editedItem.cycle_id"
+                />
+                <base-button
+                  type="secondary"
+                  title="Agregar horario"
+                  @click="addSchedule()"
+                  v-if="editedItem.cycle_id == null"
                 />
               </v-col>
               <!-- career -->
@@ -218,7 +225,14 @@
                         <th>HORA INICIO</th>
                         <th>HORA FIN</th>
                         <th>AULA</th>
-                        <th class="text-center">ACCIÓN</th>
+                        <th
+                          v-if="
+                            editedItem.active_cycle == editedItem.cycle_id ||
+                            editedItem.cycle_id == null
+                          "
+                        >
+                          ACCIÓN
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -231,7 +245,12 @@
                         <td v-text="schedule.start_time"></td>
                         <td v-text="schedule.end_time"></td>
                         <td v-text="schedule.classroom_name"></td>
-                        <td class="text-center">
+                        <td
+                          class="text-center"
+                          v-if="
+                            this.editedItem.active_cycle == schedule.cycle_id
+                          "
+                        >
                           <v-tooltip text="Eliminar" location="start">
                             <template v-slot:activator="{ props }">
                               <v-icon
@@ -408,7 +427,6 @@ import { helpers, minLength, required, maxLength } from "@vuelidate/validators";
 import groupApi from "@/services/groupApi";
 import schoolApi from "@/services/schoolApi";
 import subjectApi from "@/services/subjectApi";
-// import classroomApi from "@/services/classroomApi";
 import BaseButton from "../components/base-components/BaseButton.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
@@ -471,6 +489,8 @@ export default {
         school_name: "",
         schedule: [],
         selectedSchedule: [],
+        active_cycle: "",
+        cycle_id: "",
       },
       defaultItem: {
         group_code: "",
@@ -481,6 +501,8 @@ export default {
         school_name: "",
         schedule: [],
         selectedSchedule: [],
+        active_cycle: "",
+        cycle_id: "",
       },
       schedule: {
         classroom_name: "",
@@ -720,7 +742,6 @@ export default {
       let requests = [
         this.getDataFromApi(),
         schoolApi.get(null, { params: { itemsPerPage: -1 } }),
-        // classroomApi.get(null, { params: { itemsPerPage: -1 } }),
       ];
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
@@ -728,7 +749,6 @@ export default {
 
       if (responses) {
         this.schools = responses[1].data.data;
-        // this.classrooms = responses[2].data.available;
       }
 
       this.loading = false;
