@@ -660,8 +660,8 @@ export default {
     },
 
     async save() {
-      this.v$.$validate();
-      if (this.v$.$invalid) {
+      this.v$.editedItem.$validate();
+      if (this.v$.editedItem.$invalid) {
         toast.warn("Llene los campos obligatorios.", {
           autoClose: 2000,
           position: toast.POSITION.TOP_CENTER,

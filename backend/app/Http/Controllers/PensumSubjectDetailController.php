@@ -19,43 +19,11 @@ class PensumSubjectDetailController extends Controller
      */
     public function index(Request $request)
     {
-        $itemsPerPage = $request->itemsPerPage ?? 10;
-        $skip = ($request->page - 1) * $request->itemsPerPage;
-
-        // Getting all the records
-        if (($request->itemsPerPage == -1)) {
-            $itemsPerPage =  PensumSubjectDetail::count();
-            $skip = 0;
-        }
-
-        $sortBy = (isset($request->sortBy[0]['key'])) ? $request->sortBy[0]['key'] : 'id';
-        $sort = (isset($request->sortDesc[0]['order'])) ? "asc" : 'desc';
-
-        $search = (isset($request->search)) ? "%$request->search%" : '%%';
-
-        // $pensum_subject_detail = PensumSubjectDetail::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage)->unique();
 
         $pensums = PensumSubjectDetail::pensum();
 
-        // foreach ($pensum_subject_detail as $item) {
-        //     $item->prerequisites = Prerequisite::select('prerequisite.*', 'subject.subject_name as prerequisite')
-        //         ->join('subject', 'prerequisite.subject_id', '=', 'subject.id')
-        //         ->where('pensum_subject_detail_id', $item->id)
-        //         ->get();
-
-        //     $item->prerequisites = Encrypt::encryptObject($item->prerequisites, 'id');
-        // }
-
-        // $pensum_subject_detail = Encrypt::encryptObject($pensum_subject_detail, 'id');
-        // $pensums = Encrypt::encryptObject($pensums, 'id');
-
-
-        $total = PensumSubjectDetail::counterPagination($search);
-
         return response()->json([
             "message" => "Registros obtenidos correctamente.",
-            // "data" => $pensum_subject_detail,
-            "total" => $total,
             'programs' => $pensums,
         ]);
     }
@@ -146,6 +114,7 @@ class PensumSubjectDetailController extends Controller
         $dataExists = PensumSubjectDetail::select('pensum_subject_detail.id')
             ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
             ->join('subject', 'pensum_subject_detail.subject_id', '=', 'subject.id')
+            ->whereNull('subject.deleted_at')
             ->where('pensum.program_name', $request->pensum)
             ->where('subject.subject_name', $request->subject)
             ->exists();
@@ -156,6 +125,7 @@ class PensumSubjectDetailController extends Controller
                 ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
                 ->join('subject', 'pensum_subject_detail.subject_id', '=', 'subject.id')
                 ->whereNull('prerequisite.deleted_at')
+                ->whereNull('subject.deleted_at')
                 ->where('pensum.program_name', $request->pensum)
                 ->where('subject.subject_name', $request->subject)
                 ->get('prerequisite.subject_id');
@@ -165,6 +135,7 @@ class PensumSubjectDetailController extends Controller
                 ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
                 ->join('subject', 'pensum_subject_detail.subject_id', '=', 'subject.id')
                 ->whereNull('prerequisite.deleted_at')
+                ->whereNull('subject.deleted_at')
                 ->where('pensum.program_name', $request->pensum)
                 ->where('prerequisite.subject_id', Subject::where('subject_name', $request->subject)->first()?->id)
                 ->get('pensum_subject_detail.subject_id');
@@ -173,6 +144,7 @@ class PensumSubjectDetailController extends Controller
                 ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
                 ->join('subject', 'pensum_subject_detail.subject_id', '=', 'subject.id')
                 ->where('pensum.program_name', $request->pensum)
+                ->whereNull('subject.deleted_at')
                 ->where('subject.subject_name', 'not like', $request->subject)
                 ->whereNotIn('pensum_subject_detail.subject_id', $subjectAsPrerequisite)
                 ->whereNotIn('pensum_subject_detail.subject_id', $prerequisiteExists)
@@ -186,6 +158,7 @@ class PensumSubjectDetailController extends Controller
             $subject = PensumSubjectDetail::select('pensum_subject_detail.*', 'subject.subject_name', 'pensum.program_name')
                 ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
                 ->join('subject', 'pensum_subject_detail.subject_id', '=', 'subject.id')
+                ->whereNull('subject.deleted_at')
                 ->where('pensum.program_name', 'like', $request->pensum)
                 ->where('subject.subject_name', 'not like', $request->subject)
                 ->get();
@@ -208,26 +181,28 @@ class PensumSubjectDetailController extends Controller
             ->where('pensum.id', $program_id)
             ->get();
 
-        for ($i = 1; $i <= count($subject); $i++) {
-            foreach ($subject as $item) {
-                $item->index = $i++;
-            }
-        }
+        // for ($i = 1; $i <= count($subject); $i++) {
+        //     foreach ($subject as $item) {
+        //         $item->index = $i++;
+        //     }
+        // }
 
-        foreach ($subject as $item) {
-            $item->prerequisites = Prerequisite::select('prerequisite.*', 'subject.subject_name as prerequisite')
+        foreach ($subject as $index => $item) {
+            $item->index = $index + 1;
+
+            $prerequisites = Prerequisite::select('prerequisite.*', 'subject.subject_name as prerequisite')
                 ->join('subject', 'prerequisite.subject_id', '=', 'subject.id')
                 ->where('pensum_subject_detail_id', $item->subject_id)
                 ->whereNull('subject.deleted_at')
                 ->get();
 
+            $item->prerequisites = $prerequisites->map(function ($prerequisite) use ($subject) {
+                $prerequisite->subject_id = $subject->where('subject_id', $prerequisite->subject_id)->first()->index;
+                return $prerequisite;
+            });
+
             $item->count = count($item->prerequisites);
             $item->prerequisites = Encrypt::encryptObject($item->prerequisites, 'id');
-
-            // foreach ($item->prerequisites as $i) {
-            //     $i->index = 1;
-            // }
-            // array_push($item->prerequisites,  1);
         }
 
 

@@ -40,6 +40,7 @@ class Evaluation extends Model
             ->leftjoin('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
             ->leftjoin('teacher', 'group.teacher_id', '=', 'teacher.id')
             ->leftjoin('school', 'teacher.school_id', '=', 'school.id')
+            ->whereNull('calification.deleted_at')
             ->where('subject.subject_name', 'like', $search)
             ->orWhere('evaluation.ponder', 'like', $search)
             ->orWhere('group.group_code', 'like', $search)

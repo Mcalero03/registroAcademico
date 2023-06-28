@@ -20,18 +20,6 @@
           <!-- school_name -->
           <!-- sub_school_name -->
           <v-col cols="12" sm="6" md="6">
-            <!-- <base-select
-              label="Sub-Escuelas"
-              :items="sub_schools"
-              item-title="sub_school_name"
-              item-value="sub_school_name"
-              v-model="v$.filter.sub_school_name.$model"
-              :rules="v$.filter.sub_school_name"
-              @blur="showPensums"
-              v-if="schools.length == 0"
-              readonly
-            >
-            </base-select> -->
             <base-select
               label="Sub-Escuelas"
               :items="sub_schools"
