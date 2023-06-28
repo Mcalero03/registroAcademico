@@ -103,8 +103,7 @@ class Inscription extends Model
     public static function searchStudent($searchStudent)
     {
         return Student::select(DB::raw("CONCAT(student.name, ', ', student.last_name) as full_name"),)
-            ->Where('student.student_card', 'like', $searchStudent)
-
+            ->where('student.student_card', '=', $searchStudent)
             ->get();
     }
 }

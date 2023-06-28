@@ -141,6 +141,12 @@ const router = createRouter({
       meta: {requiresAuth: true} // add meta field to specify the route
     },
     {
+      path: '/grades', 
+      name: 'grades',
+      component: () => import("../views/GradesCheck.vue"),
+      meta: {requiresAuth: true} // add meta field to specify the route
+    },
+    {
       path: "/:pathMatch(.*)*",
       name: "NotFound",
       component: NotFoundView,

@@ -122,3 +122,5 @@ Route::get('/evaluation/showTeacher/{school}', [EvaluationController::class, 'sh
 Route::get('/evaluation/showSubjects/{name}/{last_name}', [EvaluationController::class, 'showSubjects']);
 Route::get('/evaluation/showGroups/{subject}', [EvaluationController::class, 'showGroups']);
 Route::get('/evaluation/showStudents/{group}', [EvaluationController::class, 'showStudents']);
+Route::get('/evaluation/showPrograms/{card}', [EvaluationController::class, 'showPrograms']);
+Route::get('/evaluation/showCalification/{card}/{program}', [EvaluationController::class, 'showCalification']);

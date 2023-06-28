@@ -221,6 +221,11 @@ export default {
         url: "/pensumSubjectDetail",
         icon: "mdi-details",
       },
+      {
+        title: "Calificaciones",
+        url: "/grades",
+        icon: "mdi-checkbook",
+      },
     ],
     settings: [
       {

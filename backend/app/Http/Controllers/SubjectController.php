@@ -201,6 +201,7 @@ class SubjectController extends Controller
             ->whereNull('cycle.deleted_at')
             ->where('cycle_subject_detail.deleted_at', null)
             ->where('school.school_name', $school)
+            ->distinct()
             ->get('subject.subject_name');
 
 

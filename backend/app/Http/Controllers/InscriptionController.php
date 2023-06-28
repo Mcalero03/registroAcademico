@@ -33,7 +33,7 @@ class InscriptionController extends Controller
 
         $search = (isset($request->search)) ? "%$request->search%" : '%%';
 
-        $searchStudent = (isset($request->searchStudent)) ? "%$request->searchStudent%" : '%%';
+        $searchStudent = (isset($request->searchStudent)) ? "$request->searchStudent" : '%%';
 
         $student = Inscription::searchStudent($searchStudent)->unique();
 
