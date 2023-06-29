@@ -70,7 +70,13 @@
         <v-window v-model="tab">
           <v-window-item :value="this.editedItem.program_name">
             <v-container fluid>
-              <v-row dense class="p-3 mt-3" v-if="this.califications == ''">
+              <v-row
+                dense
+                class="p-3 mt-3"
+                v-if="
+                  this.califications == '' && this.editedItem.program_name != ''
+                "
+              >
                 <v-col>
                   <v-card
                     id="card"
