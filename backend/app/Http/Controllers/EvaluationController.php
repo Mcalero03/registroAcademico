@@ -9,7 +9,6 @@ use App\Models\Cycle;
 use App\Models\Teacher;
 use App\Models\School;
 use App\Models\Group;
-// use App\Models\InscriptionDetail;
 use Encrypt;
 use DB;
 
@@ -39,12 +38,30 @@ class EvaluationController extends Controller
         $evaluation = Evaluation::allDataSearched($search, $sortBy, $sort, $skip, $itemsPerPage);
 
         foreach ($evaluation as $item) {
-            $item->califications = Calification::select(DB::raw("CONCAT(student.last_name, ', ', student.name) AS full_name"), 'calification.score', 'calification.id', 'inscription_detail.group_id', 'inscription_detail.id as inscription_detail_id')
+            $item->califications = Calification::select(DB::raw("CONCAT(student.last_name, ', ', student.name) AS full_name"), 'calification.score', 'calification.id', 'inscription_detail.group_id', 'inscription_detail.id as inscription_detail_id',)
                 ->join('evaluation', 'calification.evaluation_id', '=', 'evaluation.id')
                 ->leftJoin('inscription_detail', 'calification.inscription_detail_id', '=', 'inscription_detail.id')
                 ->leftJoin('inscription', 'inscription_detail.inscription_id', '=', 'inscription.id')
                 ->leftJoin('student', 'inscription.student_id', '=', 'student.id')
                 ->where('calification.evaluation_id', $item->id)
+                ->get();
+
+            $item->available_ponder = Inscription::select(DB::raw('100-SUM(evaluation.ponder) as available_ponder'))
+                ->join('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
+                ->join('calification', 'i.id', '=', 'calification.inscription_detail_id')
+                ->join('evaluation', 'calification.evaluation_id', '=', 'evaluation.id')
+                ->join('group', 'i.group_id', '=', 'group.id')
+                ->join('subject', 'group.subject_id', '=', 'subject.id')
+                ->join('student', 'inscription.student_id', '=', 'student.id')
+                ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+                ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+                ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
+                ->where('subject.subject_name', $item->subject_name)
+                ->where('calification.inscription_detail_id', $item->inscription_detail_id)
+                ->whereNull('calification.deleted_at')
+                ->where('i.status', 'not like', 'Retirado')
+                ->where('cycle.status', 'Activo')
+                ->groupBy('subject.subject_name')
                 ->get();
 
             $item->califications = Encrypt::encryptObject($item->califications, 'id');
@@ -68,25 +85,41 @@ class EvaluationController extends Controller
     {
         $data = $request->all();
 
-        $evaluation = Evaluation::create([
-            "evaluation_name" => $data["evaluation_name"],
-            "ponder" => $data["ponder"],
-            "group_id" => Group::where('group_code', $data["group_code"])->first()->id,
-        ]);
+        $ponder = $data['available_ponder'] - $data["ponder"];
 
-        $evaluation->save();
+        if ($data['available_ponder'] == '0') {
+            return response()->json([
+                "error" => "Ya alcanzó el máximo porcentaje a utilizar",
+            ]);
+        } elseif ($data['ponder'] == '0') {
+            return response()->json([
+                "error" => "No puede asignar cero en el porcentaje",
+            ]);
+        } elseif ($ponder >= '0') {
+            $evaluation = Evaluation::create([
+                "evaluation_name" => $data["evaluation_name"],
+                "ponder" => $data["ponder"],
+                "group_id" => Group::where('group_code', $data["group_code"])->first()->id,
+            ]);
 
-        foreach ($data['califications'] as $value) {
-            Calification::create([
-                'evaluation_id' => $evaluation->id,
-                'inscription_detail_id' => $value['inscription_detail_id'],
-                'score' => $value['score'],
+            $evaluation->save();
+
+            foreach ($data['califications'] as $value) {
+                Calification::create([
+                    'evaluation_id' => $evaluation->id,
+                    'inscription_detail_id' => $value['inscription_detail_id'],
+                    'score' => $value['score'],
+                ]);
+            }
+
+            return response()->json([
+                "message" => "Registro creado correctamente.",
+            ]);
+        } elseif ($ponder < '0') {
+            return response()->json([
+                "error" => "El porcentaje ingresado excede el máximo a utilizar",
             ]);
         }
-
-        return response()->json([
-            "message" => "Registro creado correctamente.",
-        ]);
     }
 
     /**
@@ -104,24 +137,65 @@ class EvaluationController extends Controller
     {
         $data = Encrypt::decryptArray($request->all(), 'id');
 
-        Evaluation::where('id', $data['id'])->update([
-            "evaluation_name" => $data["evaluation_name"],
-            "ponder" => $data["ponder"],
-            "group_id" => Group::where('group_code', $data["group_code"])->first()?->id,
+        $available_ponder = $data['available_ponder'][0]['available_ponder'];
+        $ponder = $available_ponder - $data["ponder"];
 
-        ]);
+        $previous_evaluation = Evaluation::select('ponder')->where('id', $data['id'])->first()?->ponder;
 
-        foreach ($data['califications'] as $value) {
-            Calification::where('id', Encrypt::decryptValue($value['id']))->update([
-                'evaluation_id' => $data['id'],
-                'inscription_detail_id' => $value['inscription_detail_id'],
-                'score' => $value['score'],
+        if ($previous_evaluation == $data['ponder']) {
+
+            Evaluation::where('id', $data['id'])->update([
+                "evaluation_name" => $data["evaluation_name"],
+                "ponder" => $data["ponder"],
+                "group_id" => Group::where('group_code', $data["group_code"])->first()?->id,
+
             ]);
-        }
 
-        return response()->json([
-            "message" => "Registro modificado correctamente",
-        ]);
+            foreach ($data['califications'] as $value) {
+                Calification::where('id', Encrypt::decryptValue($value['id']))->update([
+                    'evaluation_id' => $data['id'],
+                    'inscription_detail_id' => $value['inscription_detail_id'],
+                    'score' => $value['score'],
+                ]);
+            }
+
+            return response()->json([
+                "message" => "Registro modificado correctamente",
+            ]);
+        } elseif ($previous_evaluation != $data['ponder']) {
+            if ($available_ponder == '0') {
+                return response()->json([
+                    "error" => "Ya alcanzó el máximo porcentaje a utilizar",
+                ]);
+            } elseif ($data['ponder'] == '0') {
+                return response()->json([
+                    "error" => "No puede asignar cero en el porcentaje",
+                ]);
+            } elseif ($ponder < '0') {
+                return response()->json([
+                    "error" => "El porcentaje ingresado excede el máximo a utilizar",
+                ]);
+            } elseif ($ponder >= '0') {
+                Evaluation::where('id', $data['id'])->update([
+                    "evaluation_name" => $data["evaluation_name"],
+                    "ponder" => $data["ponder"],
+                    "group_id" => Group::where('group_code', $data["group_code"])->first()?->id,
+
+                ]);
+
+                foreach ($data['califications'] as $value) {
+                    Calification::where('id', Encrypt::decryptValue($value['id']))->update([
+                        'evaluation_id' => $data['id'],
+                        'inscription_detail_id' => $value['inscription_detail_id'],
+                        'score' => $value['score'],
+                    ]);
+                }
+
+                return response()->json([
+                    "message" => "Registro modificado correctamente",
+                ]);
+            }
+        }
     }
 
     /**
@@ -218,9 +292,63 @@ class EvaluationController extends Controller
             ->orderby('student.last_name', 'asc')
             ->get();
 
+        $subjects = Inscription::select('group.group_code', 'subject.subject_name', 'i.id',)
+            ->join('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
+            ->join('group', 'i.group_id', '=', 'group.id')
+            ->join('subject', 'group.subject_id', '=', 'subject.id')
+            ->join('student', 'inscription.student_id', '=', 'student.id')
+            ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+            ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+            ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
+            ->where('group.group_code', $group)
+            ->where('i.status', 'not like', 'Retirado')
+            ->where('cycle.status', 'Activo')
+            ->distinct()
+            ->get();
+
+        foreach ($subjects as $item) {
+            $item->califications = Inscription::select('evaluation.evaluation_name', 'evaluation.ponder', 'calification.score', 'subject.average_approval',)
+                ->join('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
+                ->join('calification', 'i.id', '=', 'calification.inscription_detail_id')
+                ->join('evaluation', 'calification.evaluation_id', '=', 'evaluation.id')
+                ->join('group', 'i.group_id', '=', 'group.id')
+                ->join('subject', 'group.subject_id', '=', 'subject.id')
+                ->join('student', 'inscription.student_id', '=', 'student.id')
+                ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+                ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+                ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
+                ->where('group.group_code', $group)
+                ->where('calification.inscription_detail_id', $item->id)
+                ->where('i.status', 'not like', 'Retirado')
+                ->where('cycle.status', 'Activo')
+                ->whereNull('calification.deleted_at')
+                ->selectRaw('ROUND(AVG((calification.score * evaluation.ponder)/100), 2) as final_average')
+                ->orderBy('evaluation.evaluation_name', 'asc')
+                ->groupBy('evaluation.evaluation_name', 'evaluation.ponder', 'calification.score', 'subject.average_approval')
+                ->get();
+
+            $item->available_ponder = Inscription::select(DB::raw('ROUND(SUM((calification.score*evaluation.ponder)/100),2) as total_average, 100-SUM(evaluation.ponder) as total_ponder'))
+                ->join('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
+                ->join('calification', 'i.id', '=', 'calification.inscription_detail_id')
+                ->join('evaluation', 'calification.evaluation_id', '=', 'evaluation.id')
+                ->join('group', 'i.group_id', '=', 'group.id')
+                ->join('subject', 'group.subject_id', '=', 'subject.id')
+                ->join('student', 'inscription.student_id', '=', 'student.id')
+                ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+                ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+                ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
+                ->where('group.group_code', $group)
+                ->where('calification.inscription_detail_id', $item->id)
+                ->whereNull('calification.deleted_at')
+                ->where('i.status', 'not like', 'Retirado')
+                ->where('cycle.status', 'Activo')
+                ->groupBy('subject.subject_name')
+                ->get();
+        }
         return response()->json([
             "message" => "Registro encontrado correctamente",
-            "students" => $student
+            "students" => $student,
+            "ponder" => $subjects
         ]);
     }
 
