@@ -101,6 +101,7 @@ Route::get('/student/byCareer/{id}/{school}', [StudentController::class, 'career
 Route::resource('/inscription', InscriptionController::class);
 Route::get('/inscription/showSchedules/{inscription}', [InscriptionController::class, 'showSchedules']);
 Route::get('/inscription/showCareers/{student}', [InscriptionController::class, 'showCareers']);
+Route::get('/inscription/showInscriptions/{card}/{program}', [InscriptionController::class, 'showInscriptions']);
 Route::get('/inscription/availableSubjects/{student}/{pensum}/{cycle}', [InscriptionController::class, 'availableSubjects']);
 
 //ATTENDANCE
