@@ -174,13 +174,41 @@
                 />
               </v-col>
               <!-- evaluation_name  -->
-              <!-- ponder  -->
-              <v-col cols="12" sm="6" md="6">
+            </v-row>
+            <v-row>
+              <!-- available_ponder  -->
+              <v-col cols="12" sm="4" md="4" v-if="editedIndex == -1">
+                <v-label>Disponible</v-label>
                 <base-input
-                  label="Ponderación"
+                  v-model="this.editedItem.available_ponder"
+                  :value="'%' + this.editedItem.available_ponder"
+                  readonly
+                />
+              </v-col>
+              <v-col cols="12" sm="4" md="4" v-if="editedIndex != -1">
+                <div
+                  v-for="(ponder, index) in editedItem.available_ponder"
+                  v-bind:index="index"
+                  :key="index"
+                >
+                  <v-label>Disponible</v-label>
+                  <base-input
+                    v-model="this.editedItem.available_ponder"
+                    :value="'%' + ponder.available_ponder"
+                    readonly
+                  />
+                </div>
+              </v-col>
+              <!-- available_ponder  -->
+              <!-- ponder  -->
+              <v-col cols="12" sm="5" md="5">
+                <v-label>Ponderación de evaluación</v-label>
+                <base-input
                   v-model="v$.editedItem.ponder.$model"
                   :rules="v$.editedItem.ponder"
                   type="number"
+                  :max="this.editedItem.available_ponder"
+                  min="0"
                 />
               </v-col>
               <!-- ponder  -->
@@ -377,6 +405,7 @@ export default {
       options: {},
       editedItem: {
         evaluation_name: "",
+        available_ponder: "",
         ponder: "",
         subject_name: "",
         group_code: "",
@@ -386,6 +415,7 @@ export default {
       },
       defaultItem: {
         evaluation_name: "",
+        available_ponder: "",
         ponder: "",
         subject_name: "",
         group_code: "",
@@ -436,9 +466,12 @@ export default {
           required: helpers.withMessage(langMessages.required, required),
           minLength: helpers.withMessage(
             ({ $params }) => langMessages.minLength($params),
-            minLength(2)
+            minLength(1)
           ),
-          maxLength: (({ $params }) => maxLength($params), maxLength(2)),
+          maxLength: (({ $params }) => maxLength($params), maxLength(3)),
+        },
+        available_ponder: {
+          required: helpers.withMessage(langMessages.required, required),
         },
         subject_name: {
           required: helpers.withMessage(langMessages.required, required),
@@ -540,6 +573,8 @@ export default {
           });
 
         this.editedItem.califications = data.students;
+        this.editedItem.available_ponder =
+          data.ponder[0].available_ponder[0].total_ponder;
       }
     },
 
@@ -678,7 +713,11 @@ export default {
 
         try {
           const { data } = await evaluationApi.put(`/${edited.id}`, edited);
-          alert.success(data.message);
+          if (data.message) {
+            alert.success(data.message);
+          } else {
+            alert.error(data.error);
+          }
         } catch (error) {
           alert.error("No fue posible actualizar el registro.");
         }
@@ -691,7 +730,11 @@ export default {
       // Creating record
       try {
         const { data } = await evaluationApi.post(null, this.editedItem);
-        alert.success(data.message);
+        if (data.message) {
+          alert.success(data.message);
+        } else {
+          alert.error(data.error);
+        }
       } catch (error) {
         alert.error("No fue posible crear el registro.");
       }
