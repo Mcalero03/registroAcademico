@@ -167,7 +167,7 @@ class InscriptionController extends Controller
             ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
             ->join('schedule', 'schedule_classroom_group_detail.schedule_id', '=', 'schedule.id')
             ->join('classroom', 'schedule_classroom_group_detail.classroom_id', '=', 'classroom.id')
-            ->where('inscription_id', $id)
+            ->where('inscription_detail.id', $id)
             ->whereNull('schedule_classroom_group_detail.deleted_at')
             ->get();
 

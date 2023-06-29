@@ -694,10 +694,14 @@ export default {
   },
 
   methods: {
-    async showSchedules() {
+    async showSchedules(index) {
       if (this.editedItem.id != "") {
+        this.editedGroup = this.editedItem.inscriptions[index];
+        console.log(this.editedGroup["id"]);
         const { data } = await inscriptionApi
-          .get("/showSchedules/" + this.editedItem.id)
+          // .get("/showSchedules/" + this.editedItem.id )
+          .get("/showSchedules/" + this.editedGroup["id"])
+
           .catch((error) => {
             toast.error("No fue posible obtener la información.", {
               autoClose: 2000,
@@ -705,6 +709,7 @@ export default {
             });
           });
         this.editedItem.schedules = data.schedules;
+        // console.log(this.editedItem.schedules);
       }
     },
 
@@ -839,9 +844,9 @@ export default {
       return datetime;
     },
 
-    viewSchedules() {
+    viewSchedules(index) {
       this.v$.editedItem.schedules.$model = [];
-      this.showSchedules();
+      this.showSchedules(index);
       this.dialogSchedules = true;
     },
 
