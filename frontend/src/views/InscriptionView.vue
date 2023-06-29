@@ -699,7 +699,6 @@ export default {
         this.editedGroup = this.editedItem.inscriptions[index];
         console.log(this.editedGroup["id"]);
         const { data } = await inscriptionApi
-          // .get("/showSchedules/" + this.editedItem.id )
           .get("/showSchedules/" + this.editedGroup["id"])
 
           .catch((error) => {
@@ -709,7 +708,6 @@ export default {
             });
           });
         this.editedItem.schedules = data.schedules;
-        // console.log(this.editedItem.schedules);
       }
     },
 

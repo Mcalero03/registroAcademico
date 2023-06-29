@@ -222,7 +222,12 @@ export default {
         icon: "mdi-details",
       },
       {
-        title: "Calificaciones",
+        title: "Materias inscritas",
+        url: "/inscriptionRecord",
+        icon: "mdi-check-all",
+      },
+      {
+        title: "Consulta de notas",
         url: "/grades",
         icon: "mdi-checkbook",
       },
