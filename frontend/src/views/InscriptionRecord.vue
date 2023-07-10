@@ -193,14 +193,13 @@ import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
 import BaseSelect from "../components/base-components/BaseSelect.vue";
 import BaseInput from "../components/base-components/BaseInput.vue";
+import BaseButton from "../components/base-components/BaseButton.vue";
 import { helpers, required } from "@vuelidate/validators";
 import Loader from "@/components/Loader.vue";
 
 import evaluationApi from "@/services/evaluationApi";
 import inscriptionApi from "@/services/inscriptionApi";
-// import schoolApi from "@/services/schoolApi";
 
-import BaseButton from "../components/base-components/BaseButton.vue";
 import useAlert from "../composables/useAlert";
 
 const { alert } = useAlert();
@@ -293,7 +292,6 @@ export default {
           });
 
         this.inscriptions = data.inscription;
-        console.log(this.inscriptions);
       }
     },
 

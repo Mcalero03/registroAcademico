@@ -67,6 +67,8 @@ Route::get('/subject/subjectByCycle/{school}', [SubjectController::class, 'subje
 
 //TEACHER
 Route::resource('/teacher', TeacherController::class);
+Route::get('/teacher/showSchedules/{card}', [TeacherController::class, 'showSchedules']);
+
 
 //SUB-SCHOOL
 Route::resource('/subSchool', SubSchoolController::class);

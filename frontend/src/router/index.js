@@ -146,10 +146,16 @@ const router = createRouter({
       component: () => import("../views/GradesCheck.vue"),
       meta: {requiresAuth: true} // add meta field to specify the route
     },
-     {
+    {
       path: '/inscriptionRecord', 
       name: 'inscriptionRecord',
       component: () => import("../views/InscriptionRecord.vue"),
+      meta: {requiresAuth: true} // add meta field to specify the route
+    },
+     {
+      path: '/teacherSchedule', 
+      name: 'teacherSchedule',
+      component: () => import("../views/TeacherSchedule.vue"),
       meta: {requiresAuth: true} // add meta field to specify the route
     },
     {
