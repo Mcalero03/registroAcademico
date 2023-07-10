@@ -38,18 +38,41 @@
           <!-- full_name  -->
         </v-row>
 
+        <v-row
+          dense
+          class="p-3 mt-3"
+          v-if="schedules.length == 0 && this.editedItem.full_name != ''"
+        >
+          <v-col>
+            <v-card
+              id="card"
+              class="mx-auto"
+              max-width="440"
+              min-width="200"
+              height="auto"
+              theme="dark"
+              :elevation="2"
+            >
+              <v-card-text>
+                <p class="text-center p-4">No hay horarios asignados</p>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+
         <!-- schedules -->
         <v-timeline
           side="end"
           align="center"
           direction="horizontal"
-          class="pt-10 overflow-y-auto"
+          class="pt-10 px-6 overflow-y-auto"
           truncate-line="start"
         >
           <v-timeline-item
             max-width="120px"
             min-width="120px"
-            max-height="300px"
+            max-height="100%"
+            min-height="100%"
             dot-color="deep-purple-accent-4"
             size="small"
             v-for="(schedule, index) in this.schedules"
@@ -71,7 +94,7 @@
                     theme="dark"
                     class="elevation-4"
                     max-width="130px"
-                    min-width="120px"
+                    min-width="130px"
                     max-height="140px"
                     min-height="150px"
                     align="center"
@@ -109,38 +132,6 @@
 <style lang="scss">
 @import "@/assets/styles/variables.scss";
 
-/* Estilos para acoplar el componente timeline a diferentes tamaños de pantalla */
-/* Pequeñas pantallas (hasta 599px) */
-@media (max-width: 599px) {
-  .v-timeline .v-timeline-item {
-    min-width: 100% !important;
-  }
-  .v-timeline .v-timeline-item .v-card {
-    max-width: none !important;
-  }
-}
-
-/* Pantallas medianas (de 600px a 959px) */
-@media (min-width: 600px) and (max-width: 959px) {
-  .v-timeline .v-timeline-item {
-    min-width: 50% !important;
-  }
-}
-
-/* Pantallas grandes (de 960px a 1279px) */
-@media (min-width: 960px) and (max-width: 1279px) {
-  .v-timeline .v-timeline-item {
-    min-width: 33.33% !important;
-  }
-}
-
-/* Pantallas extra grandes (a partir de 1280px) */
-@media (min-width: 1280px) {
-  .v-timeline .v-timeline-item {
-    min-width: 25% !important;
-  }
-}
-
 #card,
 p {
   font-size: 1rem;
@@ -175,7 +166,6 @@ import { helpers, required } from "@vuelidate/validators";
 import Loader from "@/components/Loader.vue";
 
 import teacherApi from "@/services/teacherApi";
-// import inscriptionApi from "@/services/inscriptionApi";
 
 import useAlert from "../composables/useAlert";
 
@@ -190,26 +180,13 @@ export default {
 
   data() {
     return {
-      items: [
-        {
-          id: 1,
-          color: "info",
-          icon: "mdi-information",
-        },
-        {
-          id: 2,
-          color: "error",
-          icon: "mdi-alert-circle",
-        },
-      ],
-      tab: 0,
       search: "",
       searchTeacher: "",
       total: 0,
       pensums: [],
       schedules: [],
       time: [],
-      califications: [],
+      days: [],
       loading: false,
       debounce: 0,
       options: {},
@@ -277,7 +254,6 @@ export default {
     },
 
     async showSchedules() {
-      console.log(this.searchTeacher);
       const { data } = await teacherApi
         .get("/showSchedules/" + this.searchTeacher)
         .catch((error) => {
@@ -289,9 +265,6 @@ export default {
         });
 
       this.schedules = data.schedule;
-      this.time = data.time;
-      console.log(this.schedules);
-      console.log(this.time);
     },
 
     async initialize() {

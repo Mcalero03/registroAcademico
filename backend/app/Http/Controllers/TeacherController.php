@@ -116,103 +116,38 @@ class TeacherController extends Controller
 
     public function showSchedules($card)
     {
-
         $active_cycle = Cycle::where('cycle.status', 'Activo')->first()?->id;
-        $schedule = [
-            'Lunes' => Teacher::select('schedule.*', 'classroom.classroom_name', 'group.group_code', 'subject.subject_name')
-                ->join('group', 'group.teacher_id', '=', 'teacher.id')
-                ->join('subject', 'group.subject_id', '=', 'subject.id')
-                ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
-                ->join('schedule', 'schedule_classroom_group_detail.schedule_id', '=', 'schedule.id')
-                ->join('classroom', 'schedule_classroom_group_detail.classroom_id', '=', 'classroom.id')
-                ->where('teacher.teacher_card', $card)
-                ->where('schedule.week_day', 'Lunes')
-                ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
-                ->whereNull('schedule_classroom_group_detail.deleted_at')
-                ->orderBy('schedule.start_time', 'asc')
-                ->get(),
-            'Martes' => Teacher::select('schedule.*', 'classroom.classroom_name', 'group.group_code', 'subject.subject_name')
-                ->join('group', 'group.teacher_id', '=', 'teacher.id')
-                ->join('subject', 'group.subject_id', '=', 'subject.id')
-                ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
-                ->join('schedule', 'schedule_classroom_group_detail.schedule_id', '=', 'schedule.id')
-                ->join('classroom', 'schedule_classroom_group_detail.classroom_id', '=', 'classroom.id')
-                ->where('teacher.teacher_card', $card)
-                ->where('schedule.week_day', 'Martes')
-                ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
-                ->whereNull('schedule_classroom_group_detail.deleted_at')
-                ->orderBy('schedule.start_time', 'asc')
-                ->get(),
-            'Miércoles' => Teacher::select('schedule.*', 'classroom.classroom_name', 'group.group_code', 'subject.subject_name')
-                ->join('group', 'group.teacher_id', '=', 'teacher.id')
-                ->join('subject', 'group.subject_id', '=', 'subject.id')
-                ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
-                ->join('schedule', 'schedule_classroom_group_detail.schedule_id', '=', 'schedule.id')
-                ->join('classroom', 'schedule_classroom_group_detail.classroom_id', '=', 'classroom.id')
-                ->where('teacher.teacher_card', $card)
-                ->where('schedule.week_day', 'Miércoles')
-                ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
-                ->whereNull('schedule_classroom_group_detail.deleted_at')
-                ->orderBy('schedule.start_time', 'asc')
-                ->get(),
-            'Jueves' => Teacher::select('schedule.*', 'classroom.classroom_name', 'group.group_code', 'subject.subject_name')
-                ->join('group', 'group.teacher_id', '=', 'teacher.id')
-                ->join('subject', 'group.subject_id', '=', 'subject.id')
-                ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
-                ->join('schedule', 'schedule_classroom_group_detail.schedule_id', '=', 'schedule.id')
-                ->join('classroom', 'schedule_classroom_group_detail.classroom_id', '=', 'classroom.id')
-                ->where('teacher.teacher_card', $card)
-                ->where('schedule.week_day', 'Jueves')
-                ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
-                ->whereNull('schedule_classroom_group_detail.deleted_at')
-                ->orderBy('schedule.start_time', 'asc')
-                ->get(),
-            'Viernes' => Teacher::select('schedule.*', 'classroom.classroom_name', 'group.group_code', 'subject.subject_name')
-                ->join('group', 'group.teacher_id', '=', 'teacher.id')
-                ->join('subject', 'group.subject_id', '=', 'subject.id')
-                ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
-                ->join('schedule', 'schedule_classroom_group_detail.schedule_id', '=', 'schedule.id')
-                ->join('classroom', 'schedule_classroom_group_detail.classroom_id', '=', 'classroom.id')
-                ->where('teacher.teacher_card', $card)
-                ->where('schedule.week_day', 'Viernes')
-                ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
-                ->whereNull('schedule_classroom_group_detail.deleted_at')
-                ->orderBy('schedule.start_time', 'asc')
-                ->get(),
-            'Sábado' => Teacher::select('schedule.*', 'classroom.classroom_name', 'group.group_code', 'subject.subject_name')
-                ->join('group', 'group.teacher_id', '=', 'teacher.id')
-                ->join('subject', 'group.subject_id', '=', 'subject.id')
-                ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
-                ->join('schedule', 'schedule_classroom_group_detail.schedule_id', '=', 'schedule.id')
-                ->join('classroom', 'schedule_classroom_group_detail.classroom_id', '=', 'classroom.id')
-                ->where('teacher.teacher_card', $card)
-                ->where('schedule.week_day', 'Sábado')
-                ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
-                ->whereNull('schedule_classroom_group_detail.deleted_at')
-                ->orderBy('schedule.start_time', 'asc')
-                ->get(),
-            'Domingo' => Teacher::select('schedule.*', 'classroom.classroom_name', 'group.group_code', 'subject.subject_name')
-                ->join('group', 'group.teacher_id', '=', 'teacher.id')
-                ->join('subject', 'group.subject_id', '=', 'subject.id')
-                ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
-                ->join('schedule', 'schedule_classroom_group_detail.schedule_id', '=', 'schedule.id')
-                ->join('classroom', 'schedule_classroom_group_detail.classroom_id', '=', 'classroom.id')
-                ->where('teacher.teacher_card', $card)
-                ->where('schedule.week_day', 'Domingo')
-                ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
-                ->whereNull('schedule_classroom_group_detail.deleted_at')
-                ->orderBy('schedule.start_time', 'asc')
-                ->get()
-        ];
 
-        $time = Schedule::select('schedule.start_time', 'schedule.end_time')
+        $days = Teacher::select('schedule.week_day')
+            ->join('group', 'group.teacher_id', '=', 'teacher.id')
+            ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
+            ->join('schedule', 'schedule_classroom_group_detail.schedule_id', '=', 'schedule.id')
+            ->where('teacher.teacher_card', $card)
+            ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
+            ->whereNull('schedule_classroom_group_detail.deleted_at')
             ->distinct()
             ->get();
+
+        $schedule = [];
+        foreach ($days as $day) {
+            $schedule[$day['week_day']] = Teacher::select('schedule.*', 'classroom.classroom_name', 'group.group_code', 'subject.subject_name')
+                ->join('group', 'group.teacher_id', '=', 'teacher.id')
+                ->join('subject', 'group.subject_id', '=', 'subject.id')
+                ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
+                ->join('schedule', 'schedule_classroom_group_detail.schedule_id', '=', 'schedule.id')
+                ->join('classroom', 'schedule_classroom_group_detail.classroom_id', '=', 'classroom.id')
+                ->where('teacher.teacher_card', $card)
+                ->where('schedule.week_day', $day['week_day'])
+                ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
+                ->whereNull('schedule_classroom_group_detail.deleted_at')
+                ->orderBy('schedule.start_time', 'asc')
+                ->get();
+        }
 
         return response()->json([
             'message' => 'Registro eliminado correctamente.',
             'schedule' => $schedule,
-            'time' => $time,
+
         ]);
     }
 }
