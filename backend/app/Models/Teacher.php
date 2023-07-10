@@ -67,4 +67,11 @@ class Teacher extends Model
 
             ->count();
     }
+
+    public static function searchTeacher($searchTeacher)
+    {
+        return Teacher::select(DB::raw("CONCAT(teacher.name, ', ', teacher.last_name) as full_name"),)
+            ->where('teacher.teacher_card', '=', $searchTeacher)
+            ->get();
+    }
 }

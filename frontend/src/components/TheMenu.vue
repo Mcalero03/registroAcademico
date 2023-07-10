@@ -89,6 +89,31 @@
           <v-expansion-panel :elevation="0">
             <v-expansion-panel-title id="panel">
               <v-icon
+                icon="mdi-human-male-board"
+                size="15"
+                color="white"
+                class="mr-2"
+              ></v-icon>
+              Profesor
+            </v-expansion-panel-title>
+            <v-expansion-panel-text id="panel">
+              <v-btn
+                v-for="(item, index) in teacher"
+                :key="index"
+                :value="index"
+                :append-icon="item.icon"
+                :href="item.url"
+                :text="item.title"
+                id="btn-menu"
+                :elevation="0"
+                class="justify-content-start"
+              ></v-btn>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+
+          <v-expansion-panel :elevation="0">
+            <v-expansion-panel-title id="panel">
+              <v-icon
                 icon="mdi-cogs"
                 size="15"
                 color="white"
@@ -230,6 +255,13 @@ export default {
         title: "Consulta de notas",
         url: "/grades",
         icon: "mdi-checkbook",
+      },
+    ],
+    teacher: [
+      {
+        title: "Horarios",
+        url: "/teacherSchedule",
+        icon: "mdi-details",
       },
     ],
     settings: [
