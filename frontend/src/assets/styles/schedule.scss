@@ -1,0 +1,79 @@
+@media (max-width: 959px) {
+    .v-timeline--horizontal {
+        overflow-y: hidden !important;
+        padding-bottom: 2em;
+    }
+
+    //cambia el padding alrededor del texto y lo centra
+    .v-timeline--horizontal p {
+        padding-top: 2em;
+        margin-inline-start: 40%;
+    }
+
+    //Mueve el texto con el divider a la parte superior
+    .v-timeline-item {
+        display: grid !important;
+    }
+
+    //Anchura del divider
+    .v-timeline-divider {
+        --v-timeline-line-size-base: 300px;
+    }
+
+    //Dimensiones del contenedor de los cards
+    .v-timeline-item__body {
+        max-width: 300px !important;
+        min-width: 120px !important;
+        padding: 0 !important;
+    }
+
+    //Padding entre el texto y el divider
+    .v-timeline-item__opposite {
+        padding: 0 !important;
+    }
+
+    //Dimensiones del card
+    #card {
+        max-width: 100% !important;
+        min-width: 100% !important;
+        max-height: 100% !important;
+        min-height: 100% !important;
+    }
+}
+
+@media (min-width: 960px) {
+    .v-timeline--horizontal {
+        overflow-y: hidden !important;
+        padding-bottom: 2em;
+    }
+
+    //cambia el padding alrededor del texto y lo centra
+    .v-timeline--horizontal p {
+        padding-top: 2em;
+    }
+
+    //Anchura del divider
+    .v-timeline-divider {
+        --v-timeline-line-size-base: 130px;
+    }
+
+    //Dimensiones del contenedor de los cards
+    .v-timeline-item__body {
+        max-width: 130px !important;
+        min-width: 130px !important;
+        padding: 0 !important;
+    }
+
+    //Padding entre el texto y el divider
+    .v-timeline-item__opposite {
+        padding: 0 !important;
+    }
+
+    //Dimensiones del card
+    #card {
+        max-width: 100% !important;
+        min-width: 130px !important;
+        max-height: 140px !important;
+        min-height: 150px !important;
+    }
+}
