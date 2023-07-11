@@ -697,7 +697,6 @@ export default {
     async showSchedules(index) {
       if (this.editedItem.id != "") {
         this.editedGroup = this.editedItem.inscriptions[index];
-        console.log(this.editedGroup["id"]);
         const { data } = await inscriptionApi
           .get("/showSchedules/" + this.editedGroup["id"])
 

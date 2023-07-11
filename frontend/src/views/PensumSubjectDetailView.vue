@@ -170,7 +170,7 @@
                       >
                         <template v-slot:activator="{ props }">
                           <p v-bind="props" class="text-primary text-center">
-                            Nombre de materia
+                            Materia
                           </p>
                         </template>
                       </v-tooltip>

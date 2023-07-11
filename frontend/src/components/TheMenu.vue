@@ -256,6 +256,11 @@ export default {
         url: "/grades",
         icon: "mdi-checkbook",
       },
+      {
+        title: "Horarios",
+        url: "/studentSchedule",
+        icon: "mdi-details",
+      },
     ],
     teacher: [
       {
