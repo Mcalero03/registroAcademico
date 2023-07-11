@@ -45,12 +45,12 @@
         >
           <v-col>
             <v-card
-              id="card"
+              id="message-card"
               class="mx-auto"
-              max-width="440"
-              min-width="200"
-              height="auto"
+              max-width="440px"
+              min-width="200px"
               theme="dark"
+              height="auto"
               :elevation="2"
             >
               <v-card-text>
@@ -65,12 +65,10 @@
           side="end"
           align="center"
           direction="horizontal"
-          class="pt-10 px-6 overflow-y-auto"
+          class="px-6"
           truncate-line="start"
         >
           <v-timeline-item
-            max-width="120px"
-            min-width="120px"
             max-height="100%"
             min-height="100%"
             dot-color="deep-purple-accent-4"
@@ -86,6 +84,7 @@
             <v-container fluid class="p-0">
               <v-row>
                 <v-col
+                  cols="12"
                   class="py-1 px-1"
                   v-for="(weekday, index) in schedule"
                   :key="index"
@@ -131,6 +130,7 @@
 
 <style lang="scss">
 @import "@/assets/styles/variables.scss";
+@import "@/assets/styles/schedule.scss";
 
 #card,
 p {
@@ -143,14 +143,9 @@ th {
   font-weight: bold !important;
 }
 
-#card {
+#card,
+#message-card {
   background-color: $menu-color;
-}
-
-#example-card,
-#example-card p {
-  font-size: 1rem;
-  font-weight: bolder;
 }
 </style>
 
