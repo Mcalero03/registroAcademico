@@ -125,6 +125,7 @@ class TeacherController extends Controller
             ->where('teacher.teacher_card', $card)
             ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
             ->whereNull('schedule_classroom_group_detail.deleted_at')
+            ->orderByRaw("FIELD(schedule.week_day, 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo')")
             ->distinct()
             ->get();
 

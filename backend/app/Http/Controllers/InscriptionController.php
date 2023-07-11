@@ -172,8 +172,52 @@ class InscriptionController extends Controller
             ->get();
 
         return response()->json([
-            'message' => 'Registro eliminado correctamente.',
+            'message' => 'Registro obtenido correctamente.',
             'schedules' => $schedules,
+        ]);
+    }
+
+    public function schedules($card)
+    {
+        $active_cycle = Cycle::where('cycle.status', 'Activo')->first()?->id;
+
+        $days = Student::select('schedule.week_day')
+            ->join('inscription', 'inscription.student_id', '=', 'student.id')
+            ->join('inscription_detail', 'inscription.id', '=', 'inscription_detail.inscription_id')
+            ->join('group', 'group.id', '=', 'inscription_detail.group_id')
+            ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
+            ->join('schedule', 'schedule_classroom_group_detail.schedule_id', '=', 'schedule.id')
+            ->where('student.student_card', $card)
+            ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
+            ->whereNull('schedule_classroom_group_detail.deleted_at')
+            ->whereNull('inscription_detail.deleted_at')
+            ->orderByRaw("FIELD(schedule.week_day, 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo')")
+
+            ->distinct()
+            ->get();
+
+        $schedule = [];
+        foreach ($days as $day) {
+            $schedule[$day['week_day']] = Student::select('schedule.*', 'classroom.classroom_name', 'group.group_code', 'subject.subject_name')
+                ->join('inscription', 'inscription.student_id', '=', 'student.id')
+                ->join('inscription_detail', 'inscription.id', '=', 'inscription_detail.inscription_id')
+                ->join('group', 'group.id', '=', 'inscription_detail.group_id')
+                ->join('subject', 'group.subject_id', '=', 'subject.id')
+                ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
+                ->join('schedule', 'schedule_classroom_group_detail.schedule_id', '=', 'schedule.id')
+                ->join('classroom', 'schedule_classroom_group_detail.classroom_id', '=', 'classroom.id')
+                ->where('student.student_card', $card)
+                ->where('schedule.week_day', $day['week_day'])
+                ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
+                ->whereNull('inscription_detail.deleted_at')
+                ->whereNull('schedule_classroom_group_detail.deleted_at')
+                ->orderBy('schedule.start_time', 'asc')
+                ->get();
+        }
+
+        return response()->json([
+            'message' => 'Registro obtenido correctamente.',
+            'schedules' => $schedule,
         ]);
     }
 
@@ -191,7 +235,7 @@ class InscriptionController extends Controller
             ->get();
 
         return response()->json([
-            'message' => 'Registro eliminado correctamente.',
+            'message' => 'Registro obtenido correctamente.',
             'careers' => $career,
         ]);
     }
@@ -238,7 +282,7 @@ class InscriptionController extends Controller
         }
 
         return response()->json([
-            'message' => 'Registro eliminado correctamente.',
+            'message' => 'Registro obtenido correctamente.',
             'inscription' => $inscription,
         ]);
     }

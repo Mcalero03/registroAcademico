@@ -194,13 +194,13 @@
                 <base-button
                   type="secondary"
                   title="Agregar horario"
-                  @click="addSchedule()"
+                  @click="changeClassroom()"
                   v-if="editedItem.active_cycle == editedItem.cycle_id"
                 />
                 <base-button
                   type="secondary"
                   title="Agregar horario"
-                  @click="addSchedule()"
+                  @click="changeClassroom()"
                   v-if="editedItem.cycle_id == null"
                 />
               </v-col>
@@ -618,6 +618,20 @@ export default {
             );
           });
         this.classrooms = data.classroom;
+
+        if (this.classrooms.length == 0) {
+          toast.warn(
+            "No hay salones para la cantidad de estudiantes especificada.",
+            {
+              autoClose: 2000,
+              position: toast.POSITION.TOP_CENTER,
+              multiple: false,
+            }
+          );
+          return;
+        } else {
+          this.addSchedule();
+        }
       }
     },
 
@@ -799,7 +813,6 @@ export default {
     //SCHEDULE
 
     addSchedule() {
-      this.changeClassroom();
       this.dialogSchedule = true;
       this.v$.schedule.classroom_name.$model = "";
       this.v$.schedule.week_day.$model = "";

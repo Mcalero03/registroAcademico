@@ -3,18 +3,18 @@
     <v-container fluid>
       <v-card class="p-3 mt-3">
         <h2 class="black-secondary text-uppercase text-center my-4">
-          Horarios asignados
+          Horarios
         </h2>
 
         <v-row class="pb-4">
           <!-- student -->
           <v-col cols="8" sm="4" md="6">
-            <v-label>Buscar profesor por carnet</v-label>
+            <v-label>Buscar estudiante por carnet</v-label>
             <v-text-field
               class="mt-3"
               variant="outlined"
               type="text"
-              v-model="searchTeacher"
+              v-model="searchStudent"
             >
             </v-text-field>
           </v-col>
@@ -23,13 +23,13 @@
             <base-button
               type="primary"
               title="Buscar"
-              @click="searchTeacherCard() && showSchedules()"
+              @click="searchStudentCard() && showSchedules()"
             />
           </v-col>
           <!-- full_name  -->
           <v-col cols="12" sm="12" md="6">
             <base-input
-              label="Profesor"
+              label="Estudiante"
               v-model="v$.editedItem.full_name.$model"
               :rules="v$.editedItem.full_name"
               readonly
@@ -150,7 +150,7 @@ th {
 </style>
 
 <script>
-import { toast } from "../../node_modules/vue3-toastify";
+import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";
@@ -160,7 +160,7 @@ import BaseButton from "../components/base-components/BaseButton.vue";
 import { helpers, required } from "@vuelidate/validators";
 import Loader from "@/components/Loader.vue";
 
-import teacherApi from "@/services/teacherApi";
+import inscriptionApi from "@/services/inscriptionApi";
 
 import useAlert from "../composables/useAlert";
 
@@ -176,7 +176,7 @@ export default {
   data() {
     return {
       search: "",
-      searchTeacher: "",
+      searchStudent: "",
       total: 0,
       pensums: [],
       schedules: [],
@@ -222,25 +222,25 @@ export default {
   },
 
   methods: {
-    async searchTeacherCard() {
+    async searchStudentCard() {
       try {
-        if (this.searchTeacher != "") {
-          const { data } = await teacherApi.get(null, {
+        if (this.searchStudent != "") {
+          const { data } = await inscriptionApi.get(null, {
             params: {
-              searchTeacher: this.searchTeacher,
+              searchStudent: this.searchStudent,
             },
           });
-          this.teachers = data.teacher;
-          this.editedItem.full_name = this.teachers[0].full_name;
+          this.students = data.student;
+          this.editedItem.full_name = this.students[0].full_name;
         } else {
-          toast.error("Ingrese el carnet del profesor.", {
+          toast.error("Ingrese el carnet del estudiante.", {
             autoClose: 2000,
             position: toast.POSITION.TOP_CENTER,
             multiple: false,
           });
         }
       } catch (error) {
-        toast.error("No fue posible obtener el profesor.", {
+        toast.error("No fue posible obtener el estudiante.", {
           autoClose: 2000,
           position: toast.POSITION.TOP_CENTER,
           multiple: false,
@@ -249,8 +249,8 @@ export default {
     },
 
     async showSchedules() {
-      const { data } = await teacherApi
-        .get("/showSchedules/" + this.searchTeacher)
+      const { data } = await inscriptionApi
+        .get("/schedules/" + this.searchStudent)
         .catch((error) => {
           toast.error("No fue posible obtener la información.", {
             autoClose: 2000,
@@ -259,7 +259,7 @@ export default {
           });
         });
 
-      this.schedules = data.schedule;
+      this.schedules = data.schedules;
     },
 
     async initialize() {
@@ -282,7 +282,7 @@ export default {
       clearTimeout(this.debounce);
       this.debounce = setTimeout(async () => {
         try {
-          const { data } = await teacherApi.get(null, {
+          const { data } = await inscriptionApi.get(null, {
             params: { ...options, search: this.search },
           });
 
