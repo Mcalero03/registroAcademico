@@ -42,6 +42,7 @@ class GroupController extends Controller
                 ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
                 ->join('classroom', 'schedule_classroom_group_detail.classroom_id', 'classroom.id')
                 ->where('group.id', $item->id)
+                ->orderByRaw("FIELD(schedule.week_day, 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo')")
 
                 ->get();
 
@@ -217,6 +218,7 @@ class GroupController extends Controller
         $classroom = classroom::select('classroom.classroom_name')
             ->where('classroom.school_id', $school_id)
             ->where('classroom.capacity', ">=", $student_quantity)
+            ->where('classroom.status', "Habilitado")
             ->whereNull('classroom.deleted_at')
             ->get();
 
@@ -269,6 +271,8 @@ class GroupController extends Controller
             ->whereNotIn('schedule.id', $schedule_other_teachers)
             ->whereNotIn('schedule.id', $schedule_classroom)
             ->whereNull('schedule.deleted_at')
+            ->orderByRaw("FIELD(schedule.week_day, 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo')")
+
             ->get();
 
         //Devuelve la lista de dias, correspondiente a los horarios disponibles
@@ -277,6 +281,7 @@ class GroupController extends Controller
             ->whereNotIn('schedule.id', $schedule_other_teachers)
             ->whereNotIn('schedule.id', $schedule_classroom)
             ->whereNull('schedule.deleted_at')
+            ->orderByRaw("FIELD(schedule.week_day, 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo')")
             ->distinct()
             ->get();
 
@@ -289,12 +294,13 @@ class GroupController extends Controller
     }
 
 
-    public function byDay($day, $teacher)
+    public function byDay($day, $teacher, $classroom)
     {
         $info = explode(', ', $teacher);
         $id = Group::teacherId($info[0], $info[1])->pluck('id');
         $teacher_id = Group::clean($id);
         $active_cycle = Cycle::where('status', 'Activo')->first()?->id;
+        $classroom_id = Classroom::where('classroom_name', $classroom)->first()?->id;
 
         $schedule = Group::select('schedule.id')
             ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
@@ -309,6 +315,7 @@ class GroupController extends Controller
             ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
             ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
             ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
+            ->where('schedule_classroom_group_detail.classroom_id', $classroom_id)
             ->whereNull('schedule_classroom_group_detail.deleted_at')
             ->get();
 

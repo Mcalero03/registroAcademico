@@ -111,8 +111,10 @@
                     :elevation="2"
                   >
                     <v-card-text class="pb-0">
-                      <p class="">Materia: {{ evaluation.subject_name }}</p>
-                      <p class="">Grupo: {{ evaluation.group_code }}</p>
+                      <p>Materia: {{ evaluation.subject_name }}</p>
+                      <p class="text-primary">
+                        Grupo: {{ evaluation.group_code }}
+                      </p>
                     </v-card-text>
                     <v-card-text>
                       <div class="mx-auto">
@@ -123,7 +125,7 @@
                             border-radius: 0.4rem;
                           "
                         >
-                          <thead class="text-primary text-center">
+                          <thead class="text-center">
                             <tr>
                               <th>Evaluación</th>
                               <th>Ponderación</th>
@@ -200,7 +202,7 @@ th {
 </style>
 
 <script>
-import { toast } from "../../node_modules/vue3-toastify";
+import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";

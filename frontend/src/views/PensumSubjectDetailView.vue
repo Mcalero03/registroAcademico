@@ -2,7 +2,7 @@
   <div data-app>
     <v-container fluid>
       <v-card class="p-3 mt-3">
-        <h2 class="black-secondary text-uppercase text-center my-4">pensum</h2>
+        <h2 class="black-secondary text-uppercase text-center my-4">Pensum</h2>
         <v-row class="pb-4">
           <!-- school_name -->
           <v-col cols="12" sm="6" md="6">
@@ -34,7 +34,7 @@
           <!-- sub_school_name -->
         </v-row>
 
-        <div v-if="pensums.length == 0">
+        <div v-if="pensums.length == 0 && this.filter.sub_school_name != ''">
           <loader v-if="loading" />
           <p class="text-center mt-6">No hay pensums por mostrar</p>
         </div>
@@ -71,9 +71,9 @@
                   <v-card
                     id="card"
                     class="mx-auto"
-                    max-width="200"
-                    min-width="200"
-                    height="170"
+                    max-width="200px"
+                    min-width="200px"
+                    height="170px"
                     theme="dark"
                     :elevation="2"
                   >
@@ -141,9 +141,9 @@
                 <v-col>
                   <v-card
                     class="mr-auto"
-                    max-width="200"
-                    min-width="200"
-                    height="170"
+                    max-width="200px"
+                    min-width="200px"
+                    height="170px"
                     variant="tonal"
                     :elevation="2"
                     id="example-card"
