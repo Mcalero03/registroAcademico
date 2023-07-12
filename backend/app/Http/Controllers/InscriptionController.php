@@ -124,7 +124,6 @@ class InscriptionController extends Controller
 
         Inscription::where('id', $data['id'])->update([
             'inscription_date' => $data['inscription_date'],
-            'cycle_id' => Cycle::where('cycle_number', $data['cycle'])->first()?->id,
             'student_id' => $student_id,
             'pensum_id' => Pensum::where('program_name', $data['program_name'])->first()?->id,
 

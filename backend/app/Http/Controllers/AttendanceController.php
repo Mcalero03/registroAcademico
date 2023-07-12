@@ -67,8 +67,6 @@ class AttendanceController extends Controller
 
                 ->get();
 
-
-
             $item->attendances = Encrypt::encryptObject($item->attendances, "id");
         }
 
@@ -89,6 +87,14 @@ class AttendanceController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
+        function getTime()
+        {
+            $datetime = date("H:i:s");
+            return $datetime;
+        }
+
+        // Llamada a la función para obtener la hora actual
+        $currentTime = getTime();
 
         if ($data['attendances'] != null) {
             $date = $data['attendance_date'];
@@ -101,7 +107,7 @@ class AttendanceController extends Controller
             if (!$dataExists) {
                 $attendance = Attendance::create([
                     'attendance_date' => $data['attendance_date'],
-                    'attendance_time' => $data['attendance_time'],
+                    'attendance_time' => $currentTime,
                     'group_id' =>  $group_id,
                 ]);
 
@@ -112,8 +118,6 @@ class AttendanceController extends Controller
                         'attendance_id' => $attendance->id,
                     ]);
                 }
-
-                $attendance->save();
 
                 return response()->json([
                     "message" => "Registro creado correctamente",
@@ -221,7 +225,7 @@ class AttendanceController extends Controller
     }
 
 
-    public function student($group, $subject)
+    public function byGroup($group, $subject)
     {
         $student = Inscription::select(DB::raw("CONCAT(student.last_name, ', ',student.name) as full_name"), 'i.id as inscription_detail_id')
             ->selectRaw("0 as attendance_status")

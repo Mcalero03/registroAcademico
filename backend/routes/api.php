@@ -112,7 +112,7 @@ Route::resource('/attendance', AttendanceController::class);
 Route::get('/attendance/bySchool/{school}', [AttendanceController::class, 'bySchool']);
 Route::get('/attendance/byTeacher/{name}/{last_name}', [AttendanceController::class, 'teacherSubject']);
 Route::get('/attendance/bySubject/{name}/{last_name}/{subject}', [AttendanceController::class, 'subject']);
-Route::get('/attendance/byGroup/{group}/{subject}', [AttendanceController::class, 'student']);
+Route::get('/attendance/byGroup/{group}/{subject}', [AttendanceController::class, 'byGroup']);
 
 //KINSHIP
 Route::resource('/kinship', kinshipController::class);

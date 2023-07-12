@@ -57,7 +57,7 @@ class EvaluationController extends Controller
                 ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
                 ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
                 ->where('subject.subject_name', $item->subject_name)
-                ->where('calification.inscription_detail_id', $item->inscription_detail_id)
+                // ->where('calification.inscription_detail_id', $item->inscription_detail_id).
                 ->whereNull('calification.deleted_at')
                 ->where('i.status', 'not like', 'Retirado')
                 ->where('cycle.status', 'Activo')

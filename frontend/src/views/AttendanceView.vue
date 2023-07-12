@@ -286,7 +286,6 @@ export default {
         subject: "",
         group: "",
         attendance_date: this.getDate(),
-        attendance_time: this.getTime(),
         attendances: [],
         attendance_count: "",
         no_attendance_count: "",
@@ -297,7 +296,6 @@ export default {
         group: "",
         school: "",
         attendance_date: this.getDate(),
-        attendance_time: this.getTime(),
         attendances: [],
         attendance_count: "",
         no_attendance_count: "",
@@ -307,16 +305,11 @@ export default {
 
   mounted() {
     this.initialize();
-    this.getTime();
-
-    setInterval(() => {
-      this.getTime();
-    }, 1000);
   },
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "Nuevo registro" : "Visualizar registro";
+      return this.editedIndex === -1 ? "Nuevo registro" : "Asistencia";
     },
   },
 
@@ -468,11 +461,6 @@ export default {
 
     getDate() {
       const datetime = new Date().toISOString().substring(0, 10);
-      return datetime;
-    },
-
-    getTime() {
-      const datetime = new Date().toLocaleTimeString();
       return datetime;
     },
 
