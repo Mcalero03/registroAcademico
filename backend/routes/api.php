@@ -53,7 +53,7 @@ Route::get('/group/classroomCapacity/{school}/{quantity}', [GroupController::cla
 Route::get('/group/bySubject/{subject}', [GroupController::class, 'bySubject']);
 Route::get('/group/bySchool/{school}', [GroupController::class, 'bySchool']);
 Route::get('/group/byTeacher/{teacher}/{classroom}', [GroupController::class, 'byTeacher']);
-Route::get('/group/byDay/{day}/{teacher}', [GroupController::class, 'byDay']);
+Route::get('/group/byDay/{day}/{teacher}/{classroom}', [GroupController::class, 'byDay']);
 Route::get('/group/byStartTime/{start_time}/{week_day}', [GroupController::class, 'byStartTime']);
 Route::get('/group/classroombyTeacher/{teacher}', [GroupController::class, 'classroombyTeacher']);
 

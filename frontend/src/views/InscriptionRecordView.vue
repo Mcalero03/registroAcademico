@@ -111,8 +111,10 @@
                     :elevation="2"
                   >
                     <v-card-text class="pb-0">
-                      <p class="">Ciclo: {{ subject.cycle }}</p>
-                      <p class="">Estado: {{ subject.inscription_status }}</p>
+                      <p>Ciclo: {{ subject.cycle }}</p>
+                      <p class="text-primary">
+                        Estado: {{ subject.inscription_status }}
+                      </p>
                     </v-card-text>
                     <v-card-text>
                       <div class="mx-auto">
@@ -187,7 +189,7 @@ th {
 </style>
 
 <script>
-import { toast } from "../../node_modules/vue3-toastify";
+import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import { useVuelidate } from "@vuelidate/core";
 import { messages } from "@/utils/validators/i18n-validators";

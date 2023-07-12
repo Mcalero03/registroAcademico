@@ -695,14 +695,17 @@ export default {
     async changestarttime() {
       if (
         this.v$.schedule.week_day.$model != "" &&
-        this.v$.editedItem.teacher_full_name.$model != ""
+        this.v$.editedItem.teacher_full_name.$model != "" &&
+        this.v$.schedule.classroom_name.$model != ""
       ) {
         const { data } = await groupApi
           .get(
             "/byDay/" +
               this.v$.schedule.week_day.$model +
               "/" +
-              this.v$.editedItem.teacher_full_name.$model
+              this.v$.editedItem.teacher_full_name.$model +
+              "/" +
+              this.v$.schedule.classroom_name.$model
           )
           .catch((error) => {
             alert.error(
