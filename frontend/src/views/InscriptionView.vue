@@ -102,6 +102,25 @@
                 />
               </v-col>
               <!-- cycle  -->
+              <!-- status  -->
+              <v-col
+                cols="4"
+                sm="4"
+                md="4"
+                class="p-0 m-0 pr-4 pb-4"
+                v-if="editedIndex != -1"
+              >
+                <v-label>Estado</v-label>
+                <base-select
+                  :items="status"
+                  item-title="status"
+                  item-value="status"
+                  v-model="v$.editedItem.status.$model"
+                  :rules="v$.editedItem.status"
+                  readonly
+                />
+              </v-col>
+              <!-- status  -->
               <v-col
                 cols="5"
                 sm="5"
@@ -603,7 +622,7 @@ export default {
       total: 0,
       records: [],
       cycles: [],
-      status: ["Inscrito", "Retirado", "Reprobado", "Aprobado"],
+      status: ["Inscrito", "Retirado", "Aprobado", "Reprobado"],
       students: [],
       inscriptions: [],
       pensums: [],
@@ -680,7 +699,9 @@ export default {
         program_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
-        status: {},
+        status: {
+          required: helpers.withMessage(langMessages.required, required),
+        },
       },
       group: {
         group_code: {},
