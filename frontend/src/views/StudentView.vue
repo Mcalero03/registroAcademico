@@ -210,7 +210,7 @@
             <!-- Relative Table -->
             <v-row>
               <v-col align="center" cols="12" md="12" sm="12" class="pt-4">
-                <div class="table-responsive-md">
+                <div class="table-responsive">
                   <v-table>
                     <thead>
                       <tr>
@@ -346,12 +346,13 @@
               </v-col>
               <!-- Relative Table -->
               <!-- Career Table -->
-              <v-col align="center" cols="6" md="6" sm="6" class="pt-4">
-                <div class="table-responsive-md">
+              <v-col align="center" cols="12" md="12" sm="12" class="pt-4">
+                <div class="table table-responsive">
                   <v-table>
                     <thead>
                       <tr>
                         <th>CARRERA</th>
+                        <th>ESTADO</th>
                         <th class="text-center">ACCIÓN</th>
                       </tr>
                     </thead>
@@ -362,14 +363,15 @@
                         :key="index"
                       >
                         <td v-text="career.program_name"></td>
+                        <td v-text="career.status"></td>
                         <td class="text-center">
-                          <v-tooltip text="Eliminar carrera" location="end">
+                          <v-tooltip text="Editar" location="end">
                             <template v-slot:activator="{ props }">
                               <v-icon
                                 size="20"
                                 class="mr-2"
-                                @click="deleteCareer(index)"
-                                icon="mdi-delete"
+                                @click="editItemStatus(index)"
+                                icon="mdi-pencil"
                                 v-bind="props"
                               />
                             </template>
@@ -393,7 +395,7 @@
                       </h2>
                       <v-row>
                         <!-- program_name -->
-                        <v-col cols="12" sm="12" md="12">
+                        <v-col cols="6" sm="6" md="6">
                           <v-label>Carreras</v-label>
                           <base-select
                             :items="pensums"
@@ -405,6 +407,16 @@
                           </base-select>
                         </v-col>
                         <!-- program_name -->
+                        <!-- mail  -->
+                        <v-col cols="6" sm="6" md="6">
+                          <v-label>Estado</v-label>
+                          <base-input
+                            v-model="v$.career.status.$model"
+                            :rules="v$.career.status"
+                            readonly
+                          />
+                        </v-col>
+                        <!-- mail  -->
                       </v-row>
                       <v-row>
                         <v-col align="center">
@@ -425,9 +437,59 @@
                   </v-card>
                 </v-dialog>
                 <!-- Modal -->
+
+                <!-- Modal -->
+                <v-dialog
+                  v-model="dialogEditStatus"
+                  max-width="600px"
+                  persistent
+                >
+                  <v-card height="100%">
+                    <v-container>
+                      <h2 class="black-secondary text-center mt-4 mb-4">
+                        Editar estado
+                      </h2>
+                      <v-row>
+                        <!-- subject_name  -->
+                        <v-col cols="12" sm="6" md="6">
+                          <v-label>Carrera</v-label>
+                          <base-input
+                            v-model="v$.editStatus.program_name.$model"
+                            :rules="v$.editStatus.program_name"
+                            readonly
+                          />
+                        </v-col>
+                        <!-- subject_name  -->
+                        <!-- status  -->
+                        <v-col cols="12" sm="6" md="6">
+                          <v-label>Estado</v-label>
+                          <base-select
+                            :items="status"
+                            item-title="status"
+                            item-value="status"
+                            v-model="v$.editStatus.status.$model"
+                            :rules="v$.editStatus.status"
+                          />
+                        </v-col>
+                        <!-- status  -->
+                      </v-row>
+                      <v-row>
+                        <v-col align="center">
+                          <base-button
+                            type="primary"
+                            title="Actualizar"
+                            @click="addEditItemStatus()"
+                          />
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  </v-card>
+                </v-dialog>
+                <!-- Modal -->
               </v-col>
             </v-row>
             <!-- Career Table -->
+
             <!-- Form -->
             <v-row>
               <v-col align="center">
@@ -517,12 +579,14 @@ export default {
     return {
       search: "",
       dialog: false,
+      dialogEditStatus: false,
       dialogDelete: false,
       dialogRelative: false,
       dialogCareer: false,
       editedIndex: -1,
       editedRelative: -1,
       title: "ESTUDIANTES",
+      status: ["En curso", "Retirado", "Finalizado"],
       headers: [
         { title: "NOMBRES", key: "name" },
         { title: "APELLIDOS", key: "last_name" },
@@ -578,6 +642,11 @@ export default {
       },
       career: {
         program_name: "",
+        status: "",
+      },
+      editStatus: {
+        program_name: "",
+        status: "",
       },
     };
   },
@@ -736,6 +805,11 @@ export default {
         program_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
+        status: {},
+      },
+      editStatus: {
+        program_name: {},
+        status: {},
       },
     };
   },
@@ -852,8 +926,49 @@ export default {
       return datetime;
     },
 
-    //RELATIVE
+    //EDIT STATUS OF CAREERS
+    editItemStatus(index) {
+      this.editedCareer = this.editedItem.pensums[index];
+      this.editedItem.pensums.splice(index, 1);
+      this.editStatus = Object.assign({}, this.editedCareer);
+      this.dialogEditStatus = true;
+    },
 
+    async addEditItemStatus() {
+      this.v$.editStatus.$validate();
+      if (this.v$.editStatus.$invalid) {
+        alert.error("Campo obligatorio");
+        return;
+      }
+
+      // Creating record
+      try {
+        this.editedItem.pensums.push({ ...this.editStatus });
+        toast.success("Datos actualizados. Guarde los cambios", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+          multiple: false,
+        });
+      } catch (error) {
+        toast.error("No fue posible actualizar el registro.", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_CENTER,
+          multiple: false,
+        });
+      }
+
+      this.closeEditStatus();
+      this.initialize();
+      this.loading = false;
+      return;
+    },
+
+    closeEditStatus() {
+      this.v$.editStatus.$reset();
+      this.dialogEditStatus = false;
+    },
+
+    //RELATIVE
     addRelative() {
       this.dialogRelative = true;
       this.editedRelative = -1;
@@ -905,6 +1020,7 @@ export default {
       if (this.pensums != 0 && this.editedIndex == -1) {
         this.dialogCareer = true;
         this.v$.career.program_name.$model = "";
+        this.v$.career.status.$model = "En curso";
         this.v$.career.$reset();
       } else if (
         this.pensums == 0 &&
@@ -924,6 +1040,7 @@ export default {
       } else if (this.pensums != 0 && this.editedIndex != -1) {
         this.dialogCareer = true;
         this.v$.career.program_name.$model = "";
+        this.v$.career.status.$model = "En curso";
         this.v$.career.$reset();
       } else if (this.pensums == 0 && this.editedIndex != -1) {
         toast.error("No hay carreras disponibles para inscribir!", {
@@ -961,10 +1078,6 @@ export default {
       this.v$.career.$reset();
       this.pensums = [];
       this.dialogCareer = false;
-    },
-
-    async deleteCareer(index) {
-      this.editedItem.pensums.splice(index, 1);
     },
 
     //STUDENT

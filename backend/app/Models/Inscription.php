@@ -34,7 +34,7 @@ class Inscription extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Inscription::select(DB::raw("CONCAT(student.name, ', ', student.last_name) as full_name, CONCAT(cycle.cycle_number, '-', cycle.year) as cycle"), 'inscription.*', 'pensum.program_name', 'pensum.id as id_pensum', 'cycle.status')
+        return Inscription::select(DB::raw("CONCAT(student.name, ', ', student.last_name) as full_name, CONCAT(cycle.cycle_number, '-', cycle.year) as cycle"), 'inscription.*', 'pensum.program_name', 'pensum.id as id_pensum')
             ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
             ->join('student', 'inscription.student_id', '=', 'student.id')
             ->leftjoin('inscription_detail', 'inscription.id', '=', 'inscription_detail.inscription_id')

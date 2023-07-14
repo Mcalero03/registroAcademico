@@ -45,7 +45,7 @@ class StudentController extends Controller
         }
 
         foreach ($student as $item) {
-            $item->pensums = StudentPensumDetail::select('pensum.program_name')
+            $item->pensums = StudentPensumDetail::select('pensum.program_name', 'student_pensum_detail.status')
                 ->join('pensum', 'student_pensum_detail.pensum_id', '=', 'pensum.id')
                 ->where('student_id', $item->id)
                 ->get();
@@ -110,7 +110,7 @@ class StudentController extends Controller
                 StudentPensumDetail::create([
                     'pensum_id' => Pensum::where('program_name', $value['program_name'])->first()?->id,
                     'student_id' => $student->id,
-                    'status' => "En curso"
+                    'status' => $value['status'],
                 ]);
             }
 
@@ -179,7 +179,7 @@ class StudentController extends Controller
             StudentPensumDetail::create([
                 'pensum_id' => Pensum::where('program_name', $value['program_name'])->first()?->id,
                 'student_id' => $data['id'],
-                'status' => "En curso"
+                'status' => $value['status']
             ]);
         }
 
