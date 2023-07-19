@@ -111,8 +111,12 @@
                     :elevation="2"
                   >
                     <v-card-text class="pb-0">
-                      <p>Materia: {{ evaluation.subject_name }}</p>
-                      <p class="text-primary">
+                      <p align="right">
+                        {{ evaluation.status }}
+                      </p>
+
+                      <p align="left">Materia: {{ evaluation.subject_name }}</p>
+                      <p align="left" class="text-primary">
                         Grupo: {{ evaluation.group_code }}
                       </p>
                     </v-card-text>
@@ -140,7 +144,7 @@
                               :key="index"
                             >
                               <td v-text="score.evaluation_name"></td>
-                              <td v-text="'%' + score.ponder"></td>
+                              <td v-text="score.ponder + '%'"></td>
                               <td v-text="score.score"></td>
                               <td v-text="score.final_average"></td>
                             </tr>

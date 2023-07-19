@@ -361,7 +361,7 @@ class EvaluationController extends Controller
             ->join('pensum', 'student_pensum_detail.pensum_id', '=', 'pensum.id')
             ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
             ->where('student.student_card', $card)
-            ->where('i.status', 'not like', 'Retirado')
+            ->where('student_pensum_detail.status', 'not like', 'Retirado')
             ->where('cycle.status', 'Activo')
             ->whereNull('student_pensum_detail.deleted_at')
             ->distinct()
@@ -375,7 +375,7 @@ class EvaluationController extends Controller
 
     public function showCalification($card, $program)
     {
-        $subjects = Inscription::select('group.group_code', 'subject.subject_name', 'i.id',)
+        $subjects = Inscription::select('group.group_code', 'subject.subject_name', 'i.id', 'i.status')
             ->join('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
             ->join('group', 'i.group_id', '=', 'group.id')
             ->join('subject', 'group.subject_id', '=', 'subject.id')
@@ -385,7 +385,7 @@ class EvaluationController extends Controller
             ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
             ->where('student.student_card', $card)
             ->where('pensum.program_name', $program)
-            ->where('i.status', 'not like', 'Retirado')
+            // ->where('inscription.status', 'not like', 'Retirado')
             ->where('cycle.status', 'Activo')
             ->distinct()
             ->get();
@@ -405,10 +405,10 @@ class EvaluationController extends Controller
                 ->where('pensum.program_name', $program)
                 ->where('subject.subject_name', $item->subject_name)
                 ->where('calification.inscription_detail_id', $item->id)
-                ->where('i.status', 'not like', 'Retirado')
+                // ->where('inscription.status', 'not like', 'Retirado')
                 ->where('cycle.status', 'Activo')
                 ->whereNull('calification.deleted_at')
-                ->selectRaw('ROUND(AVG((calification.score * evaluation.ponder)/100), 2) as final_average')
+                ->selectRaw('ROUND((calification.score * evaluation.ponder)/100, 2) as final_average')
                 ->orderBy('evaluation.evaluation_name', 'asc')
                 ->groupBy('evaluation.evaluation_name', 'evaluation.ponder', 'calification.score', 'subject.average_approval')
                 ->get();
@@ -428,7 +428,7 @@ class EvaluationController extends Controller
                 ->where('subject.subject_name', $item->subject_name)
                 ->where('calification.inscription_detail_id', $item->id)
                 ->whereNull('calification.deleted_at')
-                ->where('i.status', 'not like', 'Retirado')
+                // ->where('inscription.status', 'not like', 'Retirado')
                 ->where('cycle.status', 'Activo')
                 ->groupBy('subject.subject_name')
                 ->get();

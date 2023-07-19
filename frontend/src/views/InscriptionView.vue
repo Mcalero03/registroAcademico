@@ -622,7 +622,7 @@ export default {
       total: 0,
       records: [],
       cycles: [],
-      status: ["Inscrito", "Retirado", "Aprobado", "Reprobado"],
+      status: ["Inscrito", "Retirado"],
       students: [],
       inscriptions: [],
       pensums: [],
