@@ -11,6 +11,7 @@ use App\Models\Pensum;
 use App\Models\School;
 use Encrypt;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Validation\Rules\Exists;
 
 class StudentController extends Controller
 {
@@ -159,28 +160,70 @@ class StudentController extends Controller
 
         ]);
 
-        Relative::where('student_id', $data['id'])->delete();
+        //Realiza un arreglo con los id de los parientes que siguen ingresados en el formulario
+        foreach ($data['relatives'] as $value) {
+            if (isset($value['id']) == true) {
+                $relativeIds[] = Encrypt::decryptValue($value['id']);
+            }
+        };
+
+        //Realiza una consulta de los id de los parientes que estan creados 
+        $created_relatives = Relative::select('id')->where('student_id', $data['id'])->whereNull('deleted_at')->get();
+        $created_relatives_array = $created_relatives->map(function ($relative) {
+            return strval($relative->id);
+        })->toArray();
+
+        //Realiza una verificacion de aquellos id que ya no se mandaron por el formulario
+        $deleted_relatives = array_diff($created_relatives_array, $relativeIds);
+
+        //Elimina aquellos parientes que fueron eliminados desde el formulario
+        Relative::whereIn('id', $deleted_relatives)->delete();
 
         foreach ($data['relatives'] as $value) {
-            Relative::create([
-                'name' => $value['name'],
-                'last_name' => $value['last_name'],
-                'dui' => $value['dui'],
-                'phone_number' => $value['phone_number'],
-                'mail' => $value['mail'],
-                'student_id' => $data['id'],
-                'kinship_id' => Kinship::where('kinship', $value['kinship'])->first()?->id,
-            ]);
+
+            //Verifica que si no lleva id, debe de crer ese registro
+            if (isset($value['id']) == false) {
+                Relative::create([
+                    'name' => $value['name'],
+                    'last_name' => $value['last_name'],
+                    'dui' => $value['dui'],
+                    'phone_number' => $value['phone_number'],
+                    'mail' => $value['mail'],
+                    'student_id' => $data['id'],
+                    'kinship_id' => Kinship::where('kinship', $value['kinship'])->first()?->id,
+                ]);
+
+                //Si el registro ya esta creado, debe de hacer solo una actualizacion
+            } else if (isset($value['id']) == true) {
+                Relative::where('id', $value['id'])->update([
+                    'name' => $value['name'],
+                    'last_name' => $value['last_name'],
+                    'dui' => $value['dui'],
+                    'phone_number' => $value['phone_number'],
+                    'mail' => $value['mail'],
+                    'student_id' => $data['id'],
+                    'kinship_id' => Kinship::where('kinship', $value['kinship'])->first()?->id,
+                ]);
+            }
         }
 
-        StudentPensumDetail::where('student_id', $data['id'])->delete();
-
+        //Verifica si el pensum no existe, lo crea
         foreach ($data['pensums'] as $value) {
-            StudentPensumDetail::create([
-                'pensum_id' => Pensum::where('program_name', $value['program_name'])->first()?->id,
-                'student_id' => $data['id'],
-                'status' => $value['status']
-            ]);
+            if (isset($value['id']) == false) {
+                StudentPensumDetail::create([
+                    'pensum_id' => Pensum::where('program_name', $value['program_name'])->first()?->id,
+                    'student_id' => $data['id'],
+                    'status' => $value['status']
+                ]);
+            } else if (isset($value['id']) == true) {
+                $program_id = Pensum::where('program_name', $value['program_name'])->first()?->id;
+
+                StudentPensumDetail::where('student_id', $data['id'])->where('pensum_id', $program_id)->update([
+                    'pensum_id' => Pensum::where('program_name', $value['program_name'])->first()?->id,
+                    'student_id' => $data['id'],
+                    'status' => $value['status']
+                ]);
+            }
         }
 
 
