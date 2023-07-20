@@ -69,13 +69,33 @@ class CycleController extends Controller
             ->whereNull('cycle.deleted_at')
             ->exists();
 
-        if ($data['status'] != 'Activo') {
+        $today = date('Y-m-d'); // Obtener la fecha actual en formato 'YYYY-MM-DD'
+
+        switch (true) {
+            case $data['start_date'] > $today:
+                $status = 'Inactivo';
+                break;
+
+            case $data['start_date'] <= $today && $data['end_date'] >= $today:
+                $status = 'Activo';
+                break;
+
+            case $data['end_date'] < $today:
+                $status = 'Finalizado';
+                break;
+
+            default:
+                $status = 'Desconocido';
+                break;
+        }
+
+        if ($status == 'Inactivo') {
             $cycle = Cycle::create([
                 'cycle_number' => $data['cycle_number'],
                 'year' => $data['year'],
                 'start_date' => $data['start_date'],
                 'end_date' => $data['end_date'],
-                'status' => $data['status'],
+                // 'status' => $data['status'],
             ]);
 
             $cycle->save();
@@ -95,36 +115,42 @@ class CycleController extends Controller
             return response()->json([
                 "message" => "Registro creado correctamente",
             ]);
-        } elseif ($activeStatus == false) {
-            $cycle = Cycle::create([
-                'cycle_number' => $data['cycle_number'],
-                'year' => $data['year'],
-                'start_date' => $data['start_date'],
-                'end_date' => $data['end_date'],
-                'status' => $data['status'],
-            ]);
+        } elseif ($status == 'Activo') {
+            if ($activeStatus == false) {
+                $cycle = Cycle::create([
+                    'cycle_number' => $data['cycle_number'],
+                    'year' => $data['year'],
+                    'start_date' => $data['start_date'],
+                    'end_date' => $data['end_date'],
+                    // 'status' => $data['status'],
+                ]);
 
-            $cycle->save();
+                $cycle->save();
 
-            $subjects = $data['subjects'];
-            $subjectsCount = count($subjects);
+                $subjects = $data['subjects'];
+                $subjectsCount = count($subjects);
 
-            for ($i = 0; $i < $subjectsCount; $i++) {
-                $item = $subjects[$i];
+                for ($i = 0; $i < $subjectsCount; $i++) {
+                    $item = $subjects[$i];
 
-                CycleSubjectDetail::create([
-                    'cycle_id' => $cycle->id,
-                    'subject_id' => Subject::where('subject_name', $item)->first()?->id,
+                    CycleSubjectDetail::create([
+                        'cycle_id' => $cycle->id,
+                        'subject_id' => Subject::where('subject_name', $item)->first()?->id,
+                    ]);
+                }
+
+                return response()->json([
+                    "message" => "Registro creado correctamente",
+                ]);
+            } else {
+                return response()->json([
+                    "error" => "Solo puede existir un ciclo activo",
                 ]);
             }
-
+        } elseif ($status == 'Finalizado') {
             return response()->json([
-                "message" => "Registro creado correctamente",
+                "error" => "Seleccione un rango de fecha futura",
             ]);
-        } else {
-            return response()->json([
-                "error" => "Solo puede haber un ciclo activo",
-            ]); #
         }
     }
 
@@ -148,7 +174,7 @@ class CycleController extends Controller
             'year' => $data['year'],
             'start_date' => $data['start_date'],
             'end_date' => $data['end_date'],
-            'status' => $data['status'],
+            // 'status' => $data['status'],
         ]);
 
         CycleSubjectDetail::where('cycle_id', $data['id'])->delete();

@@ -118,7 +118,7 @@
               </v-col>
               <!-- end_date  -->
               <!-- status  -->
-              <v-col cols="12" sm="6" md="6">
+              <!-- <v-col cols="12" sm="6" md="6">
                 <base-select
                   label="Estado del ciclo"
                   :items="status"
@@ -127,9 +127,11 @@
                   v-model="v$.editedItem.status.$model"
                   :rules="v$.editedItem.status"
                 />
-              </v-col>
+              </v-col> -->
               <!-- status  -->
               <!-- school  -->
+            </v-row>
+            <v-row class="pt-0">
               <v-col cols="12" sm="6" md="6" v-if="editedIndex == -1">
                 <v-label>Escuela</v-label>
                 <base-select
@@ -158,7 +160,7 @@
             </v-row>
             <!-- Subject table -->
             <v-row>
-              <v-col align="center" cols="6" md="6" sm="6"
+              <v-col align="center" cols="12" md="6" sm="12"
                 ><v-data-table
                   v-if="editedIndex == -1"
                   v-model="this.editedItem.subjects"
@@ -175,7 +177,7 @@
               <v-col
                 align="center"
                 cols="12"
-                md="12"
+                md="6"
                 sm="12"
                 v-if="editedIndex != -1"
               >
@@ -206,9 +208,9 @@
               </v-col>
               <v-col
                 align="center"
-                cols="6"
+                cols="12"
                 md="6"
-                sm="6"
+                sm="12"
                 v-if="editedIndex == -1"
               >
                 <v-data-table
@@ -330,14 +332,14 @@ export default {
       subjects: [],
       loading: false,
       debounce: 0,
-      status: ["Activo", "Inactivo", "Finalizado"],
+      // status: ["Activo", "Inactivo", "Finalizado"],
       options: {},
       editedItem: {
         cycle_number: "",
         year: "",
         start_date: "",
         end_date: "",
-        status: "",
+        // status: "",
         school: "",
         pensum: "",
         subjects: [],
@@ -347,7 +349,7 @@ export default {
         year: "",
         start_date: "",
         end_date: "",
-        status: "",
+        // status: "",
         school: "",
         pensum: "",
         subjects: [],
@@ -409,13 +411,13 @@ export default {
         end_date: {
           required: helpers.withMessage(langMessages.required, required),
         },
-        status: {
-          required: helpers.withMessage(langMessages.required, required),
-          minLength: helpers.withMessage(
-            ({ $params }) => langMessages.minLength($params),
-            minLength(4)
-          ),
-        },
+        // status: {
+        //   required: helpers.withMessage(langMessages.required, required),
+        //   minLength: helpers.withMessage(
+        //     ({ $params }) => langMessages.minLength($params),
+        //     minLength(4)
+        //   ),
+        // },
         subjects: {
           required: helpers.withMessage(langMessages.required, required),
         },
