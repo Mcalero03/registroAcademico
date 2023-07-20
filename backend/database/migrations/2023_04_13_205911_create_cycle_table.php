@@ -19,7 +19,8 @@ return new class extends Migration
             $table->integer('year');
             $table->date('start_date');
             $table->date('end_date');
-            $table->string('status', 100)->comment('Creado', 'Abierto', 'En proceso', 'Finalizado',);
+            $table->string('status', 100)->comment('Activo', 'Inactivo', 'Finalizado',);
+            // $table->string('status', 255)->virtualAs(DB::raw("CASE WHEN event_date <= CURDATE() THEN 'Finalizado' ELSE 'Activo' END"));
             $table->softDeletes();
             $table->timestamps();
         });
