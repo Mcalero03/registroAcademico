@@ -160,7 +160,7 @@
             </v-row>
             <!-- Subject table -->
             <v-row>
-              <v-col align="center" cols="12" md="6" sm="12"
+              <v-col align="center" cols="12" md="12" sm="12"
                 ><v-data-table
                   v-if="editedIndex == -1"
                   v-model="this.editedItem.subjects"
@@ -177,7 +177,7 @@
               <v-col
                 align="center"
                 cols="12"
-                md="6"
+                md="12"
                 sm="12"
                 v-if="editedIndex != -1"
               >
@@ -209,7 +209,7 @@
               <v-col
                 align="center"
                 cols="12"
-                md="6"
+                md="12"
                 sm="12"
                 v-if="editedIndex == -1"
               >

@@ -126,7 +126,6 @@ class InscriptionController extends Controller
             'inscription_date' => $data['inscription_date'],
             'student_id' => $student_id,
             'pensum_id' => Pensum::where('program_name', $data['program_name'])->first()?->id,
-            'status' => $data['status'],
         ]);
 
         foreach ($data['inscriptions'] as $value) {
@@ -188,7 +187,7 @@ class InscriptionController extends Controller
             ->join('schedule', 'schedule_classroom_group_detail.schedule_id', '=', 'schedule.id')
             ->where('student.student_card', $card)
             ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
-            ->where('inscription_detail.status', 'Inscrito')
+            ->where('inscription_detail.status', 'not like', 'Retirado')
             ->whereNull('schedule_classroom_group_detail.deleted_at')
             ->whereNull('inscription_detail.deleted_at')
             ->orderByRaw("FIELD(schedule.week_day, 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo')")
@@ -209,7 +208,7 @@ class InscriptionController extends Controller
                 ->where('student.student_card', $card)
                 ->where('schedule.week_day', $day['week_day'])
                 ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
-                ->where('inscription_detail.status', 'Inscrito')
+                ->where('inscription_detail.status', 'not like', 'Retirado')
                 ->whereNull('inscription_detail.deleted_at')
                 ->whereNull('schedule_classroom_group_detail.deleted_at')
                 ->orderBy('schedule.start_time', 'asc')
