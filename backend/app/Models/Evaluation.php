@@ -32,7 +32,7 @@ class Evaluation extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Evaluation::select(DB::raw("CONCAT(teacher.name, ', ', teacher.last_name) as teacher_name"), 'evaluation.evaluation_name', 'evaluation.ponder', 'subject.subject_name', 'group.group_code', 'evaluation.id', 'school.school_name', 'inscription_detail.id as inscription_detail_id')
+        return Evaluation::select(DB::raw("CONCAT(teacher.name, ', ', teacher.last_name) as teacher_name"), 'evaluation.evaluation_name', 'evaluation.ponder', 'subject.subject_name', 'group.group_code', 'group.id as group_id', 'evaluation.id', 'school.school_name', 'inscription_detail.id as inscription_detail_id')
             ->join('calification', 'evaluation.id', '=', 'calification.evaluation_id')
             ->leftjoin('inscription_detail', 'calification.inscription_detail_id', '=', 'inscription_detail.id')
             ->leftjoin('group', 'inscription_detail.group_id', '=', 'group.id')

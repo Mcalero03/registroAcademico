@@ -102,25 +102,6 @@
                 />
               </v-col>
               <!-- cycle  -->
-              <!-- status  -->
-              <v-col
-                cols="4"
-                sm="4"
-                md="4"
-                class="p-0 m-0 pr-4 pb-4"
-                v-if="editedIndex != -1"
-              >
-                <v-label>Estado</v-label>
-                <base-select
-                  :items="status"
-                  item-title="status"
-                  item-value="status"
-                  v-model="v$.editedItem.status.$model"
-                  :rules="v$.editedItem.status"
-                  readonly
-                />
-              </v-col>
-              <!-- status  -->
               <v-col
                 cols="5"
                 sm="5"
@@ -152,6 +133,7 @@
               </v-col>
             </v-row>
             <v-row>
+              <!-- student_name  -->
               <v-col cols="12" sm="6" md="6" v-if="editedIndex == -1">
                 <v-label>Estudiante</v-label>
                 <base-input
@@ -639,7 +621,6 @@ export default {
         inscriptions: [],
         schedules: [],
         program_name: "",
-        status: "",
       },
       defaultItem: {
         inscription_date: this.getDate(),
@@ -648,7 +629,6 @@ export default {
         inscriptions: [],
         schedules: [],
         program_name: "",
-        status: "",
       },
       group: {
         group_code: "",
@@ -697,9 +677,6 @@ export default {
         },
         pensums: {},
         program_name: {
-          required: helpers.withMessage(langMessages.required, required),
-        },
-        status: {
           required: helpers.withMessage(langMessages.required, required),
         },
       },
@@ -1002,6 +979,7 @@ export default {
     },
 
     async save() {
+      console.log(this.editedItem);
       this.v$.$validate();
       if (this.v$.$invalid) {
         toast.warn("Verifique el ingreso de los grupos a inscribir.", {

@@ -57,11 +57,13 @@ class EvaluationController extends Controller
                 ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
                 ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
                 ->where('subject.subject_name', $item->subject_name)
-                // ->where('calification.inscription_detail_id', $item->inscription_detail_id).
+                ->where('evaluation.group_id', $item->group_id)
+                ->where('calification.inscription_detail_id', $item->inscription_detail_id)
                 ->whereNull('calification.deleted_at')
                 ->where('i.status', 'not like', 'Retirado')
                 ->where('cycle.status', 'Activo')
                 ->groupBy('subject.subject_name')
+                ->distinct()
                 ->get();
 
             $item->califications = Encrypt::encryptObject($item->califications, 'id');
@@ -292,7 +294,7 @@ class EvaluationController extends Controller
             ->orderby('student.last_name', 'asc')
             ->get();
 
-        $subjects = Inscription::select('group.group_code', 'subject.subject_name', 'i.id',)
+        $subjects = Inscription::select('group.group_code', 'group.id as group_id', 'subject.subject_name', 'i.id',)
             ->join('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
             ->join('group', 'i.group_id', '=', 'group.id')
             ->join('subject', 'group.subject_id', '=', 'subject.id')
@@ -327,7 +329,8 @@ class EvaluationController extends Controller
                 ->groupBy('evaluation.evaluation_name', 'evaluation.ponder', 'calification.score', 'subject.average_approval')
                 ->get();
 
-            $item->available_ponder = Inscription::select(DB::raw('ROUND(SUM((calification.score*evaluation.ponder)/100),2) as total_average, 100-SUM(evaluation.ponder) as total_ponder'))
+            $existing_califications =
+                Inscription::select('evaluation.*')
                 ->join('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
                 ->join('calification', 'i.id', '=', 'calification.inscription_detail_id')
                 ->join('evaluation', 'calification.evaluation_id', '=', 'evaluation.id')
@@ -343,7 +346,32 @@ class EvaluationController extends Controller
                 ->where('i.status', 'not like', 'Retirado')
                 ->where('cycle.status', 'Activo')
                 ->groupBy('subject.subject_name')
-                ->get();
+                ->exists();
+
+            if ($existing_califications == true) {
+                $item->available_ponder = Inscription::select(DB::raw('100-SUM(evaluation.ponder) as total_ponder'))
+                    ->join('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
+                    ->join('calification', 'i.id', '=', 'calification.inscription_detail_id')
+                    ->join('evaluation', 'calification.evaluation_id', '=', 'evaluation.id')
+                    ->join('group', 'i.group_id', '=', 'group.id')
+                    ->join('subject', 'group.subject_id', '=', 'subject.id')
+                    ->join('student', 'inscription.student_id', '=', 'student.id')
+                    ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+                    ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+                    ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
+                    ->where('subject.subject_name', $item->subject_name)
+                    ->where('evaluation.group_id', $item->group_id)
+                    ->where('calification.inscription_detail_id', $item->id)
+                    ->whereNull('calification.deleted_at')
+                    ->where('i.status', 'not like', 'Retirado')
+                    ->where('cycle.status', 'Activo')
+                    ->groupBy('subject.subject_name')
+                    ->get();
+            } else if ($existing_califications == false) {
+                $item->available_ponder =
+                    Inscription::select(DB::raw('100 as total_ponder'))
+                    ->get();
+            }
         }
         return response()->json([
             "message" => "Registro encontrado correctamente",
