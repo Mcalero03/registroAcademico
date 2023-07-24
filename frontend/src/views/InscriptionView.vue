@@ -979,7 +979,6 @@ export default {
     },
 
     async save() {
-      console.log(this.editedItem);
       this.v$.$validate();
       if (this.v$.$invalid) {
         toast.warn("Verifique el ingreso de los grupos a inscribir.", {
