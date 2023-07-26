@@ -146,9 +146,48 @@ class TeacherController extends Controller
         }
 
         return response()->json([
-            'message' => 'Registro eliminado correctamente.',
+            'message' => 'Registro obtenido correctamente.',
             'schedule' => $schedule,
 
+        ]);
+    }
+
+    public function showGroups($card)
+    {
+        $active_cycle = Cycle::where('cycle.status', 'Activo')->first()?->id;
+
+        $subjects = Teacher::select('subject.subject_name')
+            ->join('group', 'group.teacher_id', '=', 'teacher.id')
+            ->join('schedule_classroom_group_detail', 'schedule_classroom_group_detail.group_id', '=', 'group.id')
+            ->join('subject', 'subject.id', '=', 'group.subject_id')
+            ->where('teacher.teacher_card', $card)
+            ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
+            ->whereNull('schedule_classroom_group_detail.deleted_at')
+            ->orderBy('subject.subject_name', 'ASC')
+            ->distinct('subject.subject_name')
+            ->get();
+
+        $group = [];
+
+        foreach ($subjects as $subject) {
+            $group[$subject['subject_name']] = Teacher::select('group.group_code', 'schedule.*', 'classroom.classroom_name')
+                ->join('group', 'group.teacher_id', '=', 'teacher.id')
+                ->join('schedule_classroom_group_detail', 'schedule_classroom_group_detail.group_id', '=', 'group.id')
+                ->join('schedule', 'schedule.id', '=', 'schedule_classroom_group_detail.schedule_id')
+                ->join('classroom', 'classroom.id', '=', 'schedule_classroom_group_detail.classroom_id')
+                ->join('subject', 'subject.id', '=', 'group.subject_id')
+                ->where('teacher.teacher_card', $card)
+                ->where('subject.subject_name', $subject['subject_name'])
+                ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
+                ->whereNull('schedule_classroom_group_detail.deleted_at')
+                ->orderByRaw("FIELD(schedule.week_day, 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo')")
+                ->distinct('group.group_code')
+                ->get();
+        }
+
+        return response()->json([
+            'message' => 'Registro obtenido correctamente',
+            'group' => $group,
         ]);
     }
 }
