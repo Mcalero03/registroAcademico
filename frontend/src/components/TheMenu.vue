@@ -268,6 +268,11 @@ export default {
         url: "/teacherSchedule",
         icon: "mdi-details",
       },
+      {
+        title: "Grupos",
+        url: "/teacherSubject",
+        icon: "mdi-details",
+      },
     ],
     settings: [
       {
