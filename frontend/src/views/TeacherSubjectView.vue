@@ -60,72 +60,79 @@
           </v-col>
         </v-row>
 
-        <!-- groups -->
-        <v-timeline
-          side="end"
-          align="center"
-          direction="horizontal"
-          class="px-6"
-          truncate-line="start"
+        <!-- TABS -->
+        <v-tabs
+          v-model="tab"
+          color="deep-purple-accent-4"
+          align-tabs="center"
+          show-arrows
+          fixed-tabs
+          slider-color="deep-purple-accent-4"
         >
-          <v-timeline-item
-            max-height="100%"
-            min-height="100%"
-            dot-color="deep-purple-accent-4"
-            size="small"
+          <v-tab
             v-for="(group, index) in this.groups"
+            :key="index"
+            :value="index"
+            >{{ index }}</v-tab
+          >
+        </v-tabs>
+
+        <!-- CONTENIDO POR TAB -->
+        <v-window v-model="tab">
+          <v-window-item
+            v-for="(subjects, index) in this.groups"
             v-bind:index="index"
             :key="index"
+            :value="index"
           >
-            <template v-slot:opposite>
-              <p>{{ index }}</p>
-            </template>
-
-            <v-container fluid class="p-0">
-              <v-row>
-                <v-col
-                  cols="12"
-                  class="py-1 px-1"
-                  v-for="(subject, index) in group"
-                  :key="index"
-                >
+            <v-container fluid>
+              <v-row dense>
+                <v-col>
                   <v-card
-                    theme="dark"
-                    class="elevation-4"
-                    max-width="130px"
-                    min-width="130px"
-                    max-height="140px"
-                    min-height="150px"
-                    align="center"
                     id="card"
+                    class="mx-auto"
+                    max-width="440px"
+                    min-width="200"
+                    height="auto"
+                    theme="dark"
+                    :elevation="2"
                   >
-                    <div
-                      align="left"
-                      style="padding-left: 0.6rem; padding-top: 0.6rem"
-                    >
-                      {{ subject.week_day }}
-                    </div>
-                    <v-card-title
-                      style="font-size: 1rem; font-weight: bold"
-                      class="pb-0 px-0"
-                    >
-                      {{ subject.group_code }}</v-card-title
-                    >
                     <v-card-text>
-                      <strong class="me-4 text-primary">{{
-                        subject.start_time + " - " + subject.end_time
-                      }}</strong>
-                      <div>
-                        {{ subject.classroom_name }}
+                      <div class="mx-auto">
+                        <v-table
+                          style="
+                            background-color: white;
+                            color: black;
+                            border-radius: 0.4rem;
+                          "
+                          class="text-center"
+                        >
+                          <thead>
+                            <tr>
+                              <th>Grupo</th>
+                              <th>Cantidad de estudiantes</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              v-for="(subject, index) in subjects"
+                              v-bind:index="index"
+                              :key="index"
+                            >
+                              <td>{{ subject.group_code }}</td>
+                              <td>{{ subject.students_quantity }}</td>
+                            </tr>
+                          </tbody>
+                        </v-table>
                       </div>
                     </v-card-text>
                   </v-card>
                 </v-col>
               </v-row>
             </v-container>
-          </v-timeline-item>
-        </v-timeline>
-        <!-- groups -->
+          </v-window-item>
+        </v-window>
+        <!-- TABS -->
       </v-card>
     </v-container>
   </div>
@@ -133,7 +140,7 @@
 
 <style lang="scss">
 @import "@/assets/styles/variables.scss";
-@import "@/assets/styles/schedule.scss";
+// @import "@/assets/styles/schedule.scss";
 
 #card,
 p {
@@ -181,6 +188,7 @@ export default {
       search: "",
       searchTeacher: "",
       total: 0,
+      tab: this.groups,
       pensums: [],
       groups: [],
       time: [],
@@ -263,8 +271,6 @@ export default {
         });
 
       this.groups = data.group;
-
-      console.log(this.groups);
     },
 
     async initialize() {
