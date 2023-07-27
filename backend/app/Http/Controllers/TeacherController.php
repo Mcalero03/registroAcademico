@@ -170,17 +170,16 @@ class TeacherController extends Controller
         $group = [];
 
         foreach ($subjects as $subject) {
-            $group[$subject['subject_name']] = Teacher::select('group.group_code', 'schedule.*', 'classroom.classroom_name')
+            $group[$subject['subject_name']] = Teacher::select('group.group_code', 'classroom.classroom_name', 'group.students_quantity')
                 ->join('group', 'group.teacher_id', '=', 'teacher.id')
                 ->join('schedule_classroom_group_detail', 'schedule_classroom_group_detail.group_id', '=', 'group.id')
-                ->join('schedule', 'schedule.id', '=', 'schedule_classroom_group_detail.schedule_id')
                 ->join('classroom', 'classroom.id', '=', 'schedule_classroom_group_detail.classroom_id')
                 ->join('subject', 'subject.id', '=', 'group.subject_id')
                 ->where('teacher.teacher_card', $card)
                 ->where('subject.subject_name', $subject['subject_name'])
                 ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
                 ->whereNull('schedule_classroom_group_detail.deleted_at')
-                ->orderByRaw("FIELD(schedule.week_day, 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo')")
+                ->whereNull('group.deleted_at')
                 ->distinct('group.group_code')
                 ->get();
         }

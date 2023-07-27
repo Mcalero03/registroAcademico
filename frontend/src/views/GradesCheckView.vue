@@ -128,8 +128,9 @@
                             color: black;
                             border-radius: 0.4rem;
                           "
+                          class="text-center"
                         >
-                          <thead class="text-center">
+                          <thead>
                             <tr>
                               <th>Evaluación</th>
                               <th>Ponderación</th>
