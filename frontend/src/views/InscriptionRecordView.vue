@@ -220,11 +220,9 @@ export default {
       options: {},
       editedItem: {
         full_name: "",
-        // program_name: "",
       },
       defaultItem: {
         full_name: "",
-        // program_name: "",
       },
     };
   },
@@ -247,49 +245,11 @@ export default {
         full_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
-        // program_name: {
-        //   required: helpers.withMessage(langMessages.required, required),
-        // },
       },
     };
   },
 
   methods: {
-    // async showPrograms() {
-    //   const { data } = await evaluationApi
-    //     .get("/showPrograms/" + this.searchStudent)
-    //     .catch((error) => {
-    //       toast.error("No fue posible obtener la información.", {
-    //         autoClose: 2000,
-    //         position: toast.POSITION.TOP_CENTER,
-    //         multiple: false,
-    //       });
-    //     });
-
-    //   this.pensums = data.programs;
-    // },
-
-    // async showInscriptions() {
-    //   if (this.searchStudent != "" && this.editedItem.program_name != "") {
-    //     const { data } = await inscriptionApi
-    //       .get(
-    //         "/showInscriptions/" +
-    //           this.searchStudent +
-    //           "/" +
-    //           this.editedItem.program_name
-    //       )
-    //       .catch((error) => {
-    //         toast.error("No fue posible obtener la información.", {
-    //           autoClose: 2000,
-    //           position: toast.POSITION.TOP_CENTER,
-    //           multiple: false,
-    //         });
-    //       });
-
-    //     this.inscriptions = data.inscription;
-    //   }
-    // },
-
     async showInscriptions() {
       if (this.searchStudent != "") {
         const { data } = await inscriptionApi
@@ -336,22 +296,11 @@ export default {
       this.loading = true;
       this.records = [];
 
-      let requests = [
-        this.getDataFromApi(),
-        // schoolApi.get(null, {
-        //   params: {
-        //     itemsPerPage: -1,
-        //   },
-        // }),
-      ];
+      let requests = [this.getDataFromApi()];
 
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
       });
-
-      // if (responses) {
-      //   this.schools = responses[1].data.data;
-      // }
 
       this.loading = false;
     },
