@@ -35,20 +35,6 @@
             />
           </v-col>
           <!-- full_name  -->
-          <!-- program_name -->
-          <v-col cols="12" sm="12" md="6">
-            <base-select
-              label="Carreras"
-              :items="pensums"
-              item-title="program_name"
-              item-value="program_name"
-              v-model="v$.editedItem.program_name.$model"
-              :rules="v$.editedItem.program_name"
-              @blur="showCalification"
-            >
-            </base-select>
-          </v-col>
-          <!-- program_name -->
         </v-row>
 
         <!-- TABS -->
@@ -59,65 +45,68 @@
           show-arrows
           fixed-tabs
           slider-color="deep-purple-accent-4"
-          v-if="this.editedItem.program_name != ''"
         >
-          <v-tab :value="this.editedItem.program_name">{{
-            this.editedItem.program_name
-          }}</v-tab>
+          <v-tab
+            v-for="(program, index) in this.pensums"
+            :key="index"
+            :value="index"
+            >{{ index }}</v-tab
+          >
         </v-tabs>
 
         <!-- CONTENIDO POR TAB -->
         <v-window v-model="tab">
-          <v-window-item :value="this.editedItem.program_name">
+          <v-window-item
+            v-for="(program, index) in this.pensums"
+            :key="index"
+            :value="index"
+          >
             <v-container fluid>
-              <v-row
-                dense
-                class="p-3 mt-3"
-                v-if="
-                  this.califications == '' && this.editedItem.program_name != ''
-                "
-              >
+              <v-row class="p-3 mt-3" v-if="program.length == 0">
                 <v-col>
                   <v-card
-                    id="card"
+                    id="message-card"
                     class="mx-auto"
-                    max-width="440"
-                    min-width="200"
-                    height="auto"
+                    max-width="440px"
+                    min-width="200px"
                     theme="dark"
+                    height="auto"
                     :elevation="2"
                   >
                     <v-card-text>
                       <p class="text-center p-4">
-                        No hay materias inscritas en esta carrera
+                        No se han ingresado calificaciones
                       </p>
                     </v-card-text>
                   </v-card>
                 </v-col>
               </v-row>
-              <v-row dense class="p-3 mt-3" v-if="this.califications != ''">
+              <v-row class="p-3 mt-3" v-if="program.length != 0">
                 <v-col
-                  v-for="(evaluation, index) in califications"
-                  v-bind:index="index"
+                  cols="12"
+                  sm="12"
+                  md="12"
+                  lg="6"
+                  v-for="(subject, index) in program"
                   :key="index"
+                  :value="index"
                 >
                   <v-card
                     id="card"
                     class="mx-auto"
-                    max-width="440"
-                    min-width="200"
+                    max-width="440px"
+                    min-width="200px"
                     height="auto"
                     theme="dark"
                     :elevation="2"
                   >
                     <v-card-text class="pb-0">
                       <p align="right">
-                        {{ evaluation.status }}
+                        {{ subject.status }}
                       </p>
-
-                      <p align="left">Materia: {{ evaluation.subject_name }}</p>
+                      <p align="left">Materia: {{ subject.subject_name }}</p>
                       <p align="left" class="text-primary">
-                        Grupo: {{ evaluation.group_code }}
+                        Grupo: {{ subject.group_code }}
                       </p>
                     </v-card-text>
                     <v-card-text>
@@ -140,7 +129,7 @@
                           </thead>
                           <tbody>
                             <tr
-                              v-for="(score, index) in evaluation.califications"
+                              v-for="(score, index) in subject.califications"
                               v-bind:index="index"
                               :key="index"
                             >
@@ -150,7 +139,7 @@
                               <td v-text="score.final_average"></td>
                             </tr>
                             <tr
-                              v-for="(total, index) in evaluation.result"
+                              v-for="(total, index) in subject.result"
                               v-bind:index="index"
                               :key="index"
                             >
@@ -159,7 +148,7 @@
                               <td style="font-weight: bold">Promedio</td>
                               <td v-text="total.total_average"></td>
                             </tr>
-                            <tr v-if="evaluation.califications.length == 0">
+                            <tr v-if="subject.califications.length == 0">
                               <td colspan="5" class="text-center pt-3">
                                 <p style="color: #ff7e43">
                                   No se han ingresado calificaciones
@@ -195,7 +184,8 @@ th {
   font-weight: bold !important;
 }
 
-#card {
+#card,
+#message-card {
   background-color: $menu-color;
 }
 
@@ -239,17 +229,14 @@ export default {
       searchStudent: "",
       total: 0,
       pensums: [],
-      califications: [],
       loading: false,
       debounce: 0,
       options: {},
       editedItem: {
         full_name: "",
-        program_name: "",
       },
       defaultItem: {
         full_name: "",
-        program_name: "",
       },
     };
   },
@@ -272,9 +259,6 @@ export default {
         full_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
-        program_name: {
-          required: helpers.withMessage(langMessages.required, required),
-        },
       },
     };
   },
@@ -292,29 +276,6 @@ export default {
         });
 
       this.pensums = data.program;
-    },
-
-    async showCalification() {
-      if (this.searchStudent != "" && this.editedItem.program_name != "") {
-        this.califications = "";
-
-        const { data } = await evaluationApi
-          .get(
-            "/showCalification/" +
-              this.searchStudent +
-              "/" +
-              this.editedItem.program_name
-          )
-          .catch((error) => {
-            toast.error("No fue posible obtener la información.", {
-              autoClose: 2000,
-              position: toast.POSITION.TOP_CENTER,
-              multiple: false,
-            });
-          });
-
-        this.califications = data.calification;
-      }
     },
 
     async searchStudentCard() {
