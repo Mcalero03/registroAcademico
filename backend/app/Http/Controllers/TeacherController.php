@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use Encrypt;
 use App\Models\School;
 use App\Models\Cycle;
+use App\Models\InscriptionDetail;
 use App\Models\Schedule;
+use Illuminate\Support\Facades\DB;
 
 class TeacherController extends Controller
 {
@@ -168,20 +170,31 @@ class TeacherController extends Controller
             ->get();
 
         $group = [];
-
         foreach ($subjects as $subject) {
-            $group[$subject['subject_name']] = Teacher::select('group.group_code', 'classroom.classroom_name', 'group.students_quantity')
+            $group[$subject['subject_name']] = Teacher::select(
+                'group.group_code',
+                'group.id as group_id',
+                'group.students_quantity',
+            )
                 ->join('group', 'group.teacher_id', '=', 'teacher.id')
                 ->join('schedule_classroom_group_detail', 'schedule_classroom_group_detail.group_id', '=', 'group.id')
-                ->join('classroom', 'classroom.id', '=', 'schedule_classroom_group_detail.classroom_id')
                 ->join('subject', 'subject.id', '=', 'group.subject_id')
                 ->where('teacher.teacher_card', $card)
                 ->where('subject.subject_name', $subject['subject_name'])
                 ->where('schedule_classroom_group_detail.cycle_id', $active_cycle)
                 ->whereNull('schedule_classroom_group_detail.deleted_at')
                 ->whereNull('group.deleted_at')
+                ->groupBy('group.group_code', 'group.id', 'group.students_quantity')
                 ->distinct('group.group_code')
                 ->get();
+
+            foreach ($group[$subject['subject_name']] as $groupItem) {
+                $groupItem->enrolledStudents = InscriptionDetail::select(DB::raw('count(inscription_detail.id) as enrolled_students'))
+                    ->join('group', 'group.id', '=', 'inscription_detail.group_id')
+                    ->whereNull('inscription_detail.deleted_at')
+                    ->where('group.id', $groupItem->group_id)
+                    ->get();
+            }
         }
 
         return response()->json([
