@@ -273,7 +273,7 @@ export default {
           });
         });
 
-      this.pensums = data.program;
+      this.pensums = data.programs;
     },
 
     async showInscriptions() {

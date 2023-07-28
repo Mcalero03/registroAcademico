@@ -382,7 +382,7 @@ class EvaluationController extends Controller
 
     public function showPrograms($card)
     {
-        $program = Inscription::select('pensum.program_name',)
+        $programs = Inscription::select('pensum.program_name',)
             ->join('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
             ->join('student', 'inscription.student_id', '=', 'student.id')
             ->join('student_pensum_detail', 'student.id', '=', 'student_pensum_detail.student_id')
@@ -395,30 +395,23 @@ class EvaluationController extends Controller
             ->distinct()
             ->get();
 
-        return response()->json([
-            "message" => "Registro encontrado correctamente",
-            "program" => $program
-        ]);
-    }
+        foreach ($programs as $program) {
+            $subjects[$program['program_name']] = Inscription::select('group.group_code', 'subject.subject_name', 'i.id', 'i.status', 'pensum.program_name')
+                ->join('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
+                ->join('group', 'i.group_id', '=', 'group.id')
+                ->join('subject', 'group.subject_id', '=', 'subject.id')
+                ->join('student', 'inscription.student_id', '=', 'student.id')
+                ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+                ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+                ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
+                ->where('student.student_card', $card)
+                ->where('pensum.program_name', $program['program_name'])
+                ->where('cycle.status', 'Activo')
+                ->distinct()
+                ->get();
+        }
 
-    public function showCalification($card, $program)
-    {
-        $subjects = Inscription::select('group.group_code', 'subject.subject_name', 'i.id', 'i.status')
-            ->join('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
-            ->join('group', 'i.group_id', '=', 'group.id')
-            ->join('subject', 'group.subject_id', '=', 'subject.id')
-            ->join('student', 'inscription.student_id', '=', 'student.id')
-            ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
-            ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
-            ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
-            ->where('student.student_card', $card)
-            ->where('pensum.program_name', $program)
-            // ->where('inscription.status', 'not like', 'Retirado')
-            ->where('cycle.status', 'Activo')
-            ->distinct()
-            ->get();
-
-        foreach ($subjects as $item) {
+        foreach ($subjects[$program['program_name']] as $item) {
             $item->califications = Inscription::select('evaluation.evaluation_name', 'evaluation.ponder', 'calification.score', 'subject.average_approval',)
                 ->join('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
                 ->join('calification', 'i.id', '=', 'calification.inscription_detail_id')
@@ -430,15 +423,13 @@ class EvaluationController extends Controller
                 ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
                 ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
                 ->where('student.student_card', $card)
-                ->where('pensum.program_name', $program)
+                ->where('pensum.program_name', $item->program_name)
                 ->where('subject.subject_name', $item->subject_name)
                 ->where('calification.inscription_detail_id', $item->id)
-                // ->where('inscription.status', 'not like', 'Retirado')
                 ->where('cycle.status', 'Activo')
                 ->whereNull('calification.deleted_at')
                 ->selectRaw('ROUND((calification.score * evaluation.ponder)/100, 2) as final_average')
                 ->orderBy('evaluation.evaluation_name', 'asc')
-                ->groupBy('evaluation.evaluation_name', 'evaluation.ponder', 'calification.score', 'subject.average_approval')
                 ->get();
 
             $item->result = Inscription::select(DB::raw('ROUND(SUM((calification.score*evaluation.ponder)/100),2) as total_average, SUM(evaluation.ponder) as total_ponder'))
@@ -452,11 +443,10 @@ class EvaluationController extends Controller
                 ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
                 ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
                 ->where('student.student_card', $card)
-                ->where('pensum.program_name', $program)
+                ->where('pensum.program_name', $item->program_name)
                 ->where('subject.subject_name', $item->subject_name)
                 ->where('calification.inscription_detail_id', $item->id)
                 ->whereNull('calification.deleted_at')
-                // ->where('inscription.status', 'not like', 'Retirado')
                 ->where('cycle.status', 'Activo')
                 ->groupBy('subject.subject_name')
                 ->get();
@@ -464,7 +454,8 @@ class EvaluationController extends Controller
 
         return response()->json([
             "message" => "Registro encontrado correctamente",
-            "calification" => $subjects,
+            "program" => $subjects,
+            "programs" => $programs,
         ]);
     }
 }
