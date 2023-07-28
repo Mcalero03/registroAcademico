@@ -240,28 +240,45 @@ class InscriptionController extends Controller
         ]);
     }
 
-    public function showInscriptions($card, $program)
+    public function showInscriptions($card)
     {
-        $inscription = Inscription::select(
-            DB::raw("CONCAT(cycle.cycle_number, '-', cycle.year) AS cycle"),
-            'inscription.status AS inscription_status',
-            'inscription.id AS inscription_id'
-        )
-            ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
+        $programs = Inscription::select('pensum.program_name',)
+            ->join('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
             ->join('student', 'inscription.student_id', '=', 'student.id')
-            ->leftJoin('inscription_detail', 'inscription.id', '=', 'inscription_detail.inscription_id')
-            ->leftJoin('group', 'group.id', '=', 'inscription_detail.group_id')
-            ->leftJoin('subject', 'group.subject_id', '=', 'subject.id')
-            ->leftJoin('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
-            ->leftJoin('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+            ->join('student_pensum_detail', 'student.id', '=', 'student_pensum_detail.student_id')
+            ->join('pensum', 'student_pensum_detail.pensum_id', '=', 'pensum.id')
+            ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
             ->where('student.student_card', $card)
-            ->where('pensum.program_name', $program)
-            ->whereNull('inscription.deleted_at')
+            ->where('student_pensum_detail.status', 'not like', 'Retirado')
             ->where('cycle.status', 'Activo')
+            ->whereNull('student_pensum_detail.deleted_at')
             ->distinct()
             ->get();
 
-        foreach ($inscription as $item) {
+        foreach ($programs as $program) {
+            $inscription[$program['program_name']] = Inscription::select(
+                DB::raw("CONCAT(cycle.cycle_number, '-', cycle.year) AS cycle"),
+                'inscription.status AS inscription_status',
+                'inscription.id AS inscription_id',
+                'pensum.program_name'
+            )
+                ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
+                ->join('student', 'inscription.student_id', '=', 'student.id')
+                ->leftJoin('inscription_detail', 'inscription.id', '=', 'inscription_detail.inscription_id')
+                ->leftJoin('group', 'group.id', '=', 'inscription_detail.group_id')
+                ->leftJoin('subject', 'group.subject_id', '=', 'subject.id')
+                ->leftJoin('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+                ->leftJoin('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+                ->where('student.student_card', $card)
+                ->where('pensum.program_name', $program['program_name'])
+                ->whereNull('inscription.deleted_at')
+                ->where('cycle.status', 'Activo')
+                ->distinct()
+                ->get();
+        }
+
+
+        foreach ($inscription[$program['program_name']] as $item) {
             $item->subjects = Inscription::select(DB::raw("CONCAT(teacher.name, ', ', teacher.last_name) as full_name"), 'inscription_detail.status as inscription_detail_status', 'subject.subject_name', 'group.group_code', 'teacher.mail', 'inscription.id')
                 ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
                 ->join('student', 'inscription.student_id', '=', 'student.id')
@@ -273,7 +290,7 @@ class InscriptionController extends Controller
                 ->leftjoin('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
                 ->where('inscription_detail.inscription_id', $item->inscription_id)
                 ->where('student.student_card', $card)
-                ->where('pensum.program_name', $program)
+                ->where('pensum.program_name', $item->program_name)
                 ->whereNull('inscription_detail.deleted_at')
                 ->where('cycle.status', 'Activo')
                 ->get();

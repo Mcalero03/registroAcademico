@@ -22,7 +22,7 @@
             <base-button
               type="primary"
               title="Buscar"
-              @click="searchStudentCard() && showPrograms()"
+              @click="searchStudentCard() && showInscriptions()"
             />
           </v-col>
           <!-- full_name  -->
@@ -35,20 +35,6 @@
             />
           </v-col>
           <!-- full_name  -->
-          <!-- program_name -->
-          <v-col cols="12" sm="12" md="6">
-            <base-select
-              label="Carreras"
-              :items="pensums"
-              item-title="program_name"
-              item-value="program_name"
-              v-model="v$.editedItem.program_name.$model"
-              :rules="v$.editedItem.program_name"
-              @blur="showInscriptions"
-            >
-            </base-select>
-          </v-col>
-          <!-- program_name -->
         </v-row>
 
         <!-- TABS -->
@@ -59,27 +45,29 @@
           show-arrows
           fixed-tabs
           slider-color="deep-purple-accent-4"
-          v-if="this.editedItem.program_name != ''"
         >
-          <v-tab :value="this.editedItem.program_name">{{
-            this.editedItem.program_name
-          }}</v-tab>
+          <v-tab
+            v-for="(subject, index) in inscriptions"
+            v-bind:index="index"
+            :key="index"
+            :value="index"
+            >{{ index }}</v-tab
+          >
         </v-tabs>
 
         <!-- CONTENIDO POR TAB -->
         <v-window v-model="tab">
-          <v-window-item :value="this.editedItem.program_name">
+          <v-window-item
+            v-for="(subject, index) in inscriptions"
+            v-bind:index="index"
+            :key="index"
+            :value="index"
+          >
             <v-container fluid>
-              <v-row
-                dense
-                class="p-3 mt-3"
-                v-if="
-                  this.inscriptions == '' && this.editedItem.program_name != ''
-                "
-              >
+              <v-row dense class="p-3 mt-3" v-if="subject.length == 0">
                 <v-col>
                   <v-card
-                    id="card"
+                    id="message-card"
                     class="mx-auto"
                     max-width="440"
                     min-width="200"
@@ -95,9 +83,9 @@
                   </v-card>
                 </v-col>
               </v-row>
-              <v-row dense class="p-3 mt-3" v-if="this.inscriptions != ''">
+              <v-row dense class="p-3 mt-3" v-if="subject.length != 0">
                 <v-col
-                  v-for="(subject, index) in inscriptions"
+                  v-for="(inscription, index) in subject"
                   v-bind:index="index"
                   :key="index"
                 >
@@ -111,9 +99,9 @@
                     :elevation="2"
                   >
                     <v-card-text class="pb-0">
-                      <p>Ciclo: {{ subject.cycle }}</p>
+                      <p>Ciclo: {{ inscription.cycle }}</p>
                       <p class="text-primary">
-                        Estado: {{ subject.inscription_status }}
+                        Estado: {{ inscription.inscription_status }}
                       </p>
                     </v-card-text>
                     <v-card-text>
@@ -136,16 +124,20 @@
                           </thead>
                           <tbody>
                             <tr
-                              v-for="(inscription, index) in subject.subjects"
+                              v-for="(
+                                inscription_detail, index
+                              ) in inscription.subjects"
                               v-bind:index="index"
                               :key="index"
                             >
-                              <td v-text="inscription.subject_name"></td>
-                              <td v-text="inscription.group_code"></td>
-                              <td v-text="inscription.full_name"></td>
-                              <td v-text="inscription.mail"></td>
+                              <td v-text="inscription_detail.subject_name"></td>
+                              <td v-text="inscription_detail.group_code"></td>
+                              <td v-text="inscription_detail.full_name"></td>
+                              <td v-text="inscription_detail.mail"></td>
                               <td
-                                v-text="inscription.inscription_detail_status"
+                                v-text="
+                                  inscription_detail.inscription_detail_status
+                                "
                               ></td>
                             </tr>
                           </tbody>
@@ -177,7 +169,8 @@ th {
   font-weight: bold !important;
 }
 
-#card {
+#card,
+#message-card {
   background-color: $menu-color;
 }
 
@@ -227,11 +220,9 @@ export default {
       options: {},
       editedItem: {
         full_name: "",
-        program_name: "",
       },
       defaultItem: {
         full_name: "",
-        program_name: "",
       },
     };
   },
@@ -254,37 +245,15 @@ export default {
         full_name: {
           required: helpers.withMessage(langMessages.required, required),
         },
-        program_name: {
-          required: helpers.withMessage(langMessages.required, required),
-        },
       },
     };
   },
 
   methods: {
-    async showPrograms() {
-      const { data } = await evaluationApi
-        .get("/showPrograms/" + this.searchStudent)
-        .catch((error) => {
-          toast.error("No fue posible obtener la información.", {
-            autoClose: 2000,
-            position: toast.POSITION.TOP_CENTER,
-            multiple: false,
-          });
-        });
-
-      this.pensums = data.programs;
-    },
-
     async showInscriptions() {
-      if (this.searchStudent != "" && this.editedItem.program_name != "") {
+      if (this.searchStudent != "") {
         const { data } = await inscriptionApi
-          .get(
-            "/showInscriptions/" +
-              this.searchStudent +
-              "/" +
-              this.editedItem.program_name
-          )
+          .get("/showInscriptions/" + this.searchStudent)
           .catch((error) => {
             toast.error("No fue posible obtener la información.", {
               autoClose: 2000,
@@ -327,22 +296,11 @@ export default {
       this.loading = true;
       this.records = [];
 
-      let requests = [
-        this.getDataFromApi(),
-        // schoolApi.get(null, {
-        //   params: {
-        //     itemsPerPage: -1,
-        //   },
-        // }),
-      ];
+      let requests = [this.getDataFromApi()];
 
       const responses = await Promise.all(requests).catch((error) => {
         alert.error("No fue posible obtener el registro.");
       });
-
-      // if (responses) {
-      //   this.schools = responses[1].data.data;
-      // }
 
       this.loading = false;
     },
