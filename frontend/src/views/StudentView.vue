@@ -188,7 +188,7 @@
             <!-- municipality_name  -->
 
             <!-- relative -->
-            <v-row align="center" justify="center">
+            <v-row class="d-flex justify-content-end">
               <v-col cols="auto" class="pt-5 pb-5 mt-2">
                 <base-button
                   type="secondary"
@@ -196,17 +196,8 @@
                   @click="addRelative()"
                 />
               </v-col>
-              <!-- relative -->
-              <!-- career -->
-              <v-col cols="auto" class="pt-5 pb-5 mt-2">
-                <base-button
-                  type="secondary"
-                  title="Agregar carrera"
-                  @click="addCareer()"
-                />
-              </v-col>
             </v-row>
-            <!-- career -->
+            <!-- relative -->
             <!-- Relative Table -->
             <v-row>
               <v-col align="center" cols="12" md="12" sm="12" class="pt-4">
@@ -345,6 +336,17 @@
                 <!-- Modal -->
               </v-col>
               <!-- Relative Table -->
+              <!-- career -->
+              <v-row class="d-flex justify-content-end">
+                <v-col cols="auto" class="pt-5 pb-5 mt-2 pr-6">
+                  <base-button
+                    type="secondary"
+                    title="Agregar carrera"
+                    @click="addCareer()"
+                  />
+                </v-col>
+              </v-row>
+              <!-- career -->
               <!-- Career Table -->
               <v-col align="center" cols="12" md="12" sm="12" class="pt-4">
                 <div class="table table-responsive">
