@@ -7,7 +7,7 @@
     //cambia el padding alrededor del texto y lo centra
     .v-timeline--horizontal p {
         padding-top: 2em;
-        margin-inline-start: 30%;
+        margin-inline-start: 40%;
     }
 
     //Mueve el texto con el divider a la parte superior
@@ -23,7 +23,7 @@
     //Dimensiones del contenedor de los cards
     .v-timeline-item__body {
         max-width: 300px !important;
-        min-width: 120px !important;
+        min-width: 200px !important;
         padding: 0 !important;
     }
 
@@ -60,7 +60,7 @@
     //Dimensiones del contenedor de los cards
     .v-timeline-item__body {
         max-width: 130px !important;
-        min-width: 130px !important;
+        min-width: 200px !important;
         padding: 0 !important;
     }
 
@@ -72,8 +72,8 @@
     //Dimensiones del card
     #card {
         max-width: 100% !important;
-        min-width: 130px !important;
+        min-width: 200px !important;
         max-height: 140px !important;
-        min-height: 150px !important;
+        min-height: 130px !important;
     }
 }

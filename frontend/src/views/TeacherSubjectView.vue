@@ -110,7 +110,8 @@
                           <thead>
                             <tr>
                               <th>Grupo</th>
-                              <th>Cantidad de estudiantes</th>
+                              <th>Estudiantes inscritos</th>
+                              <th>Límite de estudiantes</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -120,6 +121,15 @@
                               :key="index"
                             >
                               <td>{{ subject.group_code }}</td>
+                              <td
+                                v-for="(
+                                  student, index
+                                ) in subject.enrolledStudents"
+                                v-bind:index="index"
+                                :key="index"
+                              >
+                                {{ student.enrolled_students }}
+                              </td>
                               <td>{{ subject.students_quantity }}</td>
                             </tr>
                           </tbody>
@@ -140,7 +150,6 @@
 
 <style lang="scss">
 @import "@/assets/styles/variables.scss";
-// @import "@/assets/styles/schedule.scss";
 
 #card,
 p {
