@@ -95,23 +95,48 @@
                     theme="dark"
                     :elevation="2"
                   >
-                    <v-card-text
-                      class="pb-0"
-                      v-for="(merit, index) in this.merit_unit &&
-                      unit in this.units_value"
-                      v-bind:index="index"
-                      :key="index"
-                      :value="index"
-                    >
-                      <p v-if="index == index1">
-                        CUM:
-                        <!-- {{ (info.merit_unit / info.unit_value).toFixed(2) }} -->
-                        {{ merit[0] }}
-                      </p>
-                      <p class="text-primary">Aprobadas: {{ unit[0] }}</p>
-                      <p class="text-primary">
-                        <!-- Reprobadas: {{ this.failedInscription }} -->
-                      </p>
+                    <v-card-text class="pb-0">
+                      <div
+                        v-for="(merit, index) in this.merit_unit"
+                        v-bind:index="index"
+                        :key="index"
+                        :value="index"
+                      >
+                          <p v-if="index == index1">
+
+                        <div
+                          v-for="(unit, index) in this.units_value"
+                          v-bind:index="index"
+                          :key="index"
+                          :value="index"
+                        >
+                          <p v-if="index == index1 && merit[0]!=null">
+                            CUM:
+                            {{ (merit[0] / unit[0]).toFixed(2) }}
+                          </p>
+                        </div>
+                          </p>
+                      </div>
+                      <div
+                        v-for="(approved, index) in this.approvedInscription"
+                        v-bind:index="index"
+                        :key="index"
+                        :value="index"
+                      >
+                        <p class="text-primary" v-if="index == index1">
+                          Aprobadas: {{ approved[0] }}
+                        </p>
+                      </div>
+                      <div
+                        v-for="(failed, index) in this.failedInscription"
+                        v-bind:index="index"
+                        :key="index"
+                        :value="index"
+                      >
+                        <p class="text-primary" v-if="index == index1">
+                          Reprobadas: {{ failed[0] }}
+                        </p>
+                      </div>
                     </v-card-text>
                     <v-card-text>
                       <div class="mx-auto">
@@ -282,8 +307,8 @@ export default {
         this.inscriptions = data.inscription;
         this.merit_unit = data.merit_unit;
         this.units_value = data.units_value;
-        // this.approvedInscription = data.approvedInscription;
-        // this.failedInscription = data.failedInscription;
+        this.approvedInscription = data.approvedInscription;
+        this.failedInscription = data.failedInscription;
       }
     },
 
