@@ -579,7 +579,6 @@ class InscriptionController extends Controller
                 ->where('student.student_card', $card)
                 ->where('pensum.program_name', $program->program_name)
                 ->where('inscription_detail.status', 'Aprobado')
-                ->whereNull('pensum_subject_detail.deleted_at')
                 ->whereNull('evaluation.deleted_at')
                 ->whereNull('calification.deleted_at')
                 ->pluck('merit_unit');
@@ -640,7 +639,7 @@ class InscriptionController extends Controller
             'message' => 'Registro obtenido correctamente.',
             'inscription' => $inscription,
             'merit_unit' => $merit_unit,
-            // 'units_value' => $unit_value,
+            'units_value' => $unit_value,
             'approvedInscription' => $approvedInscription,
             'failedInscription' => $failedInscription,
         ]);
