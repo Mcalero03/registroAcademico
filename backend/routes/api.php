@@ -105,6 +105,7 @@ Route::get('/inscription/showSchedules/{inscription}', [InscriptionController::c
 Route::get('/inscription/schedules/{card}', [InscriptionController::class, 'schedules']);
 Route::get('/inscription/showCareers/{student}', [InscriptionController::class, 'showCareers']);
 Route::get('/inscription/showInscriptions/{card}', [InscriptionController::class, 'showInscriptions']);
+Route::get('/inscription/showGeneralInscriptions/{card}', [InscriptionController::class, 'showGeneralInscriptions']);
 Route::get('/inscription/availableSubjects/{student}/{pensum}/{cycle}', [InscriptionController::class, 'availableSubjects']);
 
 //ATTENDANCE

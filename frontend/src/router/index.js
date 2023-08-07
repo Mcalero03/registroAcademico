@@ -171,6 +171,12 @@ const router = createRouter({
       meta: { requiresAuth: true } // add meta field to specify the route
     },
     {
+      path: '/generalExpedient',
+      name: 'generalExpedient',
+      component: () => import("../views/GeneralExpedientView.vue"),
+      meta: { requiresAuth: true } // add meta field to specify the route
+    },
+    {
       path: "/:pathMatch(.*)*",
       name: "NotFound",
       component: NotFoundView,
