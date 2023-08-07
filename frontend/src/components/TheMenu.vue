@@ -242,6 +242,11 @@ export default {
     ],
     student: [
       {
+        title: "Expediente General",
+        url: "/generalExpedient",
+        icon: "mdi-details",
+      },
+      {
         title: "Pensum",
         url: "/pensumSubjectDetail",
         icon: "mdi-details",

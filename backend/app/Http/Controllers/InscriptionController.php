@@ -9,7 +9,8 @@ use App\Models\Group;
 use App\Models\InscriptionDetail;
 use App\Models\Student;
 use App\Models\Pensum;
-use DB;
+use App\Models\Subject;
+use Illuminate\Support\Facades\DB;
 use Encrypt;
 
 class InscriptionController extends Controller
@@ -502,7 +503,6 @@ class InscriptionController extends Controller
                     ->whereIn('group.subject_id', $subject_id)
                     ->where('schedule_classroom_group_detail.cycle_id', $cycle_id)
                     ->whereNull('schedule_classroom_group_detail.deleted_at')
-
                     ->get();
 
                 $selectGroup = Group::select('group.group_code')
@@ -511,8 +511,6 @@ class InscriptionController extends Controller
                     ->whereNull('schedule_classroom_group_detail.deleted_at')
                     ->whereIn('group.subject_id', $subject_id)
                     ->groupBy('schedule_classroom_group_detail.group_id')
-
-
                     ->get();
 
                 return response()->json([
@@ -528,5 +526,123 @@ class InscriptionController extends Controller
                 'groups' => 'Registrado',
             ]);
         }
+    }
+
+    public function showGeneralInscriptions($card)
+    {
+        $programs = Inscription::select('pensum.program_name',)
+            ->join('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
+            ->join('student', 'inscription.student_id', '=', 'student.id')
+            ->join('student_pensum_detail', 'student.id', '=', 'student_pensum_detail.student_id')
+            ->join('pensum', 'student_pensum_detail.pensum_id', '=', 'pensum.id')
+            ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
+            ->where('student.student_card', $card)
+            ->whereNull('student_pensum_detail.deleted_at')
+            ->distinct()
+            ->get();
+
+        foreach ($programs as $program) {
+            $inscription[$program['program_name']] = Subject::select(
+                DB::raw(
+                    "CONCAT(cycle.cycle_number, '-', cycle.year)as cycle",
+                ),
+                'subject.subject_code',
+                'subject.subject_name',
+                'subject.units_value',
+                'inscription_detail.status',
+                'inscription_detail.id as inscription_detail_id'
+            )
+                ->join('group', 'group.subject_id', '=', 'subject.id')
+                ->join('inscription_detail', 'inscription_detail.group_id', '=', 'group.id')
+                ->join('inscription', 'inscription.id', '=', 'inscription_detail.inscription_id')
+                ->join('student', 'student.id', '=', 'inscription.student_id')
+                ->join('cycle', 'cycle.id', '=', 'inscription.cycle_id')
+                ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+                ->join('pensum', 'pensum.id', '=', 'pensum_subject_detail.pensum_id')
+                ->where('student.student_card', $card)
+                ->where('pensum.program_name', $program->program_name)
+                ->where('cycle.status', 'Finalizado')
+                ->whereNull('inscription_detail.deleted_at')
+                ->orderBy('cycle.id', 'asc')
+                ->get();
+
+            //Calculo de las unidades de merito por las materias aprobadas
+            $merit_unit[$program['program_name']] = Inscription::select(DB::raw("ROUND(SUM(((calification.score*evaluation.ponder)/100)*subject.units_value),2) as merit_unit"))
+                ->join('inscription_detail', 'inscription_detail.inscription_id', '=', 'inscription.id')
+                ->join('group', 'group.id', '=', 'inscription_detail.group_id')
+                ->join('subject', 'subject.id', '=', 'group.subject_id')
+                ->join('student', 'student.id', '=', 'inscription.student_id')
+                ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+                ->join('pensum', 'pensum.id', '=', 'pensum_subject_detail.pensum_id')
+                ->join('calification', 'calification.inscription_detail_id', '=', 'inscription_detail.id')
+                ->join('evaluation', 'evaluation.id', '=', 'calification.evaluation_id')
+                ->where('student.student_card', $card)
+                ->where('pensum.program_name', $program->program_name)
+                ->where('inscription_detail.status', 'Aprobado')
+                ->whereNull('pensum_subject_detail.deleted_at')
+                ->whereNull('evaluation.deleted_at')
+                ->whereNull('calification.deleted_at')
+                ->pluck('merit_unit');
+
+            //Suma de las unidades valorativas de las materias aprobadas 
+            $unit_value[$program['program_name']] = Inscription::select(DB::raw('SUM(subject.units_value) as units_value'))
+                ->join('inscription_detail', 'inscription_detail.inscription_id', '=', 'inscription.id')
+                ->join('student', 'student.id', '=', 'inscription.student_id')
+                ->join('group', 'group.id', '=', 'inscription_detail.group_id')
+                ->join('subject', 'subject.id', '=', 'group.subject_id')
+                ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+                ->join('pensum', 'pensum.id', '=', 'pensum_subject_detail.pensum_id')
+                ->where('student.student_card', $card)
+                ->where('pensum.program_name', $program->program_name)
+                ->where('inscription_detail.status', 'Aprobado')
+                ->pluck('units_value');
+
+            $approvedInscription[$program['program_name']] = Inscription::select(DB::raw('COUNT(inscription_detail.id) as approvedInscription'))
+                ->join('inscription_detail', 'inscription_detail.inscription_id', '=', 'inscription.id')
+                ->join('student', 'student.id', '=', 'inscription.student_id')
+                ->join('group', 'group.id', '=', 'inscription_detail.group_id')
+                ->join('subject', 'subject.id', '=', 'group.subject_id')
+                ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+                ->join('pensum', 'pensum.id', '=', 'pensum_subject_detail.pensum_id')
+                ->where('inscription_detail.status', 'Aprobado')
+                ->where('student.student_card', $card)
+                ->where('pensum.program_name', $program->program_name)
+                ->whereNull('inscription_detail.deleted_at')
+                ->pluck('approvedInscription');
+
+            $failedInscription[$program['program_name']] = Inscription::select(DB::raw('COUNT(inscription_detail.id) as approvedInscription'))
+                ->join('inscription_detail', 'inscription_detail.inscription_id', '=', 'inscription.id')
+                ->join('student', 'student.id', '=', 'inscription.student_id')
+                ->join('group', 'group.id', '=', 'inscription_detail.group_id')
+                ->join('subject', 'subject.id', '=', 'group.subject_id')
+                ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+                ->join('pensum', 'pensum.id', '=', 'pensum_subject_detail.pensum_id')
+                ->where('inscription_detail.status', 'Reprobado')
+                ->where('student.student_card', $card)
+                ->where('pensum.program_name', $program->program_name)
+                ->whereNull('inscription_detail.deleted_at')
+                ->pluck('approvedInscription');
+        }
+
+        //Calculo de la nota final del estudiante
+        foreach ($inscription[$program['program_name']] as $item) {
+            $item->averageGrade = Inscription::select(DB::raw("ROUND(SUM((calification.score*evaluation.ponder)/100),2) as total_average"))
+                ->join('inscription_detail', 'inscription_detail.inscription_id', '=', 'inscription.id')
+                ->join('calification', 'calification.inscription_detail_id', '=', 'inscription_detail.id')
+                ->join('evaluation', 'evaluation.id', '=', 'calification.evaluation_id')
+                ->where('inscription_detail.id', $item->inscription_detail_id)
+                ->whereNull('evaluation.deleted_at')
+                ->whereNull('calification.deleted_at')
+                ->get();
+        }
+
+        return response()->json([
+            'message' => 'Registro obtenido correctamente.',
+            'inscription' => $inscription,
+            'merit_unit' => $merit_unit,
+            // 'units_value' => $unit_value,
+            'approvedInscription' => $approvedInscription,
+            'failedInscription' => $failedInscription,
+        ]);
     }
 }
