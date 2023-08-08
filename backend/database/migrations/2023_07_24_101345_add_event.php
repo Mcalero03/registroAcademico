@@ -18,16 +18,23 @@ return new class extends Migration
         // Create the event
         DB::unprepared('
             CREATE EVENT verificar_estado
-            ON SCHEDULE EVERY 1 SECOND
+            ON SCHEDULE
+            EVERY 1 SECOND
             DO
-            UPDATE cycle 
-            SET status =  
-                CASE
-                    WHEN start_date > CURDATE() THEN "Inactivo"
-                    WHEN start_date <= CURDATE() AND end_date >= CURDATE() THEN "Activo"
-                    WHEN end_date < CURDATE() THEN "Finalizado"
-                    ELSE "Desconocido"
-                END;
+            BEGIN
+            DECLARE cycle_id INT;
+                
+                -- Update cycle status
+                UPDATE cycle 
+                SET status =  
+                    CASE
+                        WHEN start_date > CURDATE() THEN "Inactivo"
+                        WHEN start_date <= CURDATE() AND end_date >= CURDATE() THEN "Activo"
+                        WHEN end_date < CURDATE() THEN "Finalizado"
+                        ELSE "Desconocido"
+                    END;
+            END;  
+
         ');
 
         DB::unprepared('

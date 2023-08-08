@@ -411,13 +411,6 @@ export default {
         end_date: {
           required: helpers.withMessage(langMessages.required, required),
         },
-        // status: {
-        //   required: helpers.withMessage(langMessages.required, required),
-        //   minLength: helpers.withMessage(
-        //     ({ $params }) => langMessages.minLength($params),
-        //     minLength(4)
-        //   ),
-        // },
         subjects: {
           required: helpers.withMessage(langMessages.required, required),
         },
@@ -578,7 +571,11 @@ export default {
 
         try {
           const { data } = await cycleApi.put(`/${edited.id}`, edited);
-          alert.success(data.message);
+          if (data.message) {
+            alert.success(data.message);
+          } else {
+            alert.error(data.error);
+          }
         } catch (error) {
           alert.error("No fue posible actualizar el registro.");
         }
