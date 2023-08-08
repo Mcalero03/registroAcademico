@@ -169,25 +169,75 @@ class CycleController extends Controller
     {
         $data = Encrypt::decryptArray($request->all(), 'id');
 
-        Cycle::where('id', $data['id'])->update([
-            'cycle_number' => $data['cycle_number'],
-            'year' => $data['year'],
-            'start_date' => $data['start_date'],
-            'end_date' => $data['end_date'],
-            // 'status' => $data['status'],
-        ]);
+        $activeStatus = Cycle::where('status', 'Activo')
+            ->whereNull('cycle.deleted_at')
+            ->exists();
 
-        CycleSubjectDetail::where('cycle_id', $data['id'])->delete();
+        $today = date('Y-m-d');
 
-        foreach ($data['subjects'] as $item) {
-            CycleSubjectDetail::create([
-                'cycle_id' => $data['id'],
-                'subject_id' => Subject::where('subject_name', $item['subject_name'])->first()?->id,
-            ]);
+        switch (true) {
+            case $data['start_date'] > $today:
+                $status = 'Inactivo';
+                break;
+
+            case $data['start_date'] <= $today && $data['end_date'] >= $today:
+                $status = 'Activo';
+                break;
+
+            case $data['end_date'] < $today:
+                $status = 'Finalizado';
+                break;
+
+            default:
+                $status = 'Desconocido';
+                break;
         }
-        return response()->json([
-            "message" => "Registro modificado correctamente.",
-        ]);
+
+        if ($status == 'Inactivo' || $status == 'Finalizado') {
+            Cycle::where('id', $data['id'])->update([
+                'cycle_number' => $data['cycle_number'],
+                'year' => $data['year'],
+                'start_date' => $data['start_date'],
+                'end_date' => $data['end_date'],
+            ]);
+
+            CycleSubjectDetail::where('cycle_id', $data['id'])->delete();
+
+            foreach ($data['subjects'] as $item) {
+                CycleSubjectDetail::create([
+                    'cycle_id' => $data['id'],
+                    'subject_id' => Subject::where('subject_name', $item['subject_name'])->first()?->id,
+                ]);
+            }
+            return response()->json([
+                "message" => "Registro modificado correctamente.",
+            ]);
+        } elseif ($status == 'Activo') {
+            if ($activeStatus == false) {
+                Cycle::where('id', $data['id'])->update([
+                    'cycle_number' => $data['cycle_number'],
+                    'year' => $data['year'],
+                    'start_date' => $data['start_date'],
+                    'end_date' => $data['end_date'],
+                ]);
+
+                CycleSubjectDetail::where('cycle_id', $data['id'])->delete();
+
+                foreach ($data['subjects'] as $item) {
+                    CycleSubjectDetail::create([
+                        'cycle_id' => $data['id'],
+                        'subject_id' => Subject::where('subject_name', $item['subject_name'])->first()?->id,
+                    ]);
+                }
+                return response()->json([
+                    "message" => "Registro modificado correctamente.",
+                ]);
+            } else {
+                return response()->json([
+                    "error" => "Solo puede existir un ciclo activo",
+                ]);
+            }
+        }
     }
 
     /**
