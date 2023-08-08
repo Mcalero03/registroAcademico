@@ -114,6 +114,10 @@
                             CUM:
                             {{ (merit[0] / unit[0]).toFixed(2) }}
                           </p>
+                          <p v-if="index == index1 && merit[0]==null">
+                            CUM:
+                            0
+                          </p>
                         </div>
                           </p>
                       </div>
@@ -124,7 +128,7 @@
                         :value="index"
                       >
                         <p class="text-primary" v-if="index == index1">
-                          Aprobadas: {{ approved[0] }}
+                          Materias aprobadas: {{ approved[0] }}
                         </p>
                       </div>
                       <div
@@ -134,7 +138,7 @@
                         :value="index"
                       >
                         <p class="text-primary" v-if="index == index1">
-                          Reprobadas: {{ failed[0] }}
+                          Materias reprobadas: {{ failed[0] }}
                         </p>
                       </div>
                     </v-card-text>
