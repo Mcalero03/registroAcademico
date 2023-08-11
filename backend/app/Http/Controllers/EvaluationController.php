@@ -51,19 +51,8 @@ class EvaluationController extends Controller
                 ->join('calification', 'i.id', '=', 'calification.inscription_detail_id')
                 ->join('evaluation', 'calification.evaluation_id', '=', 'evaluation.id')
                 ->join('group', 'i.group_id', '=', 'group.id')
-                ->join('subject', 'group.subject_id', '=', 'subject.id')
-                ->join('student', 'inscription.student_id', '=', 'student.id')
-                ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
-                ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
-                ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
-                ->where('subject.subject_name', $item->subject_name)
-                ->where('evaluation.group_id', $item->group_id)
                 ->where('calification.inscription_detail_id', $item->inscription_detail_id)
                 ->whereNull('calification.deleted_at')
-                ->where('i.status', 'not like', 'Retirado')
-                ->where('cycle.status', 'Activo')
-                ->groupBy('subject.subject_name')
-                ->distinct()
                 ->get();
 
             $item->califications = Encrypt::encryptObject($item->califications, 'id');
