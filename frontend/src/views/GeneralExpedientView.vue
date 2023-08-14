@@ -78,7 +78,7 @@
                   >
                     <v-card-text>
                       <p class="text-center p-4">
-                        No hay materias inscritas para este ciclo
+                        No hay materias cursadas
                       </p>
                     </v-card-text>
                   </v-card>

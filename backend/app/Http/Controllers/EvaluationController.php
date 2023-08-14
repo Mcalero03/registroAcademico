@@ -259,8 +259,9 @@ class EvaluationController extends Controller
             ->where('cycle.status', 'Activo')
             ->whereNull('cycle.deleted_at')
             ->whereNull('cycle_subject_detail.deleted_at')
+            ->whereNull('group.deleted_at')
 
-            ->get('group.group_code')->unique();
+            ->get('group.group_code');
 
         return response()->json([
             "message" => "Registro encontrado correctamente",

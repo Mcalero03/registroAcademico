@@ -561,7 +561,6 @@ class InscriptionController extends Controller
                 ->join('pensum', 'pensum.id', '=', 'pensum_subject_detail.pensum_id')
                 ->where('student.student_card', $card)
                 ->where('pensum.program_name', $program->program_name)
-                ->where('cycle.status', 'Finalizado')
                 ->whereNull('inscription_detail.deleted_at')
                 ->orderBy('cycle.id', 'asc')
                 ->get();
