@@ -113,7 +113,9 @@ class GroupController extends Controller
         $id = Group::teacherId($info[0], $info[1])->pluck('id');
         $teacher_id = Group::clean($id);
 
-        Group::where('id', $data['id'])->update([
+        $change = intval($data['id']);
+
+        Group::where('id', $change)->update([
             'group_code' => $data['group_code'],
             'students_quantity' => $data['students_quantity'],
             'teacher_id' => $teacher_id,
@@ -124,7 +126,7 @@ class GroupController extends Controller
             ->join('group', 'schedule_classroom_group_detail.group_id', '=', 'group.id')
             ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
             ->join('classroom', 'schedule_classroom_group_detail.classroom_id', 'classroom.id')
-            ->where('group.id', $data['id'])
+            ->where('group.id', $change)
             ->get();
 
         // Obtener los IDs existentes en $selectedSchedules
@@ -156,9 +158,7 @@ class GroupController extends Controller
                         ->where('end_time', $value['end_time'])
                         ->first()?->id,
                     'classroom_id' => Classroom::where('classroom_name', $value['classroom_name'])->first()?->id,
-                    'group_id' => Group::select('id')
-                        ->where('group_code', $data['group_code'])
-                        ->where('teacher_id', $teacher_id)->first()?->id,
+                    'group_id' => $change,
                     'cycle_id' => Cycle::select('id')
                         ->where('status', 'Activo')
                         ->first()?->id,
@@ -170,9 +170,7 @@ class GroupController extends Controller
                         ->where('end_time', $value['end_time'])
                         ->first()?->id,
                     'classroom_id' => Classroom::where('classroom_name', $value['classroom_name'])->first()?->id,
-                    'group_id' => Group::select('id')
-                        ->where('group_code', $data['group_code'])
-                        ->where('teacher_id', $teacher_id)->first()?->id,
+                    'group_id' => $change,
                     'cycle_id' => Cycle::select('id')
                         ->where('status', 'Activo')
                         ->first()?->id,

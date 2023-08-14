@@ -213,8 +213,8 @@ class AttendanceController extends Controller
             ->where('cycle.status', 'Activo')
             ->whereNull('cycle.deleted_at')
             ->whereNull('cycle_subject_detail.deleted_at')
-
-            ->get('group.group_code')->unique();
+            ->whereNull('group.deleted_at')
+            ->get('group.group_code');
 
         $groups = Encrypt::encryptObject($groups, 'id');
 

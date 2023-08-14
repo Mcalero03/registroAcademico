@@ -866,9 +866,6 @@ export default {
       this.editedIndex = this.records.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
-
-      this.changeSubject();
-      this.change();
     },
 
     async save() {
