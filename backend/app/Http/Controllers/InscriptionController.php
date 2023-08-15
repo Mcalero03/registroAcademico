@@ -92,10 +92,14 @@ class InscriptionController extends Controller
         $inscription->save();
 
         foreach ($data['inscriptions'] as $value) {
+
+            $group = explode('*', $value['group_code']);
+            $id_group = $group[1];
+
             InscriptionDetail::create([
                 'status' => 'Inscrito',
                 'inscription_id' => $inscription->id,
-                'group_id' => Group::where('group_code', $value['group_code'])->first()?->id,
+                'group_id' => $id_group,
             ]);
         }
 
@@ -157,16 +161,16 @@ class InscriptionController extends Controller
         ]);
     }
 
-    public function showSchedules($inscription)
+    public function showSchedules($group)
     {
 
-        $id = Encrypt::decryptValue($inscription);
+        // $id = Encrypt::decryptValue($inscription);
         $schedules = InscriptionDetail::select('schedule_classroom_group_detail.id', 'schedule.*', 'classroom.classroom_name')
             ->join('group', 'group.id', '=',  'inscription_detail.group_id')
             ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
             ->join('schedule', 'schedule_classroom_group_detail.schedule_id', '=', 'schedule.id')
             ->join('classroom', 'schedule_classroom_group_detail.classroom_id', '=', 'classroom.id')
-            ->where('inscription_detail.id', $id)
+            ->where('group.id', $group)
             ->whereNull('schedule_classroom_group_detail.deleted_at')
             ->get();
 
@@ -348,7 +352,7 @@ class InscriptionController extends Controller
                     ->where('inscription.pensum_id', $pensum_id)
                     ->get();
 
-                //ID DE LA MATERIA QUE YA HA CURSADO EN ESA CARRERA Y QUE TIENE EL ESTADO APROBADO
+                //MATERIAS CON EL ESTADO APROBADO
                 $oldInscriptionsApproved = InscriptionDetail::select('subject.id')
                     ->join('inscription', 'inscription_detail.inscription_id', '=',  'inscription.id')
                     ->join('student', 'inscription.student_id', '=', 'student.id')
@@ -359,10 +363,10 @@ class InscriptionController extends Controller
                     ->where('inscription.student_id', $student_id)
                     ->where('inscription.pensum_id', $pensum_id)
                     ->where('inscription_detail.status', 'Aprobado')
-
                     ->pluck('subject.id')
                     ->toArray();
 
+                //MATERIAS A LAS QUE SE LES HA APROBADO EL PRERREQUISITO
                 $prerequisiteApprovedSubject = Cycle::select('subject.id')
                     ->join('cycle_subject_detail', 'cycle.id', '=', 'cycle_subject_detail.cycle_id')
                     ->leftJoin('subject', 'cycle_subject_detail.subject_id', '=', 'subject.id')
@@ -375,25 +379,11 @@ class InscriptionController extends Controller
                     ->whereIn('prerequisite.subject_id', $oldInscriptionsApproved)
                     ->whereNull('cycle.deleted_at')
                     ->whereNull('cycle_subject_detail.deleted_at')
+                    ->whereNull('prerequisite.deleted_at')
                     ->pluck('subject.id')
                     ->toArray();
 
-                $prerequisiteSubjectApprovedAsPrerequisite = Cycle::select('subject.id')
-                    ->join('cycle_subject_detail', 'cycle.id', '=', 'cycle_subject_detail.cycle_id')
-                    ->leftJoin('subject', 'cycle_subject_detail.subject_id', '=', 'subject.id')
-                    ->leftJoin('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
-                    ->leftJoin('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
-                    ->leftJoin('prerequisite', 'pensum_subject_detail.id', '=', 'prerequisite.pensum_subject_detail_id')
-                    ->where('subject.status', 1)
-                    ->where('cycle.status', 'Activo')
-                    ->where('pensum.id', $pensum_id)
-                    ->whereIn('prerequisite.subject_id', $prerequisiteApprovedSubject)
-                    ->whereNull('cycle.deleted_at')
-                    ->whereNull('cycle_subject_detail.deleted_at')
-                    ->pluck('subject.id')
-                    ->toArray();
-
-                //ID DE LA MATERIA QUE YA HA CURSADO EN ESA CARRERA Y QUE TIENE EL ESTADO REPROBADO
+                //MATERIAS CON EL ESTADO REPROBADO
                 $oldInscriptionsFailed = InscriptionDetail::select('subject.id')
                     ->join('inscription', 'inscription_detail.inscription_id', '=',  'inscription.id')
                     ->join('student', 'inscription.student_id', '=', 'student.id')
@@ -407,7 +397,11 @@ class InscriptionController extends Controller
                     ->pluck('subject.id')
                     ->toArray();
 
-                //ID DE MATERIA DONDE LA MATERIA QUE YA CURSO(REPROBO O APROBÓ) SEA PRERREQUISITO, 
+                // $intersection = array_intersect($oldInscriptionsApproved, $oldInscriptionsFailed);
+
+                // var_dump($intersection);
+
+                //MATERIA QUE TIENE DE PREREQUISITO UNA MATERIA REPROBADA
                 $prerequisiteFailedSubject = Cycle::select('subject.id')
                     ->join('cycle_subject_detail', 'cycle.id', '=', 'cycle_subject_detail.cycle_id')
                     ->leftJoin('subject', 'cycle_subject_detail.subject_id', '=', 'subject.id')
@@ -423,22 +417,6 @@ class InscriptionController extends Controller
                     ->pluck('subject.id')
                     ->toArray();
 
-                //ID DE MATERIA QUE ES PRERREQUISITO DE LA MATERIA QUE YA CURSO Y LA REPROBO
-                $prerequisiteSubjectFailedAsPrerequisite = Cycle::select('subject.id')
-                    ->join('cycle_subject_detail', 'cycle.id', '=', 'cycle_subject_detail.cycle_id')
-                    ->leftJoin('subject', 'cycle_subject_detail.subject_id', '=', 'subject.id')
-                    ->leftJoin('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
-                    ->leftJoin('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
-                    ->leftJoin('prerequisite', 'pensum_subject_detail.id', '=', 'prerequisite.pensum_subject_detail_id')
-                    ->where('subject.status', 1)
-                    ->where('cycle.status', 'Activo')
-                    ->where('pensum.id', $pensum_id)
-                    ->whereIn('prerequisite.subject_id', $prerequisiteFailedSubject)
-                    ->whereNull('cycle.deleted_at')
-                    ->whereNull('cycle_subject_detail.deleted_at')
-                    ->pluck('subject.id')
-                    ->toArray();
-
                 // MUESTRA LISTADO DE MATERIAS QUE PUEDE CURSAR EN EL ESTADO ACTIVO, DEJANDO FUERA LA QUE YA TIENE CURSADA Y APROBADA, LA QUE ES PRERREQUISITO DE LA REPROBADA Y EN CADENA 
                 $subject_id = Cycle::select('subject.id')
                     ->join('cycle_subject_detail', 'cycle.id', '=', 'cycle_subject_detail.cycle_id')
@@ -447,15 +425,16 @@ class InscriptionController extends Controller
                     ->leftJoin('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
                     ->where('cycle.status', 'Activo')
                     ->where('pensum.id', $pensum_id)
-                    ->whereNotIn('subject.id', $prerequisiteFailedSubject)
-                    ->whereNotIn('subject.id', $oldInscriptionsApproved)
-                    ->whereNotIn('subject.id', $prerequisiteSubjectFailedAsPrerequisite)
-                    ->whereNotIn('subject.id', $prerequisiteSubjectApprovedAsPrerequisite)
+                    // ->whereIn('subject.id', $intersection)
+                    // ->whereNotIn('subject.id', $prerequisiteFailedSubject) //excluye las materias que llevan prerequisito de una materia reprobada
+                    ->whereNotIn('subject.id', $oldInscriptionsApproved) //excluye aquellas materias ya aprobadas
+                    ->whereIn('subject.id', $prerequisiteApprovedSubject) //anexa materias de las que ya se cumplió el prerequisito
+                    // ->whereNotIn('subject.id', $prerequisiteSubjectApprovedAsPrerequisite)
                     ->whereNull('cycle.deleted_at')
                     ->whereNull('cycle_subject_detail.deleted_at')
                     ->get();
 
-                $group = Group::select('group.group_code', 'subject.subject_name', 'schedule.start_time', 'schedule.end_time', 'schedule.week_day')
+                $group = Group::select(DB::raw("CONCAT(group.group_code, '*', group.id) as group_code"), 'subject.subject_name', 'schedule.start_time', 'schedule.end_time', 'schedule.week_day')
                     ->join('subject', 'group.subject_id', '=', 'subject.id')
                     ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
                     ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
@@ -464,7 +443,7 @@ class InscriptionController extends Controller
                     ->whereNull('schedule_classroom_group_detail.deleted_at')
                     ->get();
 
-                $selectGroup = Group::select('group.group_code')
+                $selectGroup = Group::select(DB::raw("CONCAT(group.group_code, '*', group.id) as group_code"))
                     ->leftjoin('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
                     ->where('schedule_classroom_group_detail.cycle_id', $cycle_id)
                     ->whereNull('schedule_classroom_group_detail.deleted_at')
@@ -496,7 +475,7 @@ class InscriptionController extends Controller
                     ->pluck('subject.id')
                     ->toArray();
 
-                $group = Group::select('group.group_code', 'subject.subject_name', 'schedule.start_time', 'schedule.end_time', 'schedule.week_day')
+                $group = Group::select(DB::raw("CONCAT(group.group_code, '*', group.id) as group_code"), 'subject.subject_name', 'schedule.start_time', 'schedule.end_time', 'schedule.week_day')
                     ->join('subject', 'group.subject_id', '=', 'subject.id')
                     ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
                     ->join('schedule', 'schedule_classroom_group_detail.schedule_id', 'schedule.id')
@@ -505,7 +484,7 @@ class InscriptionController extends Controller
                     ->whereNull('schedule_classroom_group_detail.deleted_at')
                     ->get();
 
-                $selectGroup = Group::select('group.group_code')
+                $selectGroup = Group::select(DB::raw("CONCAT(group.group_code, '*', group.id) as group_code"))
                     ->leftjoin('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
                     ->where('schedule_classroom_group_detail.cycle_id', $cycle_id)
                     ->whereNull('schedule_classroom_group_detail.deleted_at')

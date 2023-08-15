@@ -696,7 +696,7 @@ export default {
       if (this.editedItem.id != "") {
         this.editedGroup = this.editedItem.inscriptions[index];
         const { data } = await inscriptionApi
-          .get("/showSchedules/" + this.editedGroup["id"])
+          .get("/showSchedules/" + this.editedGroup["group_id"])
 
           .catch((error) => {
             toast.error("No fue posible obtener la información.", {

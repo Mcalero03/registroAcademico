@@ -20,6 +20,7 @@ return new class extends Migration
             CREATE EVENT verificar_estado
             ON SCHEDULE
             EVERY 1 SECOND
+            ON COMPLETION PRESERVE
             DO
             BEGIN
             DECLARE cycle_id INT;
@@ -41,6 +42,7 @@ return new class extends Migration
             CREATE EVENT inscription_status
             ON SCHEDULE
             EVERY 1 SECOND
+            ON COMPLETION PRESERVE
             DO
             BEGIN
                 DECLARE done INT DEFAULT FALSE;
@@ -67,6 +69,7 @@ return new class extends Migration
             CREATE EVENT inscription_status_active
             ON SCHEDULE
             EVERY 1 SECOND
+            ON COMPLETION PRESERVE
             DO
             BEGIN
                 DECLARE done INT DEFAULT FALSE;
