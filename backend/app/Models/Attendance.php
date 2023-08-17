@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DB;
 
 class Attendance extends Model
 {
@@ -31,7 +32,7 @@ class Attendance extends Model
 
     public static function allDataSearched($search, $sortBy, $sort, $skip, $itemsPerpage)
     {
-        return Attendance::select('attendance.*', 'sub.subject_name', 'g.group_code')
+        return Attendance::select(DB::raw("CONCAT(g.group_code, '*', g.id) as group_code"), 'attendance.*', 'sub.subject_name')
             ->join('attendance_detail as ad', 'attendance.id', '=', 'ad.attendance_id')
             ->leftjoin('inscription_detail as i', 'ad.inscription_detail_id', '=', 'i.id')
             ->leftjoin('inscription as id', 'i.inscription_id', '=', 'id.id')
@@ -56,7 +57,7 @@ class Attendance extends Model
 
     public static function counterPagination($search)
     {
-        return Attendance::select('attendance.*', 'sub.subject_name', 'g.group_code')
+        return Attendance::select(DB::raw("CONCAT(g.group_code, '*', g.id) as group_code"), 'attendance.*', 'sub.subject_name')
             ->join('attendance_detail as ad', 'attendance.id', '=', 'ad.attendance_id')
             ->leftjoin('inscription_detail as i', 'ad.inscription_detail_id', '=', 'i.id')
             ->leftjoin('inscription as id', 'i.inscription_id', '=', 'id.id')

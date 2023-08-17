@@ -76,6 +76,9 @@ class EvaluationController extends Controller
     {
         $data = $request->all();
 
+        $group = explode('*', $data['group_code']);
+        $id_group = $group[1];
+
         $ponder = $data['available_ponder'] - $data["ponder"];
 
         if ($data['available_ponder'] == '0') {
@@ -90,7 +93,7 @@ class EvaluationController extends Controller
             $evaluation = Evaluation::create([
                 "evaluation_name" => $data["evaluation_name"],
                 "ponder" => $data["ponder"],
-                "group_id" => Group::where('group_code', $data["group_code"])->first()->id,
+                "group_id" => Group::where('id', $id_group)->first()->id,
             ]);
 
             $evaluation->save();
@@ -133,12 +136,15 @@ class EvaluationController extends Controller
 
         $previous_evaluation = Evaluation::select('ponder')->where('id', $data['id'])->first()?->ponder;
 
+        $group = explode('*', $data['group_code']);
+        $id_group = $group[1];
+
         if ($previous_evaluation == $data['ponder']) {
 
             Evaluation::where('id', $data['id'])->update([
                 "evaluation_name" => $data["evaluation_name"],
                 "ponder" => $data["ponder"],
-                "group_id" => Group::where('group_code', $data["group_code"])->first()?->id,
+                "group_id" => Group::where('group_code', $id_group)->first()?->id,
 
             ]);
 
@@ -170,7 +176,7 @@ class EvaluationController extends Controller
                 Evaluation::where('id', $data['id'])->update([
                     "evaluation_name" => $data["evaluation_name"],
                     "ponder" => $data["ponder"],
-                    "group_id" => Group::where('group_code', $data["group_code"])->first()?->id,
+                    "group_id" => Group::where('id', $id_group)->first()?->id,
 
                 ]);
 
@@ -249,7 +255,7 @@ class EvaluationController extends Controller
     {
         $active_cycle = Cycle::where('cycle.status', 'Activo')->first()?->id;
 
-        $groups = Group::select('group.group_code')
+        $groups = Group::select(DB::raw("CONCAT(group.group_code, '*', group.id) as group_code"),)
             ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
             ->join('subject', 'group.subject_id', '=', 'subject.id')
             ->join('cycle_subject_detail', 'subject.id', '=', 'cycle_subject_detail.subject_id')
@@ -271,6 +277,10 @@ class EvaluationController extends Controller
 
     public function showStudents($group)
     {
+
+        $group = explode('*', $group);
+        $id_group = $group[1];
+
         $student = Inscription::select(DB::raw("CONCAT(student.last_name, ', ',student.name) as full_name"), 'i.id as inscription_detail_id')
             ->selectRaw("0 as score")
             ->leftjoin('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
@@ -278,7 +288,7 @@ class EvaluationController extends Controller
             ->join('subject', 'group.subject_id', '=', 'subject.id')
             ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
             ->join('student', 'inscription.student_id', '=', 'student.id')
-            ->where('group.group_code', $group)
+            ->where('group.id', $id_group)
             ->where('i.status', 'not like', 'Retirado')
             ->where('cycle.status', 'Activo')
             ->orderby('student.last_name', 'asc')
@@ -292,7 +302,7 @@ class EvaluationController extends Controller
             ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
             ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
             ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
-            ->where('group.group_code', $group)
+            ->where('group.id', $id_group)
             ->where('i.status', 'not like', 'Retirado')
             ->where('cycle.status', 'Activo')
             ->distinct()
@@ -309,7 +319,7 @@ class EvaluationController extends Controller
                 ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
                 ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
                 ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
-                ->where('group.group_code', $group)
+                ->where('group.id', $id_group)
                 ->where('calification.inscription_detail_id', $item->id)
                 ->where('i.status', 'not like', 'Retirado')
                 ->where('cycle.status', 'Activo')
@@ -330,7 +340,7 @@ class EvaluationController extends Controller
                 ->join('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
                 ->join('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
                 ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
-                ->where('group.group_code', $group)
+                ->where('group.id', $id_group)
                 ->where('calification.inscription_detail_id', $item->id)
                 ->whereNull('calification.deleted_at')
                 ->where('i.status', 'not like', 'Retirado')

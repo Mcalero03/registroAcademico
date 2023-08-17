@@ -96,19 +96,22 @@ class AttendanceController extends Controller
         // Llamada a la función para obtener la hora actual
         $currentTime = getTime();
 
+        $group = explode('*', $data['group']);
+        $id_group = $group[1];
+
         if ($data['attendances'] != null) {
             $date = $data['attendance_date'];
-            $group_id = Group::where('group_code', $data['group'])->first()?->id;
+            // $group_id = Group::where('id', $id_group)->first()?->id;
 
             $dataExists = Attendance::where('attendance_date', $date)
-                ->where('group_id', $group_id)
+                ->where('group_id', $id_group)
                 ->exists();
 
             if (!$dataExists) {
                 $attendance = Attendance::create([
                     'attendance_date' => $data['attendance_date'],
                     'attendance_time' => $currentTime,
-                    'group_id' =>  $group_id,
+                    'group_id' =>  $id_group,
                 ]);
 
                 foreach ($data['attendances'] as $value) {
@@ -196,11 +199,11 @@ class AttendanceController extends Controller
         ]);
     }
 
-    public function subject($name, $last_name, $subject)
+    public function bySubject($name, $last_name, $subject)
     {
         $active_cycle = Cycle::where('cycle.status', 'Activo')->first()?->id;
 
-        $groups = Group::select('group.group_code as group')
+        $groups = Group::select(DB::raw("CONCAT(group.group_code, '*', group.id) as group_code"))
             ->join('schedule_classroom_group_detail', 'group.id', '=', 'schedule_classroom_group_detail.group_id')
             ->join('subject', 'group.subject_id', '=', 'subject.id')
             ->join('teacher', 'group.teacher_id', '=', 'teacher.id')
@@ -214,7 +217,7 @@ class AttendanceController extends Controller
             ->whereNull('cycle.deleted_at')
             ->whereNull('cycle_subject_detail.deleted_at')
             ->whereNull('group.deleted_at')
-            ->get('group.group_code');
+            ->get("group.group_code");
 
         $groups = Encrypt::encryptObject($groups, 'id');
 
@@ -227,6 +230,10 @@ class AttendanceController extends Controller
 
     public function byGroup($group, $subject)
     {
+
+        $groups = explode('*', $group);
+        $id_group = $groups[1];
+
         $student = Inscription::select(DB::raw("CONCAT(student.last_name, ', ',student.name) as full_name"), 'i.id as inscription_detail_id')
             ->selectRaw("0 as attendance_status")
             ->leftjoin('inscription_detail as i', 'inscription.id', '=', 'i.inscription_id')
@@ -234,7 +241,7 @@ class AttendanceController extends Controller
             ->join('subject', 'group.subject_id', '=', 'subject.id')
             ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
             ->join('student', 'inscription.student_id', '=', 'student.id')
-            ->where('group.group_code', $group)
+            ->where('group.id', $id_group)
             ->where('subject.subject_name', $subject)
             ->where('i.status', 'not like', 'Retirado')
             ->where('cycle.status', 'Activo')

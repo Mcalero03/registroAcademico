@@ -572,6 +572,7 @@ export default {
             );
           });
 
+        console.log(data.ponder);
         this.editedItem.califications = data.students;
         this.editedItem.available_ponder =
           data.ponder[0].available_ponder[0].total_ponder;
