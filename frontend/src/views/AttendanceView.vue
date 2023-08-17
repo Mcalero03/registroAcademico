@@ -106,8 +106,8 @@
                 <v-label>Grupo</v-label>
                 <base-select
                   :items="teacherStudentGroup"
-                  item-title="group"
-                  item-value="group"
+                  item-title="group_code"
+                  item-value="group_code"
                   v-model="v$.editedItem.group.$model"
                   :rules="v$.editedItem.group"
                   @blur="changeStudents"

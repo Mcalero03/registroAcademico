@@ -352,7 +352,7 @@ class InscriptionController extends Controller
                     ->where('inscription.pensum_id', $pensum_id)
                     ->get();
 
-                //MATERIAS CON EL ESTADO APROBADO
+                //MATERIAS CON EL ESTADO APROBADO(no se muestran)
                 $oldInscriptionsApproved = InscriptionDetail::select('subject.id')
                     ->join('inscription', 'inscription_detail.inscription_id', '=',  'inscription.id')
                     ->join('student', 'inscription.student_id', '=', 'student.id')
@@ -366,7 +366,7 @@ class InscriptionController extends Controller
                     ->pluck('subject.id')
                     ->toArray();
 
-                //MATERIAS A LAS QUE SE LES HA APROBADO EL PRERREQUISITO
+                //MATERIAS A LAS QUE SE LES HA APROBADO EL PRERREQUISITO(se muestran)
                 $prerequisiteApprovedSubject = Cycle::select('subject.id')
                     ->join('cycle_subject_detail', 'cycle.id', '=', 'cycle_subject_detail.cycle_id')
                     ->leftJoin('subject', 'cycle_subject_detail.subject_id', '=', 'subject.id')
@@ -397,9 +397,39 @@ class InscriptionController extends Controller
                     ->pluck('subject.id')
                     ->toArray();
 
-                // $intersection = array_intersect($oldInscriptionsApproved, $oldInscriptionsFailed);
+                //OBTIENE AQUELLAS MATERIAS QUE SE CURSARON, SE REPROBARON Y LUEGO SE APROBARON
+                $approvedFailedSubject = array_intersect($oldInscriptionsApproved, $oldInscriptionsFailed);
 
-                // var_dump($intersection);
+                //LISTADO DE MATERIAS QUE SE REPROBARON MENOS AQUELLAS QUE YA SE APROBARON
+                $oldInscriptionsFailed = InscriptionDetail::select('subject.id')
+                    ->join('inscription', 'inscription_detail.inscription_id', '=',  'inscription.id')
+                    ->join('student', 'inscription.student_id', '=', 'student.id')
+                    ->join('cycle', 'inscription.cycle_id', '=', 'cycle.id')
+                    ->join('group', 'inscription_detail.group_id', '=', 'group.id')
+                    ->join('subject', 'group.subject_id', '=', 'subject.id')
+                    ->where('cycle.status', 'Finalizado')
+                    ->where('inscription.student_id', $student_id)
+                    ->where('inscription.pensum_id', $pensum_id)
+                    ->where('inscription_detail.status', 'Reprobado')
+                    ->whereNotIn('subject.id', $approvedFailedSubject)
+                    ->pluck('subject.id')
+                    ->toArray();
+
+                //MATERIA QUE SE REPROBÓ SU PRERREQUISITO PERO AHORA TIENE ESTADO APROBADO
+                $prerequisiteApprovedFailedSubject = Cycle::select('subject.id')
+                    ->join('cycle_subject_detail', 'cycle.id', '=', 'cycle_subject_detail.cycle_id')
+                    ->leftJoin('subject', 'cycle_subject_detail.subject_id', '=', 'subject.id')
+                    ->leftJoin('pensum_subject_detail', 'subject.id', '=', 'pensum_subject_detail.subject_id')
+                    ->leftJoin('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
+                    ->leftJoin('prerequisite', 'pensum_subject_detail.id', '=', 'prerequisite.pensum_subject_detail_id')
+                    ->where('subject.status', 1)
+                    ->where('cycle.status', 'Activo')
+                    ->where('pensum.id', $pensum_id)
+                    ->whereIn('prerequisite.subject_id', $approvedFailedSubject)
+                    ->whereNull('cycle.deleted_at')
+                    ->whereNull('cycle_subject_detail.deleted_at')
+                    ->pluck('subject.id')
+                    ->toArray();
 
                 //MATERIA QUE TIENE DE PREREQUISITO UNA MATERIA REPROBADA
                 $prerequisiteFailedSubject = Cycle::select('subject.id')
@@ -412,12 +442,13 @@ class InscriptionController extends Controller
                     ->where('cycle.status', 'Activo')
                     ->where('pensum.id', $pensum_id)
                     ->whereIn('prerequisite.subject_id', $oldInscriptionsFailed)
+                    ->whereNotIn('subject.id', $prerequisiteApprovedFailedSubject)
                     ->whereNull('cycle.deleted_at')
                     ->whereNull('cycle_subject_detail.deleted_at')
                     ->pluck('subject.id')
                     ->toArray();
 
-                // MUESTRA LISTADO DE MATERIAS QUE PUEDE CURSAR EN EL ESTADO ACTIVO, DEJANDO FUERA LA QUE YA TIENE CURSADA Y APROBADA, LA QUE ES PRERREQUISITO DE LA REPROBADA Y EN CADENA 
+                // MUESTRA LISTADO DE MATERIAS QUE PUEDE CURSAR EN EL ESTADO ACTIVO, DEJANDO FUERA LA QUE YA TIENE APROBADA, LA QUE ES PRERREQUISITO DE LA REPROBADA Y EN CADENA 
                 $subject_id = Cycle::select('subject.id')
                     ->join('cycle_subject_detail', 'cycle.id', '=', 'cycle_subject_detail.cycle_id')
                     ->leftJoin('subject', 'cycle_subject_detail.subject_id', '=', 'subject.id')
@@ -425,11 +456,11 @@ class InscriptionController extends Controller
                     ->leftJoin('pensum', 'pensum_subject_detail.pensum_id', '=', 'pensum.id')
                     ->where('cycle.status', 'Activo')
                     ->where('pensum.id', $pensum_id)
-                    // ->whereIn('subject.id', $intersection)
-                    // ->whereNotIn('subject.id', $prerequisiteFailedSubject) //excluye las materias que llevan prerequisito de una materia reprobada
                     ->whereNotIn('subject.id', $oldInscriptionsApproved) //excluye aquellas materias ya aprobadas
+                    ->whereNotIn('subject.id', $prerequisiteFailedSubject) //excluye las materias que llevan prerequisito de una materia reprobada
+                    // ->whereIn('subject.id', $prerequisiteApprovedFailedSubject) // incluye la materia que se había reprobado pero ahora está aprobada
+                    // ->whereIn('subject.id', $oldInscriptionsFailed) //anexa materias con estado reprobado
                     ->whereIn('subject.id', $prerequisiteApprovedSubject) //anexa materias de las que ya se cumplió el prerequisito
-                    // ->whereNotIn('subject.id', $prerequisiteSubjectApprovedAsPrerequisite)
                     ->whereNull('cycle.deleted_at')
                     ->whereNull('cycle_subject_detail.deleted_at')
                     ->get();
